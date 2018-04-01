@@ -37,7 +37,7 @@ from linebot.models import (
     CarouselTemplate, CarouselColumn, PostbackEvent,
     StickerMessage, StickerSendMessage, LocationMessage, LocationSendMessage,
     ImageMessage, VideoMessage, AudioMessage, FileMessage,
-    UnfollowEvent, FollowEvent, JoinEvent, LeaveEvent, BeaconEvent
+    UnfollowEvent, FollowEvent, JoinEvent, LeaveEvent, BeaconEvent, ImageSendMessage
 )
 
 app = Flask(__name__)
@@ -56,6 +56,7 @@ line_bot_api = LineBotApi(channel_access_token)
 handler = WebhookHandler(channel_secret)
 
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
+static_nekoimg_path = os.path.join(os.path.dirname(__file__), 'static', 'nekoimg')
 
 
 # function for create tmp dir for download content
@@ -176,6 +177,29 @@ def handle_text_message(event):
         line_bot_api.reply_message(event.reply_token, template_message)
     elif text == 'imagemap':
         pass
+
+    elif text == "ねこ":
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="にゃ〜"))
+
+    elif text == "test":
+        line_bot_api.reply_message(event.reply_token,
+            [
+                TextSendMessage(text="ニャッ！"),
+                ImageSendMessage(
+                    original_content_url=request.host_url + os.path.join(static_nekoimg_path,"neko-0001.jpg"),
+                    preview_image_url=request.host_url + os.path.join(static_nekoimg_path,"preview","neko-0001.jpg")
+                )
+             ])
+
+    elif text == "ネコ":
+
+        line_bot_api.reply_message(event.reply_token,
+            [
+                TextSendMessage(text="ニャッ！"),
+                TextSendMessage(text=request.host_url +os.path.join(static_nekoimg_path,"preview","neko-0001.jpg")),
+                TextSendMessage(text=request.host_url +os.path.join(static_nekoimg_path,"neko-0001.jpg"))
+            ])
+
     else:
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=event.message.text))
