@@ -201,8 +201,8 @@ def handle_text_message(event):
         line_bot_api.reply_message(event.reply_token,
             [
                 TextSendMessage(text="ニャッ！"),
-                TextSendMessage(text=request.host_url +os.path.join(static_nekoimg_path,"preview","neko-0001.jpg")),
-                TextSendMessage(text=request.host_url +os.path.join(static_nekoimg_path,"neko-0001.jpg"))
+                TextSendMessage(text=os.path.join(static_nekoimg_path,"preview","neko-0001.jpg")),
+                TextSendMessage(text=os.path.join(static_nekoimg_path,"neko-0001.jpg"))
             ])
 
     else:
