@@ -78,7 +78,7 @@ def make_image_send_message():
     image_url = os.path.join(static_nekoimg_path ,"DSC_1035.jpg")
     image_thumb_url = os.path.join(static_nekoimg_path ,"thumb","DSC_1035-thumb.jpg")
 
-    massage = ImageSendMessage(
+    message = ImageSendMessage(
         original_content_url=image_url,
         preview_image_url=image_thumb_url
     )
