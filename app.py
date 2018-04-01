@@ -197,23 +197,37 @@ def handle_text_message(event):
     elif text == 'imagemap':
         pass
 
-    elif text == "ねこ":
+    elif text == "猫" or text == "寝子" or text == "姫":
+        line_bot_api.reply_message(event.reply_token,
+           [
+            TextSendMessage(text="Zzz..."),
+            make_image_send_message()
+            ]
+        )
+
+    elif text == "ねこ" or text == "ひめ":
         line_bot_api.reply_message(event.reply_token,
             [
-                TextSendMessage(text="はい"),
+                TextSendMessage(text="にゃー"),
                 make_image_send_message()
              ]
         )
 
-    elif text == "ネコ":
+    elif text == "ネコ" or text == "ヒメ":
         line_bot_api.reply_message(event.reply_token,
             [
-                TextSendMessage(text="はいはい"),
-                ImageSendMessage(
-                    original_content_url=os.path.join(static_nekoimg_path,"IMG_1757.jpg"),
-                    preview_image_url=os.path.join(static_nekoimg_path,"thumb","IMG_1757-thumb.jpg")
-                )
-             ])
+                TextSendMessage(text="ニャー"),
+                make_image_send_message()
+             ]
+        )
+
+    elif text == "cat" or text == "neko":
+        line_bot_api.reply_message(event.reply_token,
+            [
+                TextSendMessage(text="nya-"),
+                make_image_send_message()
+            ]
+        )
 
     elif text == "test":
 
