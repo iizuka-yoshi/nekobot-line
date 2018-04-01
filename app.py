@@ -111,7 +111,7 @@ def callback():
 def handle_text_message(event):
     text = event.message.text
     
-    elif text == "いぬ" or text == "イヌ" or text == "犬":
+    if text == "いぬ" or text == "イヌ" or text == "犬":
         line_bot_api.reply_message(
             event.reply_token, TextMessage(text=event.message.text + "きらい"))
             
