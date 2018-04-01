@@ -16,8 +16,10 @@ from __future__ import unicode_literals
 
 import errno
 import os
+import glob
 import sys
 import tempfile
+import random
 from argparse import ArgumentParser
 
 from flask import Flask, request, abort
@@ -68,6 +70,15 @@ def make_static_tmp_dir():
             pass
         else:
             raise
+
+def make_image_send_message():
+    files = []
+    files = glob.glob(os.path.join(static_nekoimg_path,"*.jpg"))
+    image_name = random.choice(files)
+    image_url = os.path.join(static_nekoimg_path ,image_name)
+    image_thumb_url = os.path.join(static_nekoimg_path ,"thumb",image_name)
+    massage = ImageSendMessage(original_content_url=image_url,preview_image_url=image_thumb_url)
+    return message
 
 
 @app.route("/")
@@ -184,7 +195,12 @@ def handle_text_message(event):
         pass
 
     elif text == "ねこ":
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="はい"))
+        line_bot_api.reply_message(event.reply_token,
+            [
+                TextSendMessage(text="はい"),
+                make_image_send_message()
+             ]
+        )
 
     elif text == "ネコ":
         line_bot_api.reply_message(event.reply_token,
@@ -204,10 +220,6 @@ def handle_text_message(event):
                 TextSendMessage(text=os.path.join(static_nekoimg_path,"preview","neko-0001.jpg")),
                 TextSendMessage(text=os.path.join(static_nekoimg_path,"neko-0001.jpg"))
             ])
-
-    else:
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=event.message.text))
 
 
 @handler.add(MessageEvent, message=LocationMessage)
