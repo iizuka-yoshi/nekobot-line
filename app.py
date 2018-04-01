@@ -72,11 +72,9 @@ def make_static_tmp_dir():
             raise
 
 def make_image_send_message():
-    #files = []
-    #files = glob.glob(os.path.join(static_nekoimg_path,"*.jpg"))
-    #image_name = random.choice(files)
-    image_url = os.path.join(static_nekoimg_path ,"DSC_1035.jpg")
-    image_thumb_url = os.path.join(static_nekoimg_path ,"thumb","DSC_1035-thumb.jpg")
+    image_name = random.choice(glob.glob("/static/nekoimg/*.jpg")))
+    image_url = os.path.join(static_nekoimg_path ,image_name)
+    image_thumb_url = os.path.join(static_nekoimg_path ,"thumb",image_name)
 
     message = ImageSendMessage(
         original_content_url=image_url,
