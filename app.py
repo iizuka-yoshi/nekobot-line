@@ -207,8 +207,8 @@ def handle_text_message(event):
             [
                 TextSendMessage(text="はいはい"),
                 ImageSendMessage(
-                    original_content_url=os.path.join(static_nekoimg_path,"neko-0001.jpg"),
-                    preview_image_url=os.path.join(static_nekoimg_path,"preview","neko-0001.jpg")
+                    original_content_url=os.path.join(static_nekoimg_path,"IMG_1757.jpg"),
+                    preview_image_url=os.path.join(static_nekoimg_path,"thumb","IMG_1757-thumb.jpg")
                 )
              ])
 
