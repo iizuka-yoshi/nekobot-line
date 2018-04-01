@@ -184,23 +184,23 @@ def handle_text_message(event):
         pass
 
     elif text == "ねこ":
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="にゃ〜"))
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="はい"))
 
-    elif text == "test":
+    elif text == "ネコ":
         line_bot_api.reply_message(event.reply_token,
             [
-                TextSendMessage(text="ニャッ！"),
+                TextSendMessage(text="はいはい"),
                 ImageSendMessage(
                     original_content_url=os.path.join(static_nekoimg_path,"neko-0001.jpg"),
                     preview_image_url=os.path.join(static_nekoimg_path,"preview","neko-0001.jpg")
                 )
              ])
 
-    elif text == "ネコ":
+    elif text == "test":
 
         line_bot_api.reply_message(event.reply_token,
             [
-                TextSendMessage(text="ニャッ！"),
+                TextSendMessage(text="test"),
                 TextSendMessage(text=os.path.join(static_nekoimg_path,"preview","neko-0001.jpg")),
                 TextSendMessage(text=os.path.join(static_nekoimg_path,"neko-0001.jpg"))
             ])
