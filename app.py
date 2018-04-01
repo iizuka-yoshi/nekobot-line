@@ -77,7 +77,12 @@ def make_image_send_message():
     image_name = random.choice(files)
     image_url = os.path.join(static_nekoimg_path ,"DSC_1035.jpg")
     image_thumb_url = os.path.join(static_nekoimg_path ,"thumb","DSC_1035-thumb.jpg")
-    massage = ImageSendMessage(original_content_url=image_url,preview_image_url=image_thumb_url)
+
+    massage = ImageSendMessage(
+        original_content_url=image_url,
+        preview_image_url=image_thumb_url
+    )
+    
     return message
 
 
@@ -217,8 +222,8 @@ def handle_text_message(event):
         line_bot_api.reply_message(event.reply_token,
             [
                 TextSendMessage(text="test"),
-                TextSendMessage(text=os.path.join(static_nekoimg_path,"preview","neko-0001.jpg")),
-                TextSendMessage(text=os.path.join(static_nekoimg_path,"neko-0001.jpg"))
+                TextSendMessage(text=os.path.join(static_nekoimg_path,"IMG_2992.jpg")),
+                TextSendMessage(text=os.path.join(static_nekoimg_path,"thumb","IMG_2992-thumb.jpg"))
             ])
 
 
