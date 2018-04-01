@@ -55,8 +55,8 @@ if channel_access_token is None:
 line_bot_api = LineBotApi(channel_access_token)
 handler = WebhookHandler(channel_secret)
 
-static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
-static_nekoimg_path = os.path.join(os.path.dirname(__file__), 'static', 'nekoimg')
+static_tmp_path = "https://line-bot-sdk-python-test.herokuapp.com/static/tmp"
+static_nekoimg_path = "https://line-bot-sdk-python-test.herokuapp.com/static/nekoimg"
 
 
 # function for create tmp dir for download content
@@ -68,6 +68,11 @@ def make_static_tmp_dir():
             pass
         else:
             raise
+
+
+@app.route("/")
+def hello_world():
+    return "hello world!"
 
 
 @app.route("/callback", methods=['POST'])
