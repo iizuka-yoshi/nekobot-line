@@ -145,7 +145,7 @@ def handle_text_message(event):
         elif isinstance(event.source, SourceRoom):
             line_bot_api.leave_room(event.source.room_id)
 
-    elif text == "みっちー" or text == "ミッチー":
+    elif text == "みっちー" or text == "ミッチー" or text == "漫画太郎":
         line_bot_api.reply_message(event.reply_token,
            [
                 make_image_send_message_micchi(),
