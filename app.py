@@ -148,7 +148,7 @@ def handle_text_message(event):
     elif text == "みっちー" or text == "ミッチー":
         line_bot_api.reply_message(event.reply_token,
            [
-                make_image_send_message_special(),
+                make_image_send_message_micchi(),
                 TextSendMessage(text="シャー")
             ]
         )
