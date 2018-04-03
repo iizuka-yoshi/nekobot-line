@@ -59,7 +59,7 @@ handler = WebhookHandler(channel_secret)
 
 static_tmp_path = "https://line-bot-sdk-python-test.herokuapp.com/static/tmp"
 static_nekoimg_path = "https://line-bot-sdk-python-test.herokuapp.com/static/nekoimg"
-
+static_specialimg_path = "https://line-bot-sdk-python-test.herokuapp.com/static/specialimg"
 
 # function for create tmp dir for download content
 def make_static_tmp_dir():
@@ -83,6 +83,27 @@ def make_image_send_message():
     
     return message
 
+def make_image_send_message_micchi():
+    image_name = 'IMG_0761.jpg'
+    image_url = os.path.join(static_specialimg_path ,image_name)
+    image_thumb_url = os.path.join(static_specialimg_path ,"thumb",image_name)
+    
+    message = ImageSendMessage(
+        original_content_url=image_url,
+        preview_image_url=image_thumb_url
+    )
+    return message
+
+def make_image_send_message_kitada():
+    image_name = 'IMG_3624.jpg'
+    image_url = os.path.join(static_specialimg_path ,image_name)
+    image_thumb_url = os.path.join(static_specialimg_path ,"thumb",image_name)
+    
+    message = ImageSendMessage(
+       original_content_url=image_url,
+       preview_image_url=image_thumb_url
+    )
+    return message
 
 @app.route("/")
 def hello_world():
@@ -110,8 +131,12 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
     text = event.message.text
+    text = text.replace(' ','')
+    text = text.replace('　','')
+    text = text.strip()
+    text = text.lower()
     
-    if text == "いぬ" or text == "イヌ" or text == "犬":
+    if text == "いぬ" or text == "イヌ" or text == "犬" or text == "dog":
         line_bot_api.reply_message(
             event.reply_token, TextMessage(text=event.message.text + "きらい"))
             
@@ -120,35 +145,29 @@ def handle_text_message(event):
         elif isinstance(event.source, SourceRoom):
             line_bot_api.leave_room(event.source.room_id)
 
-    elif text == 'confirm':
-        confirm_template = ConfirmTemplate(text='Do it?', actions=[
-            MessageTemplateAction(label='Yes', text='Yes!'),
-            MessageTemplateAction(label='No', text='No!'),
-        ])
-        template_message = TemplateSendMessage(
-            alt_text='Confirm alt text', template=confirm_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
+    elif text == "みっちー" or text == "ミッチー":
+        line_bot_api.reply_message(event.reply_token,
+           [
+                make_image_send_message_special(),
+                TextSendMessage(text="シャー")
+            ]
+        )
+        
+        if isinstance(event.source, SourceGroup):
+            line_bot_api.leave_group(event.source.group_id)
+        elif isinstance(event.source, SourceRoom):
+            line_bot_api.leave_room(event.source.room_id)
 
-    elif text == 'buttons':
-        buttons_template = ButtonsTemplate(
-            title='My buttons sample', text='Hello, my buttons', actions=[
-                URITemplateAction(
-                    label='Go to line.me', uri='https://line.me'),
-                PostbackTemplateAction(label='ping', data='ping'),
-                PostbackTemplateAction(
-                    label='ping with text', data='ping',
-                    text='ping'),
-                MessageTemplateAction(label='Translate Rice', text='米')
-            ])
-        template_message = TemplateSendMessage(
-            alt_text='Buttons alt text', template=buttons_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
+    elif text == "kitada" or text == "北田" or text == "きただ" or text == "キタダ" or text == "北田さん" or text == "きたださん" or text == "キタダサン":
+        line_bot_api.reply_message(event.reply_token,
+            make_image_send_message_kitada()
+       )
 
     elif text == "猫" or text == "寝子" or text == "姫":
         line_bot_api.reply_message(event.reply_token,
            [
-            TextSendMessage(text="Zzz..."),
-            make_image_send_message()
+                TextSendMessage(text="Zzz..."),
+                make_image_send_message()
             ]
         )
 
