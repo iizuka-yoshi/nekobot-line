@@ -84,7 +84,7 @@ def make_image_send_message():
     return message
 
 def make_image_send_message_micchi():
-    image_name = 'IMG_0761.jpg'
+    image_name = random.choice(['IMG_0761.jpg','IMG_0761_2.jpg'])
     image_url = os.path.join(static_specialimg_path ,image_name)
     image_thumb_url = os.path.join(static_specialimg_path ,"thumb",image_name)
     
@@ -95,13 +95,24 @@ def make_image_send_message_micchi():
     return message
 
 def make_image_send_message_kitada():
-    image_name = 'IMG_3624.jpg'
+    image_name = random.choice(['IMG_3624.jpg','IMG_0766.jpg'])
     image_url = os.path.join(static_specialimg_path ,image_name)
     image_thumb_url = os.path.join(static_specialimg_path ,"thumb",image_name)
     
     message = ImageSendMessage(
        original_content_url=image_url,
        preview_image_url=image_thumb_url
+    )
+    return message
+
+def make_image_send_message_ghost():
+    image_name = 'IMG_0775.jpg'
+    image_url = os.path.join(static_specialimg_path ,image_name)
+    image_thumb_url = os.path.join(static_specialimg_path ,"thumb",image_name)
+    
+    message = ImageSendMessage(
+        original_content_url=image_url,
+        preview_image_url=image_thumb_url
     )
     return message
 
@@ -157,6 +168,11 @@ def handle_text_message(event):
             line_bot_api.leave_group(event.source.group_id)
         elif isinstance(event.source, SourceRoom):
             line_bot_api.leave_room(event.source.room_id)
+
+    elif text == "おわかりいただけただろうか" or text == "オワカリイタダケタダロウカ":
+        line_bot_api.reply_message(event.reply_token,
+           make_image_send_message_ghost()
+        )
 
     elif text == "kitada" or text == "北田" or text == "きただ" or text == "キタダ" or text == "北田さん" or text == "きたださん" or text == "キタダサン":
         line_bot_api.reply_message(event.reply_token,
