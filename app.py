@@ -95,7 +95,7 @@ def make_image_send_message_micchi():
     return message
 
 def make_image_send_message_kitada():
-    image_name = random.choice(['IMG_3624.jpg','IMG_0766.jpg'])
+    image_name = random.choice(['IMG_3624.jpg','IMG_0766.jpg','IMG_0776.jpg','IMG_0777.jpg','IMG_0778.jpg'])
     image_url = os.path.join(static_specialimg_path ,image_name)
     image_thumb_url = os.path.join(static_specialimg_path ,"thumb",image_name)
     
