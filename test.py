@@ -44,31 +44,8 @@ from linebot.models import (
 
 app = Flask(__name__)
 
-# get channel_secret and channel_access_token from your environment variable
-channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
-channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
-if channel_secret is None:
-    print('Specify LINE_CHANNEL_SECRET as environment variable.')
-    sys.exit(1)
-if channel_access_token is None:
-    print('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
-    sys.exit(1)
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
-line_bot_api = LineBotApi(channel_access_token)
-handler = WebhookHandler(channel_secret)
-
-base_dir = 'https://nekobot-line.herokuapp.com'
-static_tmp_path = 'https://nekobot-line.herokuapp.com/static/tmp'
-
-# function for create tmp dir for download content
-def make_static_tmp_dir():
-    try:
-        os.makedirs(static_tmp_path)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST and os.path.isdir(static_tmp_path):
-            pass
-        else:
-            raise
 
 def get_message_pattern(text):
     text = text.replace(' ','')
@@ -210,35 +187,87 @@ def image_send_message_list(img_dir,img_list):
     )
     return message
 
-@app.route('/')
-def hello_world():
-    return random.choice('にゃー','ニャー','nya-')
+print(base_dir)
+text = 'イヌ'
 
-@app.route('/callback', methods=['POST'])
-def callback():
-    # get X-Line-Signature header value
-    signature = request.headers['X-Line-Signature']
+message_pattern = get_message_pattern(text)
+img_dir = get_img_dir(message_pattern)
 
-    # get request body as text
-    body = request.get_data(as_text=True)
-    app.logger.info('Request body: ' + body)
+send_text =''
+if message_pattern in{'neko_hime'}:
+    send_text = 'みゃー'
 
-    # handle webhook body
-    try:
-        handler.handle(body, signature)
-    except InvalidSignatureError:
-        abort(400)
+elif message_pattern in{'neko_quu'}:
+    send_text = 'にゃお〜ん'
 
-    return 'OK'
+elif message_pattern in{'neko_choco'}:
+    send_text = 'にゃっ'
 
+elif message_pattern in{'neko_hiragana'}:
+    send_text = 'にゃー'
 
+elif message_pattern in{'neko_kanji'}:
+    send_text = 'ミョウ'
 
-@handler.add(JoinEvent)
-def handle_join(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text='ねこって言ってみ')
-        )
+elif message_pattern in{'neko_kana_full'}:
+    send_text = 'ニャー'
 
-    port = int(os.getenv('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+elif message_pattern in{'neko_kana_half'}:
+    send_text = 'ﾆｬｰ'
+
+elif message_pattern in{'neko_roma_full'}:
+    send_text = 'ｎｙａ−'
+
+elif message_pattern in{'neko_roma_half'}:
+    send_text = 'nya-'
+
+elif message_pattern in{'neko_eng_full'}:
+    send_text = random.choice(['ｍｅｏｗ（ミャウ）','ｍｅｗ（ミュー）'])
+
+elif message_pattern in{'neko_eng_half'}:
+    send_text = random.choice(['meow（ミャウ）','mew（ミュー）'])
+
+if send_text != '':
+    print(send_text)
+    print(img_dir)
+    exit()
+
+#イヌ判定（テシストを返信して退出）
+send_text =''
+if message_pattern in{'dog'}:
+    send_text = text + random.choice(['きらい','やめて'])
+
+if send_text != '':
+    print(send_text)
+    exit()
+
+#test判定（画像のパスを送信）
+send_text =''
+if message_pattern == 'test':
+    send_text = 'pathをテスト'
+
+if send_text != '':
+    image_name = random.choice(os.listdir(img_dir))
+    image_url = os.path.join(base_dir,img_dir,image_name)
+    image_thumb_url = os.path.join(base_dir, img_dir,'thumb',image_name)
+
+    print(send_text)
+    print(image_name)
+    print(image_url)
+    print(image_thumb_url)
+
+    exit()
+
+#スペシャル判定（テキストとイメージを返信。場合によって退出）
+send_text =''
+if message_pattern == 'kitada':
+    print('kitada')
+elif message_pattern == 'wakamatsu':
+    print('wakamatsu')
+elif message_pattern == 'yoneda':
+    print('yoneda')
+elif message_pattern == 'ghost':
+    print('ghost')
+elif message_pattern == 'gatarou':
+   send_text ='シャー'
+   print(send_text)
