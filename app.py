@@ -69,7 +69,7 @@ def get_message_pattern(text):
     if text in{'ひめ','ヒメ','ﾋﾒ','姫','hime','ひめちゃん','ヒメちゃん','ヒメチャン'}:
         return 'neko_hime'
 
-    elif text in{'くーちゃん','クーちゃん','クーチャン','ｸｰﾁｬﾝ'}:
+    elif text in{'くーちゃん','クーちゃん','クーチャン','ｸｰﾁｬﾝ','くー','クー','ｸｰ'}:
         return 'neko_quu'
 
     elif text in{'ちょこ','チョコ','ﾁｮｺ'}:
@@ -179,7 +179,7 @@ def get_img_dir(message_pattern):
         return 'static/specialimg'
 
 def image_send_message_dir(img_dir):
-    image_name = random.choice(os.listdir(img_dir))
+    image_name = random.choice(glob.glob(os.path.join(img_dir,'*.jpg')))
     image_url = os.path.join(base_dir,img_dir,image_name)
     image_thumb_url = os.path.join(base_dir, img_dir,'thumb',image_name)
 
@@ -187,7 +187,7 @@ def image_send_message_dir(img_dir):
         original_content_url=image_url,
         preview_image_url=image_thumb_url
     )
-    print('送信したイメージのPath: ' + image_url)
+    print('image_url: ' + image_url)
     return message
 
 def image_send_message_list(img_dir,img_list):
@@ -199,7 +199,7 @@ def image_send_message_list(img_dir,img_list):
         original_content_url=image_url,
         preview_image_url=image_thumb_url
     )
-    print('送信したイメージのPath: ' + image_url)
+    print('image_url: ' + image_url)
     return message
 
 @app.route('/')
@@ -299,7 +299,7 @@ def handle_text_message(event):
                 TextSendMessage(text=image_url),
                 TextSendMessage(text=image_thumb_url)
             ])
-            
+
     #スペシャル判定（テキストとイメージを返信。場合によって退出）
     send_text =''
     if message_pattern == 'kitada':
@@ -319,7 +319,7 @@ def handle_text_message(event):
 
     elif message_pattern == 'ghost':
         line_bot_api.reply_message(event.reply_token,
-            image_send_message_list(img_dir,['IMG_0775.jpg','IMG_0847.jpg'])
+            image_send_message_list(img_dir,['IMG_0775.jpg','IMG_0847.jpg','IMG_0775.jpg','IMG_0847.jpg'])
             )
 
     elif message_pattern == 'gatarou':
@@ -327,7 +327,7 @@ def handle_text_message(event):
         line_bot_api.reply_message(event.reply_token,
             [
                 TextSendMessage(text=send_text),
-                image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg'])
+                image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg','IMG_0761.jpg','IMG_0761_2.jpg'])
             ]
         )
 
