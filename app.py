@@ -57,9 +57,9 @@ if channel_access_token is None:
 line_bot_api = LineBotApi(channel_access_token)
 handler = WebhookHandler(channel_secret)
 
-static_tmp_path = "https://line-bot-sdk-python-test.herokuapp.com/static/tmp"
-static_nekoimg_path = "https://line-bot-sdk-python-test.herokuapp.com/static/nekoimg"
-static_specialimg_path = "https://line-bot-sdk-python-test.herokuapp.com/static/specialimg"
+static_tmp_path = "https://nekobot-line.herokuapp.com/static/tmp"
+static_nekoimg_path = "https://nekobot-line.herokuapp.com/static/nekoimg"
+static_specialimg_path = "https://nekobot-line.herokuapp.com/static/specialimg"
 
 # function for create tmp dir for download content
 def make_static_tmp_dir():
@@ -80,14 +80,14 @@ def make_image_send_message():
         original_content_url=image_url,
         preview_image_url=image_thumb_url
     )
-    
+
     return message
 
 def make_image_send_message_micchi():
     image_name = random.choice(['IMG_0761.jpg','IMG_0761_2.jpg'])
     image_url = os.path.join(static_specialimg_path ,image_name)
     image_thumb_url = os.path.join(static_specialimg_path ,"thumb",image_name)
-    
+
     message = ImageSendMessage(
         original_content_url=image_url,
         preview_image_url=image_thumb_url
@@ -98,7 +98,7 @@ def make_image_send_message_kitada():
     image_name = random.choice(['IMG_3624.jpg','IMG_0766.jpg','IMG_0776.jpg','IMG_0777.jpg','IMG_0778.jpg'])
     image_url = os.path.join(static_specialimg_path ,image_name)
     image_thumb_url = os.path.join(static_specialimg_path ,"thumb",image_name)
-    
+
     message = ImageSendMessage(
        original_content_url=image_url,
        preview_image_url=image_thumb_url
@@ -109,7 +109,7 @@ def make_image_send_message_ghost():
     image_name = 'IMG_0775.jpg'
     image_url = os.path.join(static_specialimg_path ,image_name)
     image_thumb_url = os.path.join(static_specialimg_path ,"thumb",image_name)
-    
+
     message = ImageSendMessage(
         original_content_url=image_url,
         preview_image_url=image_thumb_url
@@ -146,11 +146,11 @@ def handle_text_message(event):
     text = text.replace('　','')
     text = text.strip()
     text = text.lower()
-    
+
     if text == "いぬ" or text == "イヌ" or text == "犬" or text == "dog":
         line_bot_api.reply_message(
             event.reply_token, TextMessage(text=event.message.text + "きらい"))
-            
+
         if isinstance(event.source, SourceGroup):
             line_bot_api.leave_group(event.source.group_id)
         elif isinstance(event.source, SourceRoom):
@@ -163,7 +163,7 @@ def handle_text_message(event):
                 TextSendMessage(text="シャー")
             ]
         )
-        
+
         if isinstance(event.source, SourceGroup):
             line_bot_api.leave_group(event.source.group_id)
         elif isinstance(event.source, SourceRoom):
@@ -229,6 +229,6 @@ def handle_join(event):
 if __name__ == "__main__":
     # create tmp dir for download content
     make_static_tmp_dir()
-    
+
     port = int(os.getenv("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
