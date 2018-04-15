@@ -99,7 +99,10 @@ def get_message_pattern(text):
     elif text in{'cat'}:
         return 'neko_eng_half'
 
-    elif text in{'犬','いぬ','イヌ','ｲﾇ','わんちゃん','ワンちゃん','ワンチャン','ﾜﾝﾁｬﾝ','ｄｏｇ','dog'}:
+    elif text in{'🐈'}:
+        return 'neko_emoji'
+
+    elif text in{'犬','いぬ','イヌ','ｲﾇ','わんちゃん','ワンちゃん','ワンチャン','ﾜﾝﾁｬﾝ','ｄｏｇ','dog','🐕'}:
         return 'dog'
 
     elif text in{
@@ -141,7 +144,7 @@ def get_message_pattern(text):
 def get_img_dir(message_pattern):
     if message_pattern in{
         'neko_hime','neko_hiragana','neko_kanji','neko_kana_full','neko_kana_half',
-        'neko_roma_full','neko_roma_half','neko_eng_full','neko_eng_half'
+        'neko_roma_full','neko_roma_half','neko_eng_full','neko_eng_half','neko_emoji'
         }:
         return 'static/nekoimg'
 
@@ -263,6 +266,9 @@ def handle_text_message(event):
 
     elif message_pattern in{'neko_eng_half'}:
         send_text = random.choice(['meow（ミャウ）','mew（ミュー）'])
+
+    elif message_pattern in{'neko_emoji'}:
+        send_text = '絵文字？'
 
     if send_text != '':
         line_bot_api.reply_message(event.reply_token,
