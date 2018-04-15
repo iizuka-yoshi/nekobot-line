@@ -330,14 +330,14 @@ def handle_text_message(event):
             image_send_message_list(img_dir,['IMG_0775.jpg','IMG_0847.jpg'])
             )
 
-    elif message_pattern == 'gatarou':
-        send_text ='シャー'
-        line_bot_api.reply_message(event.reply_token,
-            [
-                TextSendMessage(text=send_text),
-                image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg'])
-            ]
-        )
+#    elif message_pattern == 'gatarou':
+#        send_text ='シャー'
+#        line_bot_api.reply_message(event.reply_token,
+#            [
+#                TextSendMessage(text=send_text),
+#                image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg'])
+#            ]
+#        )
 
 @handler.add(JoinEvent)
 def handle_join(event):
