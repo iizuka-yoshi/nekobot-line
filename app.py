@@ -60,16 +60,6 @@ handler = WebhookHandler(channel_secret)
 base_dir = 'https://nekobot-line.herokuapp.com'
 static_tmp_path = 'https://nekobot-line.herokuapp.com/static/tmp'
 
-# function for create tmp dir for download content
-def make_static_tmp_dir():
-    try:
-        os.makedirs(static_tmp_path)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST and os.path.isdir(static_tmp_path):
-            pass
-        else:
-            raise
-
 def get_message_pattern(text):
     text = text.replace(' ','')
     text = text.replace('　','')
@@ -346,5 +336,6 @@ def handle_join(event):
         TextSendMessage(text='ねこって言ってみ')
         )
 
+if __name__ == "__main__":
     port = int(os.getenv('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
