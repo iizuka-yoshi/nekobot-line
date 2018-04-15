@@ -368,7 +368,7 @@ def handle_text_message(event):
 
     elif message_pattern == 'gatarou':
        send_text ='シャー'
-        line_bot_api.reply_message(event.reply_token,
+       line_bot_api.reply_message(event.reply_token,
             [
                 TextSendMessage(text=send_text),
                 image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg'])
