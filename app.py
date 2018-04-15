@@ -179,7 +179,7 @@ def get_img_dir(message_pattern):
         return 'static/specialimg'
 
 def image_send_message_dir(img_dir):
-    image_name = random.choice(glob.glob(os.path.join(img_dir,'*.jpg')))
+    image_name = random.choice(os.path.basename(glob.glob(os.path.join(img_dir,'*.jpg'))))
     image_url = os.path.join(base_dir,img_dir,image_name)
     image_thumb_url = os.path.join(base_dir, img_dir,'thumb',image_name)
 
