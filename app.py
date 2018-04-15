@@ -349,24 +349,24 @@ def handle_text_message(event):
     if message_pattern == 'kitada':
         line_bot_api.reply_message(event.reply_token,
             image_send_message_dir(img_dir)
-       )
+            )
 
-   elif message_pattern == 'wakamatsu':
+    elif message_pattern == 'wakamatsu':
         line_bot_api.reply_message(event.reply_token,
             image_send_message_dir(img_dir)
-       )
+            )
 
-   elif message_pattern == 'yoneda':
+    elif message_pattern == 'yoneda':
         line_bot_api.reply_message(event.reply_token,
             image_send_message_dir(img_dir)
-       )
+            )
 
-   elif message_pattern == 'ghost':
+    elif message_pattern == 'ghost':
         line_bot_api.reply_message(event.reply_token,
             image_send_message_list(img_dir,['IMG_0775.jpg','IMG_0847.jpg'])
-       )
+            )
 
-   elif message_pattern == 'gatarou':
+    elif message_pattern == 'gatarou':
        send_text ='シャー'
         line_bot_api.reply_message(event.reply_token,
             [
