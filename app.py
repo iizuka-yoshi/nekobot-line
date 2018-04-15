@@ -127,8 +127,8 @@ def get_message_pattern(text):
 
     elif text in{
         '漫画太郎','','漫☆画太郎',
-        'みっちー',"ミッチー"
-        'みっちーさん','ミッチーサン',
+        'みっちー','ミッチー',
+        'みっちーさん','ミッチーサン'
         }:
         return 'gatarou'
 
@@ -202,7 +202,7 @@ def image_send_message_list(img_dir,img_list):
 
 @app.route('/')
 def hello_world():
-    return random.choice('にゃー','ニャー','nya-')
+    return 'にゃー'
 
 @app.route('/callback', methods=['POST'])
 def callback():
