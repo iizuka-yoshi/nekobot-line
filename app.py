@@ -214,3 +214,137 @@ def image_send_message_list(img_dir,img_list):
 def hello_world():
     return random.choice('にゃー','ニャー','nya-')
 
+@app.route('/callback', methods=['POST'])
+def callback():
+    # get X-Line-Signature header value
+    signature = request.headers['X-Line-Signature']
+
+    # get request body as text
+    body = request.get_data(as_text=True)
+    app.logger.info('Request body: ' + body)
+
+    # handle webhook body
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        abort(400)
+
+    return 'OK'
+
+@handler.add(MessageEvent, message=TextMessage)
+def handle_text_message(event):
+    text = event.message.text
+    message_pattern = get_message_pattern(text)
+    img_dir = get_img_dir(message_pattern)
+
+    #ねこ判定（テキストとイメージを返信）
+    send_text =''
+    if message_pattern in{'neko_hime'}:
+        send_text = 'みゃー'
+
+    elif message_pattern in{'neko_quu'}:
+        send_text = 'にゃお〜ん'
+
+    elif message_pattern in{'neko_choco'}:
+        send_text = 'にゃっ'
+
+    elif message_pattern in{'neko_hiragana'}:
+        send_text = 'にゃー'
+
+    elif message_pattern in{'neko_kanji'}:
+        send_text = 'ミョウ'
+
+    elif message_pattern in{'neko_kana_full'}:
+        send_text = 'ニャー'
+
+    elif message_pattern in{'neko_kana_half'}:
+        send_text = 'ﾆｬｰ'
+
+    elif message_pattern in{'neko_roma_full'}:
+        send_text = 'ｎｙａ−'
+
+    elif message_pattern in{'neko_roma_half'}:
+        send_text = 'nya-'
+
+    elif message_pattern in{'neko_eng_full'}:
+        send_text = random.choice(['ｍｅｏｗ（ミャウ）','ｍｅｗ（ミュー）'])
+
+    elif message_pattern in{'neko_eng_half'}:
+        send_text = random.choice(['meow（ミャウ）','mew（ミュー）'])
+
+    if send_text != '':
+        line_bot_api.reply_message(event.reply_token,
+           [
+                TextSendMessage(text=send_text),
+                image_send_message_dir(img_dir)
+            ]
+        )
+
+    #イヌ判定（テシストを返信して退出）
+    send_text =''
+    if message_pattern in{'dog'}:
+        send_text = text + random.choice(['きらい','やめて'])
+
+    if send_text != '':
+        line_bot_api.reply_message(event.reply_token, TextMessage(text=send_text))
+        if isinstance(event.source, SourceGroup):
+            line_bot_api.leave_group(event.source.group_id)
+        elif isinstance(event.source, SourceRoom):
+            line_bot_api.leave_room(event.source.room_id)
+
+    #test判定（画像のパスを送信）
+    send_text =''
+    if message_pattern == 'test':
+        send_text = 'pathをテスト'
+
+    if send_text != '':
+        image_name = random.choice(os.listdir(img_dir))
+        image_url = os.path.join(base_dir,img_dir,image_name)
+        image_thumb_url = os.path.join(base_dir, img_dir,'thumb',image_name)
+        line_bot_api.reply_message(event.reply_token,
+            [
+                TextSendMessage(text=send_text),
+                TextSendMessage(text=image_url),
+                TextSendMessage(text=image_thumb_url)
+            ])
+            
+    #スペシャル判定（テキストとイメージを返信。場合によって退出）
+    send_text =''
+    if message_pattern == 'kitada':
+        line_bot_api.reply_message(event.reply_token,
+            image_send_message_dir(img_dir)
+            )
+
+    elif message_pattern == 'wakamatsu':
+        line_bot_api.reply_message(event.reply_token,
+            image_send_message_dir(img_dir)
+            )
+
+    elif message_pattern == 'yoneda':
+        line_bot_api.reply_message(event.reply_token,
+            image_send_message_dir(img_dir)
+            )
+
+    elif message_pattern == 'ghost':
+        line_bot_api.reply_message(event.reply_token,
+            image_send_message_list(img_dir,['IMG_0775.jpg','IMG_0847.jpg'])
+            )
+
+    elif message_pattern == 'gatarou':
+        send_text ='シャー'
+        line_bot_api.reply_message(event.reply_token,
+            [
+                TextSendMessage(text=send_text),
+                image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg'])
+            ]
+        )
+
+@handler.add(JoinEvent)
+def handle_join(event):
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text='ねこって言ってみ')
+        )
+
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
