@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-#  Licensed under the Apache License, Version 2.0 (the "License"); you may
+#  Licensed under the Apache License, Version 2.0 (the 'License'); you may
 #  not use this file except in compliance with the License. You may obtain
 #  a copy of the License at
 #
 #       http://www.apache.org/licenses/LICENSE-2.0
 #
 #  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  distributed under the License is distributed on an 'AS IS' BASIS, WITHOUT
 #  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #  License for the specific language governing permissions and limitations
 #  under the License.
@@ -57,9 +57,8 @@ if channel_access_token is None:
 line_bot_api = LineBotApi(channel_access_token)
 handler = WebhookHandler(channel_secret)
 
-static_tmp_path = "https://nekobot-line.herokuapp.com/static/tmp"
-static_nekoimg_path = "https://nekobot-line.herokuapp.com/static/nekoimg"
-static_specialimg_path = "https://nekobot-line.herokuapp.com/static/specialimg"
+base_dir = os.path.dirname(os.path.abspath(__file__))
+static_tmp_path = 'https://nekobot-line.herokuapp.com/static/tmp'
 
 # function for create tmp dir for download content
 def make_static_tmp_dir():
@@ -71,22 +70,150 @@ def make_static_tmp_dir():
         else:
             raise
 
-def make_image_send_message():
-    image_name = random.choice(os.listdir("static/nekoimg"))
-    image_url = os.path.join(static_nekoimg_path ,image_name)
-    image_thumb_url = os.path.join(static_nekoimg_path ,"thumb",image_name)
+def get_message_pattern(text):
+    text = text.replace(' ','')
+    text = text.replace('　','')
+    text = text.strip()
+    text = text.lower()
+
+    if text in{'ひめ','ヒメ','ﾋﾒ','姫','hime','ひめちゃん','ヒメちゃん','ヒメチャン'}:
+        return 'neko_hime'
+
+    elif text in{'くーちゃん','クーちゃん','クーチャン','ｸｰﾁｬﾝ'}:
+        return 'neko_quu'
+
+    elif text in{'ちょこ','チョコ','ﾁｮｺ'}:
+        return 'neko_choco'
+
+    elif text in{'ねこ','ねこちゃん'}:
+        return 'neko_hiragana'
+
+    elif text in{'猫','寝子','猫ちゃん'}:
+        return 'neko_kanji'
+
+    elif text in{'ネコ','ネコちゃん','ネコチャン'}:
+        return 'neko_kana_full'
+
+    elif text in{'ﾈｺ','ﾈｺﾁｬﾝ'}:
+        return 'neko_kana_half'
+
+    elif text in{'ｎｅｋｏ','ｎｅｃｏ'}:
+        return 'neko_roma_full'
+
+    elif text in{'neko','neco'}:
+        return 'neko_roma_half'
+
+    elif text in{'ｃａｔ'}:
+        return 'neko_eng_full'
+
+    elif text in{'cat'}:
+        return 'neko_eng_half'
+
+    elif text in{'犬','いぬ','イヌ','ｲﾇ','わんちゃん','ワンちゃん','ワンチャン','ﾜﾝﾁｬﾝ','ｄｏｇ','dog'}:
+        return 'dog'
+
+    elif text in{
+        '北田','きただ','キタダ','ｷﾀﾀﾞﾞ','ｋｉｔａｄａ','kitada',
+        '北田さん','きたださん','キタダサン','ｷﾀﾀﾞｻﾝ',
+        '北','きた','キタ','ｷﾀ','ｋｉｔａ','kita'
+        }:
+        return 'kitada'
+
+    elif text in{
+        '若松','わかまつ','ワカマツ','ﾜｶﾏﾂ',
+        '若松さん','わかまつさん','ワカマツサン','ﾜｶﾏﾂｻﾝ',
+        'ｗａｋａｍａｔｓｕ','wakamatsu',
+        '若','わか','ワカ','ﾜｶ','ｗａｋａ','waka'
+        }:
+        return 'wakamatsu'
+
+    elif text in{
+        '米田','よねだ','ヨネダ','ﾖﾈﾀﾞ',
+        '米田さん','よねださん','ヨネダサン','ﾖﾈﾀﾞｻﾝ',
+        'ｙｏｎｅｄａ','yoneda',
+        '米','よね','ヨネ','ﾖﾈ','ｙｏｎｅ','yone'
+        }:
+        return 'yoneda'
+
+    elif text in{
+        '漫画太郎','','漫☆画太郎',
+        'みっちー',"ミッチー"
+        'みっちーさん','ミッチーサン',
+        }:
+        return 'gatarou'
+
+    elif text in{'おわかりいただけただろうか'}:
+        return 'ghost'
+
+    elif text in{'てすと','テスト','ﾃｽﾄ','test'}:
+        return 'test'
+
+def get_img_dir(message_pattern):
+    if message_pattern in{
+        'neko_hime','neko_hiragana','neko_kanji','neko_kana_full','neko_kana_half',
+        'neko_roma_full','neko_roma_half','neko_eng_full','neko_eng_half'
+        }:
+        return 'static/nekoimg'
+
+    elif message_pattern in{
+        'neko_quu'
+        }:
+        return 'static/quuimg'
+
+    elif message_pattern in{
+        'neko_choco'
+        }:
+        return 'static/chocoimg'
+
+    elif message_pattern in{
+        'kitada'
+        }:
+        return 'static/kitadaimg'
+
+    elif message_pattern in{
+        'wakamatsu'
+        }:
+        return 'static/wakamatsuimg'
+
+    elif message_pattern in{
+        'yoneda'
+        }:
+        return 'static/yonedaimg'
+
+    elif message_pattern in{
+        'test'
+        }:
+        return 'static/nekoimg'
+
+    else:
+        return 'static/specialimg'
+
+def image_send_message_dir(img_dir):
+    image_name = random.choice(os.listdir(img_dir))
+    image_url = os.path.join(base_dir,img_dir,image_name)
+    image_thumb_url = os.path.join(base_dir, img_dir,'thumb',image_name)
 
     message = ImageSendMessage(
         original_content_url=image_url,
         preview_image_url=image_thumb_url
     )
+    return message
 
+def image_send_message_list(img_dir,img_list):
+    image_name = random.choice(img_list)
+    image_url = os.path.join(base_dir,img_dir,image_name)
+    image_thumb_url = os.path.join(base_dir, img_dir,'thumb',image_name)
+
+    message = ImageSendMessage(
+        original_content_url=image_url,
+        preview_image_url=image_thumb_url
+    )
     return message
 
 def make_image_send_message_micchi():
     image_name = random.choice(['IMG_0761.jpg','IMG_0761_2.jpg'])
     image_url = os.path.join(static_specialimg_path ,image_name)
-    image_thumb_url = os.path.join(static_specialimg_path ,"thumb",image_name)
+    image_thumb_url = os.path.join(static_specialimg_path ,'thumb',image_name)
 
     message = ImageSendMessage(
         original_content_url=image_url,
@@ -97,7 +224,7 @@ def make_image_send_message_micchi():
 def make_image_send_message_kitada():
     image_name = random.choice(['IMG_3624.jpg','IMG_0766.jpg','IMG_0776.jpg','IMG_0777.jpg','IMG_0778.jpg'])
     image_url = os.path.join(static_specialimg_path ,image_name)
-    image_thumb_url = os.path.join(static_specialimg_path ,"thumb",image_name)
+    image_thumb_url = os.path.join(static_specialimg_path ,'thumb',image_name)
 
     message = ImageSendMessage(
        original_content_url=image_url,
@@ -108,7 +235,7 @@ def make_image_send_message_kitada():
 def make_image_send_message_ghost():
     image_name = 'IMG_0775.jpg'
     image_url = os.path.join(static_specialimg_path ,image_name)
-    image_thumb_url = os.path.join(static_specialimg_path ,"thumb",image_name)
+    image_thumb_url = os.path.join(static_specialimg_path ,'thumb',image_name)
 
     message = ImageSendMessage(
         original_content_url=image_url,
@@ -116,19 +243,18 @@ def make_image_send_message_ghost():
     )
     return message
 
-@app.route("/")
+@app.route('/')
 def hello_world():
-    return "hello world!"
+    return random.choice('にゃー','ニャー','nya-')
 
-
-@app.route("/callback", methods=['POST'])
+@app.route('/callback', methods=['POST'])
 def callback():
     # get X-Line-Signature header value
     signature = request.headers['X-Line-Signature']
 
     # get request body as text
     body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
+    app.logger.info('Request body: ' + body)
 
     # handle webhook body
     try:
@@ -138,97 +264,123 @@ def callback():
 
     return 'OK'
 
-
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
     text = event.message.text
-    text = text.replace(' ','')
-    text = text.replace('　','')
-    text = text.strip()
-    text = text.lower()
+    message_pattern = get_message_pattern(text)
+    img_dir = get_img_dir(message_pattern)
 
-    if text == "いぬ" or text == "イヌ" or text == "犬" or text == "dog":
-        line_bot_api.reply_message(
-            event.reply_token, TextMessage(text=event.message.text + "きらい"))
+    #ねこ判定（テキストとイメージを返信）
+    send_text =''
+    if message_pattern in{'neko_hime'}:
+        send_text = 'みゃー'
 
-        if isinstance(event.source, SourceGroup):
-            line_bot_api.leave_group(event.source.group_id)
-        elif isinstance(event.source, SourceRoom):
-            line_bot_api.leave_room(event.source.room_id)
+    elif message_pattern in{'neko_quu'}:
+        send_text = 'にゃお〜ん'
 
-    elif text == "みっちー" or text == "ミッチー" or text == "漫画太郎" or text == "漫☆画太郎":
+    elif message_pattern in{'neko_choco'}:
+        send_text = 'にゃっ'
+
+    elif message_pattern in{'neko_hiragana'}:
+        send_text = 'にゃー'
+
+    elif message_pattern in{'neko_kanji'}:
+        send_text = 'ミョウ'
+
+    elif message_pattern in{'neko_kana_full'}:
+        send_text = 'ニャー'
+
+    elif message_pattern in{'neko_kana_half'}:
+        send_text = 'ﾆｬｰ'
+
+    elif message_pattern in{'neko_roma_full'}:
+        send_text = 'ｎｙａ−'
+
+    elif message_pattern in{'neko_roma_half'}:
+        send_text = 'nya-'
+
+    elif message_pattern in{'neko_eng_full'}:
+        send_text = random.choice(['ｍｅｏｗ（ミャウ）','ｍｅｗ（ミュー）'])
+
+    elif message_pattern in{'neko_eng_half'}:
+        send_text = random.choice(['meow（ミャウ）','mew（ミュー）'])
+
+    if send_text != '':
         line_bot_api.reply_message(event.reply_token,
            [
-                make_image_send_message_micchi(),
-                TextSendMessage(text="シャー")
+                TextSendMessage(text=send_text),
+                image_send_message_dir(img_dir)
             ]
         )
+        return
 
+    #イヌ判定（テシストを返信して退出）
+    send_text =''
+    if message_pattern in{'dog'}:
+        send_text = text + random.choice(['きらい','やめて'])
+
+    if send_text != '':
+        line_bot_api.reply_message(event.reply_token, TextMessage(text=send_text))
         if isinstance(event.source, SourceGroup):
             line_bot_api.leave_group(event.source.group_id)
         elif isinstance(event.source, SourceRoom):
             line_bot_api.leave_room(event.source.room_id)
+        return
 
-    elif text == "おわかりいただけただろうか" or text == "オワカリイタダケタダロウカ":
-        line_bot_api.reply_message(event.reply_token,
-           make_image_send_message_ghost()
-        )
+    #test判定（画像のパスを送信）
+    send_text =''
+    if message_pattern == 'test':
+        send_text = 'pathをテスト'
 
-    elif text == "kitada" or text == "北田" or text == "きただ" or text == "キタダ" or text == "北田さん" or text == "きたださん" or text == "キタダサン":
+    if send_text != '':
+        image_name = random.choice(os.listdir(img_dir))
+        image_url = os.path.join(base_dir,img_dir,image_name)
+        image_thumb_url = os.path.join(base_dir, img_dir,'thumb',image_name)
         line_bot_api.reply_message(event.reply_token,
-            make_image_send_message_kitada()
+            [
+                TextSendMessage(text=send_text),
+                TextSendMessage(text=image_url),
+                TextSendMessage(text=image_thumb_url)
+            ])
+        return
+
+    #スペシャル判定（テキストとイメージを返信。場合によって退出）
+    send_text =''
+    if message_pattern == 'kitada':
+        line_bot_api.reply_message(event.reply_token,
+            image_send_message_dir(img_dir)
        )
 
-    elif text == "猫" or text == "寝子" or text == "姫":
+   elif message_pattern == 'wakamatsu':
         line_bot_api.reply_message(event.reply_token,
-           [
-                TextSendMessage(text="Zzz..."),
-                make_image_send_message()
+            image_send_message_dir(img_dir)
+       )
+
+   elif message_pattern == 'yoneda':
+        line_bot_api.reply_message(event.reply_token,
+            image_send_message_dir(img_dir)
+       )
+
+   elif message_pattern == 'ghost':
+        line_bot_api.reply_message(event.reply_token,
+            image_send_message_list(img_dir,['IMG_0775.jpg','IMG_0847.jpg'])
+       )
+
+   elif message_pattern == 'gatarou':
+       send_text ='シャー'
+        line_bot_api.reply_message(event.reply_token,
+            [
+                TextSendMessage(text=send_text),
+                image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg'])
             ]
-        )
-
-    elif text == "ねこ" or text == "ひめ":
-        line_bot_api.reply_message(event.reply_token,
-            [
-                TextSendMessage(text="にゃー"),
-                make_image_send_message()
-             ]
-        )
-
-    elif text == "ネコ" or text == "ヒメ":
-        line_bot_api.reply_message(event.reply_token,
-            [
-                TextSendMessage(text="ニャー"),
-                make_image_send_message()
-             ]
-        )
-
-    elif text == "cat" or text == "neko":
-        line_bot_api.reply_message(event.reply_token,
-            [
-                TextSendMessage(text="nya-"),
-                make_image_send_message()
-            ]
-        )
-
-    elif text == "test":
-
-        line_bot_api.reply_message(event.reply_token,
-            [
-                TextSendMessage(text="test"),
-                TextSendMessage(text=os.path.join(static_nekoimg_path,"IMG_2992.jpg")),
-                TextSendMessage(text=os.path.join(static_nekoimg_path,"thumb","IMG_2992-thumb.jpg"))
-            ])
+       )
 
 @handler.add(JoinEvent)
 def handle_join(event):
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text="ねこって言ってみ"))
+        TextSendMessage(text='ねこって言ってみ')
+        )
 
-if __name__ == "__main__":
-    # create tmp dir for download content
-    make_static_tmp_dir()
-
-    port = int(os.getenv("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
