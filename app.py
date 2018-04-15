@@ -279,7 +279,6 @@ def handle_text_message(event):
                 image_send_message_dir(img_dir)
             ]
         )
-        return None
 
     #イヌ判定（テシストを返信して退出）
     send_text =''
@@ -292,7 +291,6 @@ def handle_text_message(event):
             line_bot_api.leave_group(event.source.group_id)
         elif isinstance(event.source, SourceRoom):
             line_bot_api.leave_room(event.source.room_id)
-        return None
 
     #test判定（画像のパスを送信）
     send_text =''
@@ -309,8 +307,7 @@ def handle_text_message(event):
                 TextSendMessage(text=image_url),
                 TextSendMessage(text=image_thumb_url)
             ])
-        return None
-
+            
     #スペシャル判定（テキストとイメージを返信。場合によって退出）
     send_text =''
     if message_pattern == 'kitada':
