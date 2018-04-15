@@ -214,31 +214,3 @@ def image_send_message_list(img_dir,img_list):
 def hello_world():
     return random.choice('にゃー','ニャー','nya-')
 
-@app.route('/callback', methods=['POST'])
-def callback():
-    # get X-Line-Signature header value
-    signature = request.headers['X-Line-Signature']
-
-    # get request body as text
-    body = request.get_data(as_text=True)
-    app.logger.info('Request body: ' + body)
-
-    # handle webhook body
-    try:
-        handler.handle(body, signature)
-    except InvalidSignatureError:
-        abort(400)
-
-    return 'OK'
-
-
-
-@handler.add(JoinEvent)
-def handle_join(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text='ねこって言ってみ')
-        )
-
-    port = int(os.getenv('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
