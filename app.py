@@ -337,7 +337,7 @@ def handle_text_message(event):
                 TextSendMessage(text=send_text),
                 image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg'])
             ]
-       )
+        )
 
 @handler.add(JoinEvent)
 def handle_join(event):
