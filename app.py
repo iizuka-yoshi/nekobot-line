@@ -57,7 +57,7 @@ if channel_access_token is None:
 line_bot_api = LineBotApi(channel_access_token)
 handler = WebhookHandler(channel_secret)
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
+base_dir = 'https://nekobot-line.herokuapp.com'
 static_tmp_path = 'https://nekobot-line.herokuapp.com/static/tmp'
 
 # function for create tmp dir for download content
