@@ -197,7 +197,7 @@ def image_send_message_dir(img_dir):
         original_content_url=image_url,
         preview_image_url=image_thumb_url
     )
-    print('image_url: ' + image_url)
+    print('[Message Log]image_url: ' + image_url)
     return message
 
 def image_send_message_list(img_dir,img_list):
@@ -239,8 +239,8 @@ def handle_text_message(event):
     message_pattern = get_message_pattern(text)
     img_dir = get_img_dir(message_pattern)
 
-    print('text: ' + str(text))
-    print('message_pattern: ' + str(message_pattern))
+    print('[Message Log]text: ' + str(text))
+    print('[Message Log]message_pattern: ' + str(message_pattern))
 
     #ねこ判定（テキストとイメージを返信）
     send_text =''
