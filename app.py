@@ -311,13 +311,13 @@ def handle_text_message(event):
         image_thumb_url = os.path.join(base_dir, img_dir,'thumb',image_name)
         line_bot_api.reply_message(event.reply_token,
             [
-                TextSendMessage(text=send_text),
-                TextSendMessage(text=image_url),
-                TextSendMessage(text=image_thumb_url),
+                #TextSendMessage(text=send_text),
+                #TextSendMessage(text=image_url),
+                #TextSendMessage(text=image_thumb_url),
                 TextSendMessage(text='random test'),
                 TextSendMessage(text=str(random.random())),
                 TextSendMessage(text='choice test'),
-                #TextSendMessage(text=random.choice(['0','1','2','3','4','5','6','7','8','9']))
+                TextSendMessage(text=random.choice(['0','1','2','3','4','5','6','7','8','9']))
             ])
 
     #スペシャル判定（テキストとイメージを返信。場合によって退出）
