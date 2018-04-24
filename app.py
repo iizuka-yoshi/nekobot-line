@@ -239,8 +239,8 @@ def handle_text_message(event):
     message_pattern = get_message_pattern(text)
     img_dir = get_img_dir(message_pattern)
 
-    print('text: ' + text)
-    print('message_pattern: ' + message_pattern)
+    print('text: ' + str(text))
+    print('message_pattern: ' + str(message_pattern))
 
     #ねこ判定（テキストとイメージを返信）
     send_text =''
