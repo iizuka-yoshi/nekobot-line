@@ -239,6 +239,8 @@ def handle_text_message(event):
     message_pattern = get_message_pattern(text)
     img_dir = get_img_dir(message_pattern)
 
+    print('text:' + text + ' ' + 'message_pattern:' + message_pattern)
+
     #ねこ判定（テキストとイメージを返信）
     send_text =''
     if message_pattern in{'neko_hime'}:
@@ -300,7 +302,7 @@ def handle_text_message(event):
     #test判定（画像のパスを送信）
     send_text =''
     if message_pattern == 'test':
-        send_text = 'pathをテスト'
+        send_text = 'path test'
 
     if send_text != '':
         image_name = random.choice(os.listdir(img_dir))
@@ -311,7 +313,10 @@ def handle_text_message(event):
                 TextSendMessage(text=send_text),
                 TextSendMessage(text=image_url),
                 TextSendMessage(text=image_thumb_url),
-                TextSendMessage(text='疑似乱数：' + str(random.random())),
+                TextSendMessage(text='疑似乱数 test'),
+                TextSendMessage(text=str(random.random())),
+                TextSendMessage(text='choice test'),
+                TextSendMessage(text=random.choice(['0','1','2','3','4','5','6','7','8','9',]))
             ])
 
     #スペシャル判定（テキストとイメージを返信。場合によって退出）
