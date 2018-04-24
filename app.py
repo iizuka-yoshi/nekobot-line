@@ -75,13 +75,13 @@ def get_message_pattern(text):
     elif text in{'ちょこ','チョコ','ﾁｮｺ'}:
         return 'neko_choco'
 
-    elif text in{'ねこ','ねこちゃん'}:
+    elif text in{'ねこ','ねこちゃん','にゃんこ'}:
         return 'neko_hiragana'
 
     elif text in{'猫','寝子','猫ちゃん'}:
         return 'neko_kanji'
 
-    elif text in{'ネコ','ネコちゃん','ネコチャン'}:
+    elif text in{'ネコ','ネコちゃん','ネコチャン','キティ','キティちゃん'}:
         return 'neko_kana_full'
 
     elif text in{'ﾈｺ','ﾈｺﾁｬﾝ'}:
@@ -96,13 +96,17 @@ def get_message_pattern(text):
     elif text in{'ｃａｔ'}:
         return 'neko_eng_full'
 
-    elif text in{'cat'}:
+    elif text in{'cat','cats','kitty'}:
         return 'neko_eng_half'
 
     elif text in{'🐈','🐱','😸','😹','😺','😻','😼','😽','😾','😿','🙀'}:
         return 'neko_emoji'
 
-    elif text in{'犬','いぬ','イヌ','ｲﾇ','わんちゃん','ワンちゃん','ワンチャン','ﾜﾝﾁｬﾝ','ｄｏｇ','dog','🐕'}:
+    elif text in{
+        '犬','いぬ','イヌ','ｲﾇ','わんちゃん','ワンちゃん','ワンチャン','ﾜﾝﾁｬﾝ',
+        'ｄｏｇ','dog',
+        '🐕','🐩','🐶'
+        }:
         return 'dog'
 
     elif text in{
@@ -306,7 +310,8 @@ def handle_text_message(event):
             [
                 TextSendMessage(text=send_text),
                 TextSendMessage(text=image_url),
-                TextSendMessage(text=image_thumb_url)
+                TextSendMessage(text=image_thumb_url),
+                TextSendMessage(text='疑似乱数：' + random.random()),
             ])
 
     #スペシャル判定（テキストとイメージを返信。場合によって退出）
