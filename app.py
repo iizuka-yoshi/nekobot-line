@@ -99,7 +99,7 @@ def get_message_pattern(text):
     elif text in{'cat'}:
         return 'neko_eng_half'
 
-    elif text in{'🐈'}:
+    elif text in{'🐈','🐱','😸','😹','😺','😻','😼','😽','😾','😿','🙀'}:
         return 'neko_emoji'
 
     elif text in{'犬','いぬ','イヌ','ｲﾇ','わんちゃん','ワンちゃん','ワンチャン','ﾜﾝﾁｬﾝ','ｄｏｇ','dog','🐕'}:
@@ -116,7 +116,8 @@ def get_message_pattern(text):
         '若松','わかまつ','ワカマツ','ﾜｶﾏﾂ',
         '若松さん','わかまつさん','ワカマツサン','ﾜｶﾏﾂｻﾝ',
         'ｗａｋａｍａｔｓｕ','wakamatsu',
-        '若','わか','ワカ','ﾜｶ','ｗａｋａ','waka'
+        '若','わか','ワカ','ﾜｶ','ｗａｋａ','waka',
+        '若さま','わかさま','ワカサマ','ﾜｶｻﾏ','wakasama'
         }:
         return 'wakamatsu'
 
@@ -270,7 +271,7 @@ def handle_text_message(event):
         send_text = random.choice(['meow（ミャウ）','mew（ミュー）'])
 
     elif message_pattern in{'neko_emoji'}:
-        send_text = '絵文字？'
+        send_text = random.choice(['🐈','🐱','😸','😹','😺','😻','😼','😽','😾','😿','🙀'])
 
     if send_text != '':
         line_bot_api.reply_message(event.reply_token,
