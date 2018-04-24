@@ -314,9 +314,9 @@ def handle_text_message(event):
                 TextSendMessage(text=send_text),
                 TextSendMessage(text=image_url),
                 TextSendMessage(text=image_thumb_url),
-                TextSendMessage(text='疑似乱数 test'),
-                TextSendMessage(text=str(random.random()))
-                #TextSendMessage(text='choice test'),
+                TextSendMessage(text='random test'),
+                TextSendMessage(text=str(random.random())),
+                TextSendMessage(text='choice test'),
                 #TextSendMessage(text=random.choice(['0','1','2','3','4','5','6','7','8','9']))
             ])
 
