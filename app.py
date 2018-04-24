@@ -311,7 +311,7 @@ def handle_text_message(event):
                 TextSendMessage(text=send_text),
                 TextSendMessage(text=image_url),
                 TextSendMessage(text=image_thumb_url),
-                TextSendMessage(text='疑似乱数：' + random.random()),
+                TextSendMessage(text='疑似乱数：' + str(random.random())),
             ])
 
     #スペシャル判定（テキストとイメージを返信。場合によって退出）
