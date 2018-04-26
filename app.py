@@ -63,6 +63,7 @@ static_tmp_path = 'https://nekobot-line.herokuapp.com/static/tmp'
 def get_message_pattern(text):
     text = text.replace(' ','')
     text = text.replace('　','')
+    text = text.replace('〜','ー')
     text = text.strip()
     text = text.lower()
 
@@ -101,6 +102,13 @@ def get_message_pattern(text):
 
     elif text in{'🐈','🐱','😸','😹','😺','😻','😼','😽','😾','😿','🙀'}:
         return 'neko_emoji'
+
+    elif text in{
+        'チャオちゅーる','ちゃおちゅーる','チャオチュール','ciaoチュール',
+        'ちゅーる','チュール',
+        'いなば','イナバ','inaba',
+        'おやつ','オヤツ'}:
+        return 'cyu-ru'
 
     elif text in{
         '犬','いぬ','イヌ','ｲﾇ','わんちゃん','ワンちゃん','ワンチャン','ﾜﾝﾁｬﾝ',
@@ -167,6 +175,11 @@ def get_img_dir(message_pattern):
         'neko_roma_full','neko_roma_half','neko_eng_full','neko_eng_half','neko_emoji'
         }:
         return 'static/nekoimg'
+
+    elif message_pattern in{
+        'cyu-ru'
+        }:
+        return 'static/cyu-ruimg'
 
     elif message_pattern in{
         'neko_quu'
@@ -365,6 +378,16 @@ def handle_text_message(event):
 
     #スペシャル判定（テキストとイメージを返信。場合によって退出）
     send_text =''
+
+    if message_pattern == 'cyu-ru':
+        send_text ='ぺろぺろ'
+        line_bot_api.reply_message(event.reply_token,
+            [
+                TextSendMessage(text=send_text),
+                image_send_message_dir(img_dir)
+            ]
+        )
+
     if message_pattern == 'kitada':
         line_bot_api.reply_message(event.reply_token,
             image_send_message_dir(img_dir)
