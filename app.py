@@ -233,7 +233,7 @@ def image_send_message_dir(img_dir):
         original_content_url=image_url,
         preview_image_url=image_thumb_url
     )
-    print('[Image Log] image_url: ' + image_url)
+    print('[Image Log] image_url=' + image_url)
     return message
 
 def image_send_message_list(img_dir,img_list):
@@ -245,7 +245,7 @@ def image_send_message_list(img_dir,img_list):
         original_content_url=image_url,
         preview_image_url=image_thumb_url
     )
-    print('[Image Log] image_url: ' + image_url)
+    print('[Image Log] image_url=' + image_url)
     return message
 
 @app.route('/')
@@ -293,9 +293,9 @@ def handle_text_message(event):
         user_name = 'Unknown'
 
     print('[Event Log]'
-        + ' user_name: ' + str(user_name)
-        + ' text: ' + str(text)
-        + ' message_pattern: ' + str(message_pattern)
+        + ' user_name=' + str(user_name)
+        + ' text=' + str(text)
+        + ' message_pattern=' + str(message_pattern)
         )
 
     #ねこ判定（テキストとイメージを返信）
