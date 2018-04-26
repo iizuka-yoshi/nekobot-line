@@ -239,8 +239,15 @@ def handle_text_message(event):
     message_pattern = get_message_pattern(text)
     img_dir = get_img_dir(message_pattern)
 
-    print('[Message Log]text: ' + str(text))
-    print('[Message Log]message_pattern: ' + str(message_pattern))
+    #log
+    if isinstance(event.source, SourceUser):
+        profile = line_bot_api.get_profile(event.source.user_id)
+
+    print('[Message Log]'
+        + ' user_name: ' + profile.display_name
+        + ' text: ' + str(text)
+        + ' message_pattern: ' + str(message_pattern)
+
 
     #ねこ判定（テキストとイメージを返信）
     send_text =''
@@ -248,7 +255,7 @@ def handle_text_message(event):
         send_text = 'みゃー'
 
     elif message_pattern in{'neko_quu'}:
-        send_text = 'にゃお〜ん'
+        send_text = 'にゃおーん'
 
     elif message_pattern in{'neko_choco'}:
         send_text = 'にゃっ'
