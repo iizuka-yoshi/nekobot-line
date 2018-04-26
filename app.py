@@ -247,6 +247,7 @@ def handle_text_message(event):
         + ' user_name: ' + profile.display_name
         + ' text: ' + str(text)
         + ' message_pattern: ' + str(message_pattern)
+        )
 
 
     #ねこ判定（テキストとイメージを返信）
