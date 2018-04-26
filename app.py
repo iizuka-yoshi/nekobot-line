@@ -244,6 +244,9 @@ def handle_text_message(event):
         profile = line_bot_api.get_profile(event.source.user_id)
         user_name = profile.display_name
 
+    else:
+        user_name = 'Group'
+
     print('[Message Log]'
         + ' user_name: ' + str(user_name)
         + ' text: ' + str(text)
