@@ -240,19 +240,25 @@ def handle_text_message(event):
     img_dir = get_img_dir(message_pattern)
 
     #log
-    if isinstance(event.source, SourceUser):
-        profile = line_bot_api.get_profile(event.source.user_id)
-        user_name = profile.display_name
+    try:
+        if isinstance(event.source, SourceUser):
+            profile = line_bot_api.get_profile(event.source.user_id)
+            user_name = profile.display_name
 
-    else:
-        user_name = 'Group'
+        elif isinstance(event.source, SourceGroup):
+            profile = line_bot_api.get_group_member_profile(event.source.group_id, event.source.user_id)
+
+        elif isinstance(event.source, SourceRoom):
+            profile = line_bot_api.get_room_member_profile(event.source.room_id, event.source.user_id)
+
+    except:
+        user_name = 'Unknown'
 
     print('[Message Log]'
         + ' user_name: ' + str(user_name)
         + ' text: ' + str(text)
         + ' message_pattern: ' + str(message_pattern)
         )
-
 
     #ねこ判定（テキストとイメージを返信）
     send_text =''
