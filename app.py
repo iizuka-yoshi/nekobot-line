@@ -242,9 +242,10 @@ def handle_text_message(event):
     #log
     if isinstance(event.source, SourceUser):
         profile = line_bot_api.get_profile(event.source.user_id)
+        user_name = profile.display_name
 
     print('[Message Log]'
-        + ' user_name: ' + str(profile.display_name)
+        + ' user_name: ' + str(user_name)
         + ' text: ' + str(text)
         + ' message_pattern: ' + str(message_pattern)
         )
