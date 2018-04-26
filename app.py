@@ -233,7 +233,7 @@ def image_send_message_dir(img_dir):
         original_content_url=image_url,
         preview_image_url=image_thumb_url
     )
-    print('[Message Log] image_url: ' + image_url)
+    print('[Image Log] image_url: ' + image_url)
     return message
 
 def image_send_message_list(img_dir,img_list):
@@ -245,7 +245,7 @@ def image_send_message_list(img_dir,img_list):
         original_content_url=image_url,
         preview_image_url=image_thumb_url
     )
-    print('[Message Log] image_url: ' + image_url)
+    print('[Image Log] image_url: ' + image_url)
     return message
 
 @app.route('/')
@@ -292,7 +292,7 @@ def handle_text_message(event):
     except:
         user_name = 'Unknown'
 
-    print('[Message Log]'
+    print('[Event Log]'
         + ' user_name: ' + str(user_name)
         + ' text: ' + str(text)
         + ' message_pattern: ' + str(message_pattern)
@@ -374,7 +374,8 @@ def handle_text_message(event):
                 TextSendMessage(text=str(random.random())),
                 TextSendMessage(text='choice test [0-9]'),
                 TextSendMessage(text=random.choice(['0','1','2','3','4','5','6','7','8','9']))
-            ])
+            ]
+        )
 
     #スペシャル判定（テキストとイメージを返信。場合によって退出）
     send_text =''
