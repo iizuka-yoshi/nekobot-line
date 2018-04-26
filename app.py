@@ -149,6 +149,9 @@ def get_message_pattern(text):
     elif text in{'きむたく','キムタク','ｷﾑﾀｸ','ｋｉｍｕｔａｋｕ','kimutaku'}:
         return 'kimutaku'
 
+    elif text in{'竹内涼真','りょうま','りょーま','リョウマ','リョーマ'}:
+        return 'ryoma'
+
     elif text in{'てすと','テスト','ﾃｽﾄ','test'}:
         return 'test'
 
@@ -188,6 +191,11 @@ def get_img_dir(message_pattern):
         'kimutaku'
         }:
         return 'static/kimutakuimg'
+
+    elif message_pattern in{
+        'ryoma'
+        }:
+        return 'static/ryomaimg'
 
     elif message_pattern in{
         'test'
@@ -367,7 +375,16 @@ def handle_text_message(event):
             )
 
     elif message_pattern == 'kimutaku':
-        send_text ='こら'
+        send_text ='まてよ'
+        line_bot_api.reply_message(event.reply_token,
+            [
+                TextSendMessage(text=send_text),
+                image_send_message_dir(img_dir)
+            ]
+        )
+
+    elif message_pattern == 'ryoma':
+        send_text ='あいしてる'
         line_bot_api.reply_message(event.reply_token,
             [
                 TextSendMessage(text=send_text),
