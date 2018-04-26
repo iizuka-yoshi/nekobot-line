@@ -106,7 +106,7 @@ def get_message_pattern(text):
     elif text in{
         'チャオちゅーる','ちゃおちゅーる','チャオチュール','ciaoチュール',
         'ちゅーる','チュール',
-        'いなば','イナバ','inaba',
+        'いなば食品','いなば','イナバ','inaba',
         'おやつ','オヤツ'}:
         return 'cyu-ru'
 
