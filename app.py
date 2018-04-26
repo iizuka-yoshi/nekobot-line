@@ -244,7 +244,7 @@ def handle_text_message(event):
         profile = line_bot_api.get_profile(event.source.user_id)
 
     print('[Message Log]'
-        + ' user_name: ' + profile.display_name
+        + ' user_name: ' + str(profile.display_name)
         + ' text: ' + str(text)
         + ' message_pattern: ' + str(message_pattern)
         )
