@@ -146,6 +146,9 @@ def get_message_pattern(text):
     elif text in{'おわかりいただけただろうか'}:
         return 'ghost'
 
+    elif text in{'きむたく','キムタク','ｷﾑﾀｸ','ｋｉｍｕｔａｋｕ','kimutaku'}:
+        return 'kimutaku'
+
     elif text in{'てすと','テスト','ﾃｽﾄ','test'}:
         return 'test'
 
@@ -180,6 +183,11 @@ def get_img_dir(message_pattern):
         'yoneda'
         }:
         return 'static/yonedaimg'
+
+    elif message_pattern in{
+        'kimutaku'
+        }:
+        return 'static/kimutakuimg'
 
     elif message_pattern in{
         'test'
@@ -253,7 +261,7 @@ def handle_text_message(event):
         elif isinstance(event.source, SourceRoom):
             profile = line_bot_api.get_room_member_profile(event.source.room_id, event.source.user_id)
             user_name = profile.display_name
-            
+
     except:
         user_name = 'Unknown'
 
@@ -357,6 +365,15 @@ def handle_text_message(event):
         line_bot_api.reply_message(event.reply_token,
             image_send_message_dir(img_dir)
             )
+
+    elif message_pattern == 'kimutaku':
+        send_text ='こら'
+        line_bot_api.reply_message(event.reply_token,
+            [
+                TextSendMessage(text=send_text),
+                image_send_message_dir(img_dir)
+            ]
+        )
 
     elif message_pattern == 'ghost':
         line_bot_api.reply_message(event.reply_token,
