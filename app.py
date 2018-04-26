@@ -127,6 +127,12 @@ def get_message_pattern(text):
         return 'wakamatsu'
 
     elif text in{
+        'あご','アゴ','ｱｺﾞ','あご松','あごまつ','アゴマツ','ｱｺﾞﾏﾂ',
+        'ａｇｏ','ago'
+        }:
+        return 'ago'
+
+    elif text in{
         '米田','よねだ','ヨネダ','ﾖﾈﾀﾞ',
         '米田さん','よねださん','ヨネダサン','ﾖﾈﾀﾞｻﾝ',
         'ｙｏｎｅｄａ','yoneda',
@@ -178,7 +184,7 @@ def get_img_dir(message_pattern):
         return 'static/kitadaimg'
 
     elif message_pattern in{
-        'wakamatsu'
+        'wakamatsu','ago'
         }:
         return 'static/wakamatsuimg'
 
@@ -368,6 +374,15 @@ def handle_text_message(event):
         line_bot_api.reply_message(event.reply_token,
             image_send_message_dir(img_dir)
             )
+
+    elif message_pattern == 'ago':
+        send_text ='こら'
+        line_bot_api.reply_message(event.reply_token,
+            [
+                TextSendMessage(text=send_text),
+                image_send_message_dir(img_dir)
+            ]
+        )
 
     elif message_pattern == 'yoneda':
         line_bot_api.reply_message(event.reply_token,
