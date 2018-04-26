@@ -149,7 +149,7 @@ def get_message_pattern(text):
     elif text in{'きむたく','キムタク','ｷﾑﾀｸ','ｋｉｍｕｔａｋｕ','kimutaku'}:
         return 'kimutaku'
 
-    elif text in{'竹内涼真','りょうま','りょーま','リョウマ','リョーマ'}:
+    elif text in{'竹内涼真','涼真','りょうま','りょーま','リョウマ','リョーマ'}:
         return 'ryoma'
 
     elif text in{'てすと','テスト','ﾃｽﾄ','test'}:
