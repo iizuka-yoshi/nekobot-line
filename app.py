@@ -248,10 +248,12 @@ def handle_text_message(event):
 
         elif isinstance(event.source, SourceGroup):
             profile = line_bot_api.get_group_member_profile(event.source.group_id, event.source.user_id)
+            user_name = profile.display_name
 
         elif isinstance(event.source, SourceRoom):
             profile = line_bot_api.get_room_member_profile(event.source.room_id, event.source.user_id)
-
+            user_name = profile.display_name
+            
     except:
         user_name = 'Unknown'
 
