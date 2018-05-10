@@ -68,6 +68,8 @@ def get_message_pattern(text):
     text = text.replace('？','')
     text = text.replace('!','')
     text = text.replace('?','')
+    text = text.replace('、','')
+    text = text.replace('。','')
     text = text.strip()
     text = text.lower()
 
