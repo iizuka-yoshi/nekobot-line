@@ -445,7 +445,7 @@ def handle_text_message(event):
         )
 
     elif message_pattern == 'goodjob':
-        send_text ='おつかれ☆'
+        send_text ='おつかれ！'
         line_bot_api.reply_message(event.reply_token,
             [
                 TextSendMessage(text=send_text),
