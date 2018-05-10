@@ -456,7 +456,7 @@ def handle_text_message(event):
 
     elif message_pattern == 'goodjob':
         #time.sleep(60)
-        send_text ='おつかれ'
+        send_text ='おつかれさま'
         line_bot_api.reply_message(event.reply_token,
             [
                 TextSendMessage(text=send_text),
