@@ -64,6 +64,10 @@ def get_message_pattern(text):
     text = text.replace(' ','')
     text = text.replace('　','')
     text = text.replace('〜','ー')
+    text = text.replace('！','')
+    text = text.replace('？','')
+    text = text.replace('!','')
+    text = text.replace('?','')
     text = text.strip()
     text = text.lower()
 
@@ -169,8 +173,11 @@ def get_message_pattern(text):
     elif text in{
         'お疲れ様です','お疲れさまです','おつかれさまです','オツカレサマデス',
         'お疲れ','おつかれ','オツカレ',
+        'お疲れー','おつかれー','オツカレー',
         '乙','おつ','オツ',
+        '乙ー','おつー','オツー',
         'お疲れ様でした','お疲れさまでした','おつかれさまでした','オツカレサマデシタ'
+        '疲れた','つかれた','ツカレタ',
         }:
         return 'goodjob'
 
