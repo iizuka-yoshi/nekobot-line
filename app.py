@@ -485,7 +485,9 @@ def handle_text_message(event):
             line_bot_api.reply_message(event.reply_token,
                 [
                     TextSendMessage(text=random.choice(['笞??冗┌蜉ｹ縺ｪ繧ｳ繝槭Φ繝','縺翫ｏ縺九ｊ縺?◆縺?縺代◆縺?繧阪≧縺'])),
-                    image_send_message_list(img_dir,['IMG_0775.jpg','IMG_0847.jpg','IMG_0775.jpg','IMG_0847.jpg'])
+                    image_send_message_list(img_dir,['IMG_0775.jpg','IMG_0847.jpg','IMG_0775.jpg','IMG_0847.jpg']),
+                    TextSendMessage(text='...'),
+                    TextSendMessage(text='エラー')
                 ]
             )
 
@@ -500,7 +502,9 @@ def handle_text_message(event):
             line_bot_api.reply_message(event.reply_token,
                 [
                     TextSendMessage(text=random.choice(['??ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ','･ｷ･罍ｼ｡｡･ｷ･罍ｼ｡｡･ｷ･罍ｼ'])),
-                    image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg','IMG_0761.jpg','IMG_0761_2.jpg'])
+                    image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg','IMG_0761.jpg','IMG_0761_2.jpg']),
+                    TextSendMessage(text='...'),
+                    TextSendMessage(text='エラー')
                 ]
             )
 
