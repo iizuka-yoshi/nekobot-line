@@ -469,12 +469,12 @@ def handle_text_message(event):
     elif message_pattern == 'ghost':
         if epsilon <= random.random():
             line_bot_api.reply_message(event.reply_token,
-                TextSendMessage(text='[警告] 無効なコマンドです')
+                TextSendMessage(text=random.choice(['[警告] コマンドを拒否','[警告] 危険なコマンドです','やめろ','こら','[隴ｦ蜻馨 繧ｳ繝槭Φ繝峨ｒ諡貞凄']))
             )
         else:
             line_bot_api.reply_message(event.reply_token,
                 [
-                    TextSendMessage(text='笞??冗┌蜉ｹ縺ｪ繧ｳ繝槭Φ繝'),
+                    TextSendMessage(text=random.choice(['笞??冗┌蜉ｹ縺ｪ繧ｳ繝槭Φ繝','縺翫ｏ縺九ｊ縺?◆縺?縺代◆縺?繧阪≧縺'])),
                     image_send_message_list(img_dir,['IMG_0775.jpg','IMG_0847.jpg','IMG_0775.jpg','IMG_0847.jpg'])
                 ]
             )
@@ -483,12 +483,12 @@ def handle_text_message(event):
         send_text ='シャー'
         if epsilon <= random.random():
             line_bot_api.reply_message(event.reply_token,
-                TextSendMessage(text='[警告] 無効なコマンドです')
+                    TextSendMessage(text=random.choice(['[警告] コマンドを拒否','[警告] 危険なコマンドです','やめろ','こら','[?ｭｦ???] ??ｳ?????ｳ???????????ｦ']))
             )
         else:
             line_bot_api.reply_message(event.reply_token,
                 [
-                    TextSendMessage(text='??ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ'),
+                    TextSendMessage(text=random.choice(['??ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ','･ｷ･罍ｼ｡｡･ｷ･罍ｼ｡｡･ｷ･罍ｼ'])),
                     image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg','IMG_0761.jpg','IMG_0761_2.jpg'])
                 ]
             )
