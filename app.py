@@ -275,8 +275,8 @@ def image_send_message_list(img_dir,img_list):
 
 def warning_message_text():
     text = random.choice([
-        '[警告] コマンドを拒否','[警告] 危険なコマンド','[警告] そのコマンドは禁止されています','[警告] 画像データへアクセスできません',
-        'やめろ',
+        '[警告] コマンドを拒否','[警告] 危険なコマンド','[警告] そのコマンドは禁止されています','[警告] 画像データへのアクセスを拒否',
+        'やめろ','こら','危険','😾',
         '[?ｭｦ???] ??ｳ?????ｳ???????????ｦ','[隴ｦ蜻馨 繧ｳ繝槭Φ繝峨ｒ諡貞凄'
     ])
     return text
@@ -304,7 +304,7 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
-    epsilon = 0.1
+    epsilon = 0.05
     text = event.message.text
     message_pattern = get_message_pattern(text)
     img_dir = get_img_dir(message_pattern)
