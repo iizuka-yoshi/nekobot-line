@@ -469,7 +469,7 @@ def handle_text_message(event):
     elif message_pattern == 'ghost':
         if epsilon <= random.random():
             line_bot_api.reply_message(event.reply_token,
-                TextSendMessage(text=random.choice(['[警告] コマンドを拒否','[警告] 危険なコマンドです','やめろ','こら','[隴ｦ蜻馨 繧ｳ繝槭Φ繝峨ｒ諡貞凄']))
+                TextSendMessage(text=random.choice(['[警告] コマンドを拒否','[警告] 危険なコマンド','やめろ','こら','[隴ｦ蜻馨 繧ｳ繝槭Φ繝峨ｒ諡貞凄']))
             )
         else:
             line_bot_api.reply_message(event.reply_token,
@@ -483,7 +483,7 @@ def handle_text_message(event):
         send_text ='シャー'
         if epsilon <= random.random():
             line_bot_api.reply_message(event.reply_token,
-                    TextSendMessage(text=random.choice(['[警告] コマンドを拒否','[警告] 危険なコマンドです','やめろ','こら','[?ｭｦ???] ??ｳ?????ｳ???????????ｦ']))
+                    TextSendMessage(text=random.choice(['[警告] コマンドを拒否','[警告] 危険なコマンド','やめろ','こら','[?ｭｦ???] ??ｳ?????ｳ???????????ｦ']))
             )
         else:
             line_bot_api.reply_message(event.reply_token,
