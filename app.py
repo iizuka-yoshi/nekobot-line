@@ -158,7 +158,7 @@ def get_message_pattern(text):
         return 'yoneda'
 
     elif text in{
-        '漫画太郎','','漫☆画太郎',
+        '漫画太郎','漫☆画太郎',
         'みっちー','ミッチー',
         'みっちーさん','ミッチーサン'
         }:
@@ -175,6 +175,7 @@ def get_message_pattern(text):
 
     elif text in{
         'お疲れ様です','お疲れさまです','おつかれさまです','オツカレサマデス',
+        'お疲れ様','お疲れさま','おつかれさま','オツカレサマ',
         'お疲れ','おつかれ','オツカレ',
         'お疲れー','おつかれー','オツカレー',
         '乙','おつ','オツ',
@@ -294,6 +295,7 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
+    epsilon = 0.05
     text = event.message.text
     message_pattern = get_message_pattern(text)
     img_dir = get_img_dir(message_pattern)
@@ -455,7 +457,6 @@ def handle_text_message(event):
         )
 
     elif message_pattern == 'goodjob':
-        #time.sleep(60)
         send_text ='おつかれさま'
         line_bot_api.reply_message(event.reply_token,
             [
@@ -465,18 +466,32 @@ def handle_text_message(event):
         )
 
     elif message_pattern == 'ghost':
-        line_bot_api.reply_message(event.reply_token,
-            image_send_message_list(img_dir,['IMG_0775.jpg','IMG_0847.jpg','IMG_0775.jpg','IMG_0847.jpg'])
+        if epsilon > random.random():
+            line_bot_api.reply_message(event.reply_token,
+                TextSendMessage(text='⚠️無効なコマンド')
+            )
+        else:
+            line_bot_api.reply_message(event.reply_token,
+                [
+                    TextSendMessage(text='笞??冗┌蜉ｹ縺ｪ繧ｳ繝槭Φ繝')
+                    image_send_message_list(img_dir,['IMG_0775.jpg','IMG_0847.jpg','IMG_0775.jpg','IMG_0847.jpg'])
+                ]
             )
 
     elif message_pattern == 'gatarou':
         send_text ='シャー'
-        line_bot_api.reply_message(event.reply_token,
-            [
-                TextSendMessage(text=send_text),
-                image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg','IMG_0761.jpg','IMG_0761_2.jpg'])
-            ]
-        )
+        if epsilon > random.random():
+            line_bot_api.reply_message(event.reply_token,
+                TextSendMessage(text='⚠️無効なコマンド')
+            )
+        else:
+            line_bot_api.reply_message(event.reply_token,
+                [
+                    TextSendMessage(text='??ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ')
+                    TextSendMessage(text=send_text),
+                    image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg','IMG_0761.jpg','IMG_0761_2.jpg'])
+                ]
+            )
 
 @handler.add(JoinEvent)
 def handle_join(event):
