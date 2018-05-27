@@ -296,7 +296,7 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
-    epsilon = 0.05
+    epsilon = 0.1
     text = event.message.text
     message_pattern = get_message_pattern(text)
     img_dir = get_img_dir(message_pattern)
@@ -469,7 +469,7 @@ def handle_text_message(event):
     elif message_pattern == 'ghost':
         if epsilon <= random.random():
             line_bot_api.reply_message(event.reply_token,
-                TextSendMessage(text='[警告] 無効なコマンド')
+                TextSendMessage(text='[警告] 危険なコマンドです')
             )
         else:
             line_bot_api.reply_message(event.reply_token,
@@ -483,7 +483,7 @@ def handle_text_message(event):
         send_text ='シャー'
         if epsilon <= random.random():
             line_bot_api.reply_message(event.reply_token,
-                TextSendMessage(text='[警告] 無効なコマンド')
+                TextSendMessage(text='[警告] 危険なコマンドです')
             )
         else:
             line_bot_api.reply_message(event.reply_token,
