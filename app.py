@@ -160,7 +160,8 @@ def get_message_pattern(text):
     elif text in{
         '漫画太郎','漫☆画太郎',
         'みっちー','ミッチー',
-        'みっちーさん','ミッチーサン'
+        'みっちーさん','ミッチーサン',
+        ''
         }:
         return 'gatarou'
 
@@ -466,7 +467,7 @@ def handle_text_message(event):
         )
 
     elif message_pattern == 'ghost':
-        if epsilon > random.random():
+        if epsilon <= random.random():
             line_bot_api.reply_message(event.reply_token,
                 TextSendMessage(text='⚠️無効なコマンド')
             )
@@ -480,7 +481,7 @@ def handle_text_message(event):
 
     elif message_pattern == 'gatarou':
         send_text ='シャー'
-        if epsilon > random.random():
+        if epsilon <= random.random():
             line_bot_api.reply_message(event.reply_token,
                 TextSendMessage(text='⚠️無効なコマンド')
             )
