@@ -273,6 +273,14 @@ def image_send_message_list(img_dir,img_list):
     print('[Image Log] image_url=' + image_url)
     return message
 
+def warning_message_text():
+    text = random.choice([
+        '[警告] コマンドを拒否','[警告] 危険なコマンド','[警告] そのコマンドは禁止されています',
+        'やめろ','やめて','危険'
+        '[?ｭｦ???] ??ｳ?????ｳ???????????ｦ','[隴ｦ蜻馨 繧ｳ繝槭Φ繝峨ｒ諡貞凄','[ｷﾙｹ ･ｳ･ﾞ･ﾉ､ﾝ'
+    ])
+    return text
+
 @app.route('/')
 def hello_world():
     return 'にゃー'
@@ -468,9 +476,11 @@ def handle_text_message(event):
 
     elif message_pattern == 'ghost':
         if epsilon <= random.random():
+            send_text = warning_message_text()
             line_bot_api.reply_message(event.reply_token,
-                TextSendMessage(text=random.choice(['[警告] コマンドを拒否','[警告] 危険なコマンド','やめろ','こら','[隴ｦ蜻馨 繧ｳ繝槭Φ繝峨ｒ諡貞凄']))
+                TextSendMessage(text=send_text)
             )
+
         else:
             line_bot_api.reply_message(event.reply_token,
                 [
@@ -480,11 +490,12 @@ def handle_text_message(event):
             )
 
     elif message_pattern == 'gatarou':
-        send_text ='シャー'
         if epsilon <= random.random():
+            send_text = warning_message_text()
             line_bot_api.reply_message(event.reply_token,
-                    TextSendMessage(text=random.choice(['[警告] コマンドを拒否','[警告] 危険なコマンド','やめろ','こら','[?ｭｦ???] ??ｳ?????ｳ???????????ｦ']))
+                    TextSendMessage(text=send_text)
             )
+
         else:
             line_bot_api.reply_message(event.reply_token,
                 [
