@@ -469,7 +469,7 @@ def handle_text_message(event):
     elif message_pattern == 'ghost':
         if epsilon <= random.random():
             line_bot_api.reply_message(event.reply_token,
-                TextSendMessage(text='⚠️無効なコマンド')
+                TextSendMessage(text='[警告] 無効なコマンド')
             )
         else:
             line_bot_api.reply_message(event.reply_token,
@@ -483,7 +483,7 @@ def handle_text_message(event):
         send_text ='シャー'
         if epsilon <= random.random():
             line_bot_api.reply_message(event.reply_token,
-                TextSendMessage(text='⚠️無効なコマンド')
+                TextSendMessage(text='[警告] 無効なコマンド')
             )
         else:
             line_bot_api.reply_message(event.reply_token,
