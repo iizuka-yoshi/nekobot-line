@@ -489,7 +489,6 @@ def handle_text_message(event):
             line_bot_api.reply_message(event.reply_token,
                 [
                     TextSendMessage(text='??ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ'),
-                    TextSendMessage(text=send_text),
                     image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg','IMG_0761.jpg','IMG_0761_2.jpg'])
                 ]
             )
