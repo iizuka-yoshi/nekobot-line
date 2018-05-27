@@ -473,7 +473,7 @@ def handle_text_message(event):
         else:
             line_bot_api.reply_message(event.reply_token,
                 [
-                    TextSendMessage(text='笞??冗┌蜉ｹ縺ｪ繧ｳ繝槭Φ繝')
+                    TextSendMessage(text='笞??冗┌蜉ｹ縺ｪ繧ｳ繝槭Φ繝'),
                     image_send_message_list(img_dir,['IMG_0775.jpg','IMG_0847.jpg','IMG_0775.jpg','IMG_0847.jpg'])
                 ]
             )
@@ -487,7 +487,7 @@ def handle_text_message(event):
         else:
             line_bot_api.reply_message(event.reply_token,
                 [
-                    TextSendMessage(text='??ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ')
+                    TextSendMessage(text='??ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ'),
                     TextSendMessage(text=send_text),
                     image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg','IMG_0761.jpg','IMG_0761_2.jpg'])
                 ]
