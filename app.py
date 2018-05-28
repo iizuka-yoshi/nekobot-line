@@ -274,8 +274,8 @@ def image_send_message_list(img_dir,img_list):
 
 def warning_message_text():
     text = random.choice([
-        '[警告] コマンドを拒否','[警告] 危険なコマンド','[警告] そのコマンドは禁止されています','[警告] 画像データへのアクセスを拒否',
-        'やめろ','こら','危険','😾',
+        '[警告] コマンドを拒否','[警告] 危険なコマンド','[警告] 禁止されています','[警告] アクセスできません',
+        'やめろ','こら','危険','😾','あぶない',
         '[?ｭｦ???] ??ｳ?????ｳ???????????ｦ','[隴ｦ蜻馨 繧ｳ繝槭Φ繝峨ｒ諡貞凄'
     ])
     return text
@@ -486,7 +486,7 @@ def handle_text_message(event):
                     TextSendMessage(text=random.choice(['笞??冗┌蜉ｹ縺ｪ繧ｳ繝槭Φ繝','縺翫ｏ縺九ｊ縺?◆縺?縺代◆縺?繧阪≧縺'])),
                     image_send_message_list(img_dir,['IMG_0775.jpg','IMG_0847.jpg','IMG_0775.jpg','IMG_0847.jpg']),
                     TextSendMessage(text='...'),
-                    TextSendMessage(text='にゃー')
+                    TextSendMessage(text='エラー')
                 ]
             )
 
@@ -503,7 +503,7 @@ def handle_text_message(event):
                     TextSendMessage(text=random.choice(['??ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ','･ｷ･罍ｼ｡｡･ｷ･罍ｼ｡｡･ｷ･罍ｼ'])),
                     image_send_message_list(img_dir,['IMG_0761.jpg','IMG_0761_2.jpg','IMG_0761.jpg','IMG_0761_2.jpg']),
                     TextSendMessage(text='...'),
-                    TextSendMessage(text='にゃー')
+                    TextSendMessage(text='エラー')
                 ]
             )
 
