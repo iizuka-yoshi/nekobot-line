@@ -161,7 +161,6 @@ def get_message_pattern(text):
         '漫画太郎','漫☆画太郎',
         'みっちー','ミッチー',
         'みっちーさん','ミッチーサン',
-        ''
         }:
         return 'gatarou'
 
