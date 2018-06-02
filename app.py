@@ -174,6 +174,14 @@ def get_message_pattern(text):
         return 'ryoma'
 
     elif text in{
+        '新田真剣佑','真剣佑','前田真剣佑',
+        'あらたまっけんゆう','まっけんゆう','まえだまっけんゆう',
+        'アラタマッケンユウ','マッケンユウ','マエダマッケンユウ',
+        'まっけん','マッケン'
+        }:
+        return 'makken'
+
+    elif text in{
         'お疲れ様です','お疲れさまです','おつかれさまです','オツカレサマデス',
         'お疲れ様','お疲れさま','おつかれさま','オツカレサマ',
         'お疲れ','おつかれ','オツカレ',
@@ -181,7 +189,9 @@ def get_message_pattern(text):
         '乙','おつ','オツ',
         '乙ー','おつー','オツー',
         'お疲れ様でした','お疲れさまでした','おつかれさまでした','オツカレサマデシタ',
-        '疲れた','つかれた','ツカレタ'
+        '疲れた','つかれた','ツカレタ',
+        'ご苦労様','ご苦労さま','ごくろうさま','ゴクロウサマ',
+        'ご苦労','ごくろう','ゴクロウ'
         }:
         return 'goodjob'
 
@@ -234,6 +244,11 @@ def get_img_dir(message_pattern):
         'ryoma'
         }:
         return 'static/ryomaimg'
+
+    elif message_pattern in{
+        'makken'
+        }:
+        return 'static/makkenimg'
 
     elif message_pattern in{
         'goodjob'
@@ -457,6 +472,15 @@ def handle_text_message(event):
 
     elif message_pattern == 'ryoma':
         send_text ='あいしてる'
+        line_bot_api.reply_message(event.reply_token,
+            [
+                TextSendMessage(text=send_text),
+                image_send_message_dir(img_dir)
+            ]
+        )
+
+    elif message_pattern == 'makken':
+        send_text ='お前のこと、好きって言ってなかった'
         line_bot_api.reply_message(event.reply_token,
             [
                 TextSendMessage(text=send_text),
