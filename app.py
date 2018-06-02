@@ -480,7 +480,7 @@ def handle_text_message(event):
         )
 
     elif message_pattern == 'makken':
-        send_text ='おまえのこと好きといってなかった'
+        send_text ='おまえのこと好きと言ってなかった'
         line_bot_api.reply_message(event.reply_token,
             [
                 TextSendMessage(text=send_text),
