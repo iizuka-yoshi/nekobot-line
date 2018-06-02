@@ -226,9 +226,14 @@ def get_img_dir(message_pattern):
         return 'static/kitadaimg'
 
     elif message_pattern in{
-        'wakamatsu','ago'
+        'ago'
         }:
         return 'static/wakamatsuimg'
+
+    elif message_pattern in{
+        'wakamatsu'
+        }:
+        return 'static/gakkiimg'
 
     elif message_pattern in{
         'yoneda'
