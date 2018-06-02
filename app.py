@@ -323,6 +323,8 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
+    random.seed()
+    
     epsilon = 0.05
     text = event.message.text
     message_pattern = get_message_pattern(text)
