@@ -545,24 +545,24 @@ def handle_text_message(event):
 
     elif message_pattern == 'carousel':
         carousel_template = CarouselTemplate(columns=[
-            CarouselColumn(text='ラーメン、居酒屋、焼きとん', title='ZOOT [浜松町]', actions=[
+            CarouselColumn(text='ラーメン、居酒屋、焼きとん\n'+'営業時間:17:00～24:00', title='ZOOT [浜松町]', actions=[
                 URITemplateAction(
                     label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
-                MessageTemplateAction(label='ここにする', text='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
+                MessageTemplateAction(label='ここにする', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13058997/'),
                 MessageTemplateAction(label='ねこ', text='ねこ'),
             ]),
 
-            CarouselColumn(text='牛タン、麦とろ、カレーライス', title='利助 [浜松町]', actions=[
+            CarouselColumn(text='牛タン、麦とろ、カレーライス\n'+'営業時間:17:30～22:30', title='利助 [浜松町]', actions=[
                 URITemplateAction(
                     label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/'),
                 MessageTemplateAction(label='ここにする', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13014253/'),
                 MessageTemplateAction(label='ねこ', text='ねこ'),
             ]),
 
-            CarouselColumn(text='中華料理、中国鍋・火鍋、ラーメン', title='青蓮 [浜松町]', actions=[
+            CarouselColumn(text='中華料理、中国鍋・火鍋、ラーメン\n'+'営業時間:17:00～23:00（L.O. 22:30）', title='青蓮 [浜松町]', actions=[
                 URITemplateAction(
                     label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13109938/'),
-                MessageTemplateAction(label='ここにする', text='https://tabelog.com/tokyo/A1314/A131401/13109938/'),
+                MessageTemplateAction(label='ここにする', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13109938/'),
                 MessageTemplateAction(label='ねこ', text='ねこ'),
             ]),
 
