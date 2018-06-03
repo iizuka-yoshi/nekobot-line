@@ -196,7 +196,16 @@ def get_message_pattern(text):
         return 'goodjob'
 
     elif text in{
-        'carousel'
+        'carousel',
+        '行きますか','いきますか','イキマスカ',
+        '行きます','いきます','イキマス',
+        '行く','いく','イク'
+        'どうしますか','ドウシマスカ'
+        'どうします','ドウシマス'
+        'どうする','ドウスル'
+        '終わった','おわった','オワッタ',
+        '終わる','おわる','オワル',
+        'そろそろ','ソロソロ',
         }:
         return 'carousel'
 
@@ -548,21 +557,56 @@ def handle_text_message(event):
             CarouselColumn(text='ラーメン、居酒屋、焼きとん\n'+'営業時間:17:00～24:00', title='ZOOT [浜松町]', actions=[
                 URITemplateAction(
                     label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
-                MessageTemplateAction(label='ここにする', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13058997/'),
+                MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13058997/'),
                 MessageTemplateAction(label='ねこ', text='ねこ'),
             ]),
 
             CarouselColumn(text='牛タン、麦とろ、カレーライス\n'+'営業時間:17:30～22:30', title='利助 [浜松町]', actions=[
                 URITemplateAction(
                     label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/'),
-                MessageTemplateAction(label='ここにする', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13014253/'),
+                MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13014253/'),
                 MessageTemplateAction(label='ねこ', text='ねこ'),
             ]),
 
-            CarouselColumn(text='中華料理、中国鍋・火鍋、ラーメン\n'+'営業時間:17:00～23:00（L.O. 22:30）', title='青蓮 [浜松町]', actions=[
+            CarouselColumn(text='中華料理、中国鍋・火鍋、ラーメン\n'+'営業時間:17:00～23:00(L.O. 22:30)', title='青蓮 [浜松町]', actions=[
                 URITemplateAction(
                     label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13109938/'),
-                MessageTemplateAction(label='ここにする', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13109938/'),
+                MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13109938/'),
+                MessageTemplateAction(label='ねこ', text='ねこ'),
+            ]),
+
+            CarouselColumn(text='魚介料理・海鮮料理、居酒屋\n'+'営業時間:17:00～23:30', title='魚金 [浜松町]', actions=[
+                URITemplateAction(
+                    label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13052364/'),
+                MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13052364/'),
+                MessageTemplateAction(label='ねこ', text='ねこ'),
+            ]),
+
+            CarouselColumn(text='ダイニングバー、ワインバー\n'+'営業時間:17:00～23:30(L.O.22:30、ドリンクL.O.23:00)', title='bonanza [浜松町]', actions=[
+                URITemplateAction(
+                    label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13143248/'),
+                MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13143248/'),
+                MessageTemplateAction(label='ねこ', text='ねこ'),
+            ]),
+
+            CarouselColumn(text='王様のブランチ第２位の餃子\n'+'営業時間:17:00～23:00(L.O.22:20)', title='東海飯店 [浜松町]', actions=[
+                URITemplateAction(
+                    label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13023334/'),
+                MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13023334/'),
+                MessageTemplateAction(label='ねこ', text='ねこ'),
+            ]),
+
+            CarouselColumn(text='ビストロ、イタリアン、居酒屋\n'+'営業時間:17:00～23:30(L.O.22:45)', title='ビストロガブリ [浜松町]', actions=[
+                URITemplateAction(
+                    label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13192222/'),
+                MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13192222/'),
+                MessageTemplateAction(label='ねこ', text='ねこ'),
+            ]),
+
+            CarouselColumn(text='居酒屋、くじら料理\n'+'営業時間:16:30～23:30', title='旨蔵 うま八 [新橋]', actions=[
+                URITemplateAction(
+                    label='食べログを見る', uri='https://tabelog.com/tokyo/A1301/A130103/13045442/'),
+                MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1301/A130103/13045442/'),
                 MessageTemplateAction(label='ねこ', text='ねこ'),
             ]),
 
