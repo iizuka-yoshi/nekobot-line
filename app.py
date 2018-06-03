@@ -324,7 +324,7 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
     random.seed()
-    
+
     epsilon = 0.05
     text = event.message.text
     message_pattern = get_message_pattern(text)
@@ -537,6 +537,24 @@ def handle_text_message(event):
                     TextSendMessage(text='エラー')
                 ]
             )
+
+    elif text == 'carousel':
+        carousel_template = CarouselTemplate(columns=[
+            CarouselColumn(text='hoge1', title='fuga1', actions=[
+                URITemplateAction(
+                    label='Go to line.me', uri='https://line.me'),
+                PostbackTemplateAction(label='ping', data='ping')
+            ]),
+            CarouselColumn(text='hoge2', title='fuga2', actions=[
+                PostbackTemplateAction(
+                    label='ping with text', data='ping',
+                    text='ping'),
+                MessageTemplateAction(label='Translate Rice', text='米')
+            ]),
+        ])
+        template_message = TemplateSendMessage(
+            alt_text='Carousel alt text', template=carousel_template)
+        line_bot_api.reply_message(event.reply_token, template_message)
 
 @handler.add(JoinEvent)
 def handle_join(event):
