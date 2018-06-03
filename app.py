@@ -572,7 +572,7 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('zoot'),
+                thumbnail_image_url=restaurant_image_url('risuke'),
                 text='牛タン、麦とろ、カレーライス\n'+'営業時間:17:30～22:30',
                 title='利助 [浜松町]',
                 actions=[
@@ -582,7 +582,7 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('zoot'),
+                thumbnail_image_url=restaurant_image_url('seiren'),
                 text='中華料理、中国鍋・火鍋、ラーメン\n'+'営業時間:17:00～23:00(L.O. 22:30)',
                 title='青蓮 [浜松町]',
                 actions=[
@@ -592,7 +592,7 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('zoot'),
+                thumbnail_image_url=restaurant_image_url('uokin'),
                 text='魚介料理・海鮮料理、居酒屋\n'+'営業時間:17:00～23:30',
                 title='魚金 [浜松町]',
                 actions=[
@@ -602,7 +602,7 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('zoot'),
+                thumbnail_image_url=restaurant_image_url('bonanza'),
                 text='ダイニングバー、ワインバー\n'+'営業時間:17:00～23:30(L.O.22:30、ドリンクL.O.23:00)',
                 title='bonanza [浜松町]',
                 actions=[
@@ -612,7 +612,7 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('zoot'),
+                thumbnail_image_url=restaurant_image_url('tokaihntn'),
                 text='王様のブランチ第２位の餃子\n'+'営業時間:17:00～23:00(L.O.22:20)',
                 title='東海飯店 [浜松町]',
                 actions=[
@@ -622,7 +622,7 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('zoot'),
+                thumbnail_image_url=restaurant_image_url('bstrgabri'),
                 text='ビストロ、イタリアン、居酒屋\n'+'営業時間:17:00～23:30(L.O.22:45)',
                 title='ビストロガブリ [浜松町]',
                 actions=[
@@ -632,7 +632,7 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('zoot'),
+                thumbnail_image_url=restaurant_image_url('uma8'),
                 text='居酒屋、くじら料理\n'+'営業時間:16:30～23:30',
                 title='旨蔵 うま八 [新橋]',
                 actions=[
