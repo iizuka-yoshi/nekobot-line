@@ -326,6 +326,12 @@ def warning_message_text():
     ])
     return text
 
+def restaurant_message_text():
+    text = random.choice([
+        '猫','ねこ','ネコ','cat','neko','ﾈｺﾁｬﾝ','ひめ',
+    ])
+    return text
+
 @app.route('/')
 def hello_world():
     return 'にゃー'
@@ -573,7 +579,7 @@ def handle_text_message(event):
                 actions=[
                     URITemplateAction(label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
                     MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13058997/'),
-                    MessageTemplateAction(label='ねこ', text='ねこ'),
+                    MessageTemplateAction(label='ねこ', text=restaurant_message_text()),
             ]),
 
             CarouselColumn(
@@ -583,7 +589,7 @@ def handle_text_message(event):
                 actions=[
                     URITemplateAction(label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13109938/'),
                     MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13109938/'),
-                    MessageTemplateAction(label='ねこ', text='ねこ'),
+                    MessageTemplateAction(label='ねこ', text=restaurant_message_text()),
             ]),
 
             CarouselColumn(
@@ -593,7 +599,7 @@ def handle_text_message(event):
                 actions=[
                     URITemplateAction(label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13052364/'),
                     MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13052364/'),
-                    MessageTemplateAction(label='ねこ', text='ねこ'),
+                    MessageTemplateAction(label='ねこ', text=restaurant_message_text()),
             ]),
 
             CarouselColumn(
@@ -603,7 +609,7 @@ def handle_text_message(event):
                 actions=[
                     URITemplateAction(label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/'),
                     MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13014253/'),
-                    MessageTemplateAction(label='ねこ', text='ねこ'),
+                    MessageTemplateAction(label='ねこ', text=restaurant_message_text()),
             ]),
 
             CarouselColumn(
@@ -613,7 +619,7 @@ def handle_text_message(event):
                 actions=[
                     URITemplateAction(label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13143248/'),
                     MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13143248/'),
-                    MessageTemplateAction(label='ねこ', text='ねこ'),
+                    MessageTemplateAction(label='ねこ', text=restaurant_message_text()),
             ]),
 
             CarouselColumn(
@@ -623,7 +629,7 @@ def handle_text_message(event):
                 actions=[
                     URITemplateAction(label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13023334/'),
                     MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13023334/'),
-                    MessageTemplateAction(label='ねこ', text='ねこ'),
+                    MessageTemplateAction(label='ねこ', text=restaurant_message_text()),
             ]),
 
             CarouselColumn(
@@ -633,7 +639,7 @@ def handle_text_message(event):
                 actions=[
                     URITemplateAction(label='食べログを見る', uri='https://tabelog.com/tokyo/A1301/A130103/13045442/'),
                     MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1301/A130103/13045442/'),
-                    MessageTemplateAction(label='ねこ', text='ねこ'),
+                    MessageTemplateAction(label='ねこ', text=restaurant_message_text()),
             ]),
 
         ])
