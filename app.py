@@ -562,7 +562,7 @@ def handle_text_message(event):
     elif message_pattern == 'carousel':
         carousel_template = CarouselTemplate(columns=[
             CarouselColumn(
-                thumbnailImageUrl=restaurant_image_url('zoot'),
+                thumbnailImageUrl='https://nekobot-line.herokuapp.com/static/restaurantimg/zoot.jpg',
                 text='ラーメン、居酒屋、焼きとん\n'+'営業時間:17:00～24:00',
                 title='ZOOT [浜松町]',
                 actions=[
