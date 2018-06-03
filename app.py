@@ -550,7 +550,7 @@ def handle_text_message(event):
                     label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
                 URITemplateAction(
                     label='地図を見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/dtlmap/'),
-                MessageTemplateAction(label='ここにする', text='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
+                MessageTemplateAction(label='ここにする', text='ここで¥n' + 'https://tabelog.com/tokyo/A1314/A131401/13058997/'),
                 #MessageTemplateAction(label='ねこ', text='ねこ'),
             ]),
 
