@@ -199,10 +199,10 @@ def get_message_pattern(text):
         'carousel',
         '行きますか','いきますか','イキマスカ',
         '行きます','いきます','イキマス',
-        '行く','いく','イク'
-        'どうしますか','ドウシマスカ'
-        'どうします','ドウシマス'
-        'どうする','ドウスル'
+        '行く','いく','イク',
+        'どうしますか','ドウシマスカ',
+        'どうします','ドウシマス',
+        'どうする','ドウスル',
         '終わった','おわった','オワッタ',
         '終わる','おわる','オワル',
         'そろそろ','ソロソロ',
@@ -305,6 +305,13 @@ def image_send_message_list(img_dir,img_list):
     )
     print('[Image Log] image_url=' + image_url)
     return message
+
+def restaurant_image_url(restaurant):
+    image_name = restaurant + '.jpg'
+    image_url = os.path.join(base_dir,img_dir,image_name)
+    image_thumb_url = os.path.join(base_dir, img_dir,'thumb',image_name)
+
+    return image_url
 
 def warning_message_text():
     text = random.choice([
@@ -555,7 +562,7 @@ def handle_text_message(event):
     elif message_pattern == 'carousel':
         carousel_template = CarouselTemplate(columns=[
             CarouselColumn(
-                thumbnailImageUrl='https://tabelog.com/imgview/original?id=r839884175556',
+                thumbnailImageUrl=restaurant_image_url('zoot'),
                 text='ラーメン、居酒屋、焼きとん\n'+'営業時間:17:00～24:00',
                 title='ZOOT [浜松町]',
                 actions=[
@@ -565,7 +572,7 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnailImageUrl='https://tabelog.com/imgview/original?id=r839884175556',
+                thumbnailImageUrl=restaurant_image_url('zoot'),
                 text='牛タン、麦とろ、カレーライス\n'+'営業時間:17:30～22:30',
                 title='利助 [浜松町]',
                 actions=[
@@ -575,7 +582,7 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnailImageUrl='https://tabelog.com/imgview/original?id=r839884175556',
+                thumbnailImageUrl=restaurant_image_url('zoot'),
                 text='中華料理、中国鍋・火鍋、ラーメン\n'+'営業時間:17:00～23:00(L.O. 22:30)',
                 title='青蓮 [浜松町]',
                 actions=[
@@ -585,7 +592,7 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnailImageUrl='https://tabelog.com/imgview/original?id=r839884175556',
+                thumbnailImageUrl=restaurant_image_url('zoot'),
                 text='魚介料理・海鮮料理、居酒屋\n'+'営業時間:17:00～23:30',
                 title='魚金 [浜松町]',
                 actions=[
@@ -595,7 +602,7 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnailImageUrl='https://tabelog.com/imgview/original?id=r839884175556',
+                thumbnailImageUrl=restaurant_image_url('zoot'),
                 text='ダイニングバー、ワインバー\n'+'営業時間:17:00～23:30(L.O.22:30、ドリンクL.O.23:00)',
                 title='bonanza [浜松町]',
                 actions=[
@@ -605,7 +612,7 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnailImageUrl='https://tabelog.com/imgview/original?id=r839884175556',
+                thumbnailImageUrl=restaurant_image_url('zoot'),
                 text='王様のブランチ第２位の餃子\n'+'営業時間:17:00～23:00(L.O.22:20)',
                 title='東海飯店 [浜松町]',
                 actions=[
@@ -615,7 +622,7 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnailImageUrl='https://tabelog.com/imgview/original?id=r839884175556',
+                thumbnailImageUrl=restaurant_image_url('zoot'),
                 text='ビストロ、イタリアン、居酒屋\n'+'営業時間:17:00～23:30(L.O.22:45)',
                 title='ビストロガブリ [浜松町]',
                 actions=[
@@ -625,7 +632,7 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnailImageUrl='https://tabelog.com/imgview/original?id=r839884175556',
+                thumbnailImageUrl=restaurant_image_url('zoot'),
                 text='居酒屋、くじら料理\n'+'営業時間:16:30～23:30',
                 title='旨蔵 うま八 [新橋]',
                 actions=[
