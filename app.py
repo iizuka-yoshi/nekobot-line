@@ -577,16 +577,6 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('risuke'),
-                text='牛タン、麦とろ、カレーライス\n'+'営業時間:17:30～22:30',
-                title='利助 [浜松町]',
-                actions=[
-                    URITemplateAction(label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/'),
-                    MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13014253/'),
-                    MessageTemplateAction(label='ねこ', text='ねこ'),
-            ]),
-
-            CarouselColumn(
                 thumbnail_image_url=restaurant_image_url('seiren'),
                 text='中華料理、中国鍋・火鍋、ラーメン\n'+'営業時間:17:00～23:00(L.O. 22:30)',
                 title='青蓮 [浜松町]',
@@ -607,6 +597,16 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
+                thumbnail_image_url=restaurant_image_url('risuke'),
+                text='牛タン、麦とろ、カレーライス\n'+'営業時間:17:30～22:30',
+                title='利助 [浜松町]',
+                actions=[
+                    URITemplateAction(label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/'),
+                    MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13014253/'),
+                    MessageTemplateAction(label='ねこ', text='ねこ'),
+            ]),
+
+            CarouselColumn(
                 thumbnail_image_url=restaurant_image_url('bonanza'),
                 text='ダイニングバー、ワインバー\n'+'営業時間:17:00～23:30(L.O.22:30、ドリンクL.O.23:00)',
                 title='bonanza [浜松町]',
@@ -623,16 +623,6 @@ def handle_text_message(event):
                 actions=[
                     URITemplateAction(label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13023334/'),
                     MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13023334/'),
-                    MessageTemplateAction(label='ねこ', text='ねこ'),
-            ]),
-
-            CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('bstrgabri'),
-                text='ビストロ、イタリアン、居酒屋\n'+'営業時間:17:00～23:30(L.O.22:45)',
-                title='ビストロガブリ [浜松町]',
-                actions=[
-                    URITemplateAction(label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13192222/'),
-                    MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13192222/'),
                     MessageTemplateAction(label='ねこ', text='ねこ'),
             ]),
 
