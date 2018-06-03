@@ -548,28 +548,22 @@ def handle_text_message(event):
             CarouselColumn(text='ラーメン、居酒屋、焼きとん', title='ZOOT [浜松町]', actions=[
                 URITemplateAction(
                     label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
-                URITemplateAction(
-                    label='地図を見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/dtlmap/'),
-                MessageTemplateAction(label='ここにする', text='ここで ' + 'https://tabelog.com/tokyo/A1314/A131401/13058997/'),
-                #MessageTemplateAction(label='ねこ', text='ねこ'),
+                MessageTemplateAction(label='ここにする', text='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
+                MessageTemplateAction(label='ねこ', text='ねこ'),
             ]),
 
             CarouselColumn(text='牛タン、麦とろ、カレーライス', title='利助 [浜松町]', actions=[
                 URITemplateAction(
                     label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/'),
-                URITemplateAction(
-                    label='地図を見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/dtlmap/'),
                 MessageTemplateAction(label='ここにする', text='https://tabelog.com/tokyo/A1314/A131401/13014253/'),
-                #MessageTemplateAction(label='ねこ', text='ねこ'),
+                MessageTemplateAction(label='ねこ', text='ねこ'),
             ]),
 
             CarouselColumn(text='中華料理、中国鍋・火鍋、ラーメン', title='青蓮 [浜松町]', actions=[
                 URITemplateAction(
                     label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13109938/'),
-                URITemplateAction(
-                    label='地図を見る', uri='https://tabelog.com/tokyo/A1314/A131401/13109938/dtlmap/'),
                 MessageTemplateAction(label='ここにする', text='https://tabelog.com/tokyo/A1314/A131401/13109938/'),
-                #MessageTemplateAction(label='ねこ', text='ねこ'),
+                MessageTemplateAction(label='ねこ', text='ねこ'),
             ]),
 
         ])
