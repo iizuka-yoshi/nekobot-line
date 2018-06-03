@@ -555,7 +555,7 @@ def handle_text_message(event):
             CarouselColumn(text='牛タン、麦とろ、カレーライス', title='利助 [浜松町]', actions=[
                 URITemplateAction(
                     label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/'),
-                MessageTemplateAction(label='ここにする', text='ここで！¥¥n'+'https://tabelog.com/tokyo/A1314/A131401/13014253/'),
+                MessageTemplateAction(label='ここにする', text='ここで！\\n'+'https://tabelog.com/tokyo/A1314/A131401/13014253/'),
                 MessageTemplateAction(label='ねこ', text='ねこ'),
             ]),
 
