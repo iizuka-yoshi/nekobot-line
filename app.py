@@ -545,7 +545,7 @@ def handle_text_message(event):
 
     elif message_pattern == 'carousel':
         carousel_template = CarouselTemplate(columns=[
-            CarouselColumn(text='ラーメン、居酒屋、焼きとん', title='ZOOT[浜松町]', actions=[
+            CarouselColumn(text='ラーメン、居酒屋、焼きとん', title='ZOOT [浜松町]', actions=[
                 URITemplateAction(
                     label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
                 URITemplateAction(
@@ -553,17 +553,32 @@ def handle_text_message(event):
                 MessageTemplateAction(label='ねこ', text='ねこ'),
             ]),
 
-            CarouselColumn(text='牛タン、麦とろ、カレーライス', title='利助[浜松町]', actions=[
+            CarouselColumn(text='牛タン、麦とろ、カレーライス', title='利助 [浜松町]', actions=[
                 URITemplateAction(
                     label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/'),
                 URITemplateAction(
                     label='地図を見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/dtlmap/'),
                 MessageTemplateAction(label='ねこ', text='ねこ'),
             ]),
+
+            CarouselColumn(text='中華料理、中国鍋・火鍋、ラーメン', title='青蓮 [浜松町]', actions=[
+                URITemplateAction(
+                    label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13109938/'),
+                URITemplateAction(
+                    label='地図を見る', uri='https://tabelog.com/tokyo/A1314/A131401/13109938/dtlmap/'),
+                MessageTemplateAction(label='ねこ', text='ねこ'),
+            ]),
+
         ])
         template_message = TemplateSendMessage(
             alt_text='Carousel alt text', template=carousel_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
+
+        line_bot_api.reply_message(event.reply_token,
+            [
+                TextSendMessage(text='どこにしようか'),
+                template_message,
+            ]
+        )
 
 @handler.add(JoinEvent)
 def handle_join(event):
