@@ -308,7 +308,7 @@ def image_send_message_list(img_dir,img_list):
 
 def restaurant_image_url(restaurant):
     image_name = restaurant + '.jpg'
-    image_url = os.path.join(base_dir,img_dir,image_name)
+    image_url = os.path.join(base_dir,'restaurantimg',image_name)
 
     return image_url
 
