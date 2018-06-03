@@ -633,6 +633,16 @@ def handle_text_message(event):
             ]),
 
             CarouselColumn(
+                thumbnail_image_url=restaurant_image_url('settsu'),
+                text='居酒屋、インドカレー、和食\n'+'営業時間:14:30〜23:00(L.O.22:15)',
+                title='摂津 [浜松町]',
+                actions=[
+                    URITemplateAction(label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13097178/'),
+                    MessageTemplateAction(label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13097178/'),
+                    MessageTemplateAction(label='ねこ', text=restaurant_message_text()),
+            ]),
+
+            CarouselColumn(
                 thumbnail_image_url=restaurant_image_url('uma8'),
                 text='居酒屋、くじら料理\n'+'営業時間:16:30～23:30',
                 title='旨蔵 うま八 [新橋]',
@@ -648,7 +658,7 @@ def handle_text_message(event):
 
         line_bot_api.reply_message(event.reply_token,
             [
-                TextSendMessage(text='どこにしようか'),
+                TextSendMessage(text='どこにしよう'),
                 template_message,
             ]
         )
