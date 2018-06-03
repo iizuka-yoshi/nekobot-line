@@ -310,6 +310,7 @@ def restaurant_image_url(restaurant):
     image_name = restaurant + '.jpg'
     image_url = os.path.join(base_dir,'restaurantimg',image_name)
 
+    print('[Debug] restaurant_image_url:' + image_url)
     return image_url
 
 def warning_message_text():
