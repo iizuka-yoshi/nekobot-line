@@ -195,6 +195,11 @@ def get_message_pattern(text):
         }:
         return 'goodjob'
 
+    elif text in{
+        'carousel'
+        }:
+        return 'carousel'
+
     elif text in{'てすと','テスト','ﾃｽﾄ','test'}:
         return 'test'
 
@@ -538,18 +543,22 @@ def handle_text_message(event):
                 ]
             )
 
-    elif text == 'carousel':
+    elif message_pattern == 'carousel':
         carousel_template = CarouselTemplate(columns=[
-            CarouselColumn(text='hoge1', title='fuga1', actions=[
+            CarouselColumn(text='ラーメン、居酒屋、焼きとん', title='ZOOT[浜松町]', actions=[
                 URITemplateAction(
-                    label='Go to line.me', uri='https://line.me'),
-                PostbackTemplateAction(label='ping', data='ping')
+                    label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
+                URITemplateAction(
+                    label='地図を見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/dtlmap/')
+                MessageTemplateAction(label='ねこ', text='ねこ')
             ]),
-            CarouselColumn(text='hoge2', title='fuga2', actions=[
-                PostbackTemplateAction(
-                    label='ping with text', data='ping',
-                    text='ping'),
-                MessageTemplateAction(label='Translate Rice', text='米')
+
+            CarouselColumn(text='牛タン、麦とろ、カレーライス', title='利助[浜松町]', actions=[
+                URITemplateAction(
+                    label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/'),
+                URITemplateAction(
+                    label='地図を見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/dtlmap/')
+                MessageTemplateAction(label='ねこ', text='ねこ')        
             ]),
         ])
         template_message = TemplateSendMessage(
