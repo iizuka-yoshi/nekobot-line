@@ -593,7 +593,7 @@ def handle_text_message(event):
     if message_pattern == 'test2':
         send_text = 'PostgreSQL からパターン判定します'
 
-        message_pattern = get_entitｙ('あああ')
+        message_pattern = get_entitｙ('ねこ')
         print('message_pattern: '+message_pattern)
 
         if message_pattern == 'neko_hiragana':
