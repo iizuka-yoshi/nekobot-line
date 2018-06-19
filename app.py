@@ -142,7 +142,7 @@ def get_entitｙ(text):
 
     with psycopg2.connect(DB_URL) as conn:
         with conn.cursor() as curs:
-            curs.execute('SELECT name FROM entities WHERE ' + text + ' = ANY (synonym);')
+            curs.execute('SELECT name FROM entities \'' + text + '\' = ANY (synonym);')
             entity = curs.fetchone()
 
     return entity
@@ -876,7 +876,7 @@ def handle_image_message(event):
 
     line_bot_api.reply_message(event.reply_token,
                                 [
-                                    TextSendMessage(text='画像を Amazon S3 にアップロードしました\n[テスト]コマンドで確認できます')
+                                    TextSendMessage(text='Amazon S3 へ画像をアップロードしました\n[テスト]コマンドで確認できます')
                                 ]
                                 )
 
