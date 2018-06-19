@@ -127,6 +127,7 @@ def image_send_message_s3(img_category):
     print('[Image Log] image_send_message_s3 image_url=' + image_url)
     return message
 
+
 def shrink_image(source_path,save_path, target_width, target_height):
     img = Image.open(source_path)
     w, h = img.size
@@ -143,9 +144,7 @@ def get_entitｙ(text):
     with psycopg2.connect(DB_URL) as conn:
         with conn.cursor() as curs:
             curs.execute('SELECT name FROM entities WHERE %s = ANY (synonym);',(text,))
-            entity = curs.fetchone()[0]
-
-    print('entity: ' + entity)
+            (entity,) = curs.fetchone()
 
     return entity
 
@@ -591,7 +590,7 @@ def handle_text_message(event):
     if message_pattern == 'test2':
         send_text = 'PostgreSQL からパターン判定します'
 
-        message_pattern = get_entitｙ('にゃんこ')
+        message_pattern = get_entitｙ('あああ')
         
         img_dir = get_img_dir(message_pattern)
 
