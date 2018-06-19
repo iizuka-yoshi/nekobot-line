@@ -424,6 +424,7 @@ def handle_text_message(event):
         user_name = 'Unknown'
 
     print('[Event Log]'
+          + ' user_id=' + str(user_id)
           + ' user_name=' + str(user_name)
           + ' text=' + str(text)
           + ' message_pattern=' + str(message_pattern)
