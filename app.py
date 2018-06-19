@@ -89,8 +89,10 @@ def download_image_from_s3(prefix):
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
 
-    image_list = bucket.objects.filter(Prefix=prefix)
-    image_key = random.choice(image_list)
+    objects = bucket.objects.filter(Prefix=prefix)
+    keys = [content['Key'] for content in objects['Contents']]
+
+    image_key = random.choice(keys)
     download_path = os.path.join(static_tmp_path,os.path.basename(image_key))
 
     bucket.download_file(image_key, download_path)
