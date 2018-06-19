@@ -74,9 +74,15 @@ USER_ID_IIZUKA = 'U35bca0dfb497d294737b7b25f4261a0b'
 
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
-def upload_image_to_s3(source_image_path,prefix):
+def get_s3_image_prefix(img_category):
+    prefix = os.path.join('image', img_category)
+    return prefix
 
-    image_key = os.path.join('image', prefix, os.path.basename(source_image_path))
+def upload_image_to_s3(source_image_path, img_category):
+
+    prefix = get_s3_image_prefix(img_category)
+
+    image_key = os.path.join(prefix, os.path.basename(source_image_path))
     
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
@@ -84,13 +90,16 @@ def upload_image_to_s3(source_image_path,prefix):
 
     return image_key
 
-def download_image_from_s3(prefix):
+def download_image_from_s3(img_category):
+
+    prefix = get_s3_image_prefix(img_category)
 
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
 
-    objects = bucket.objects.filter(Prefix=prefix)
-    keys = [content['Key'] for content in objects['Contents']]
+    #objects = bucket.objects.filter(Prefix=prefix)
+    obj_collection = bucket.objects.all()
+    keys = [obj_summary.key for obj_summary in obj_collection]
 
     image_key = random.choice(keys)
     download_path = os.path.join(static_tmp_path,os.path.basename(image_key))
@@ -99,9 +108,10 @@ def download_image_from_s3(prefix):
 
     return download_path
 
-def image_send_message_s3(prefix):
 
-    image_path = download_image_from_s3(prefix)
+def image_send_message_s3(img_category):
+
+    image_path = download_image_from_s3(img_category)
     image_name = os.path.basename(image_path)
     image_dir = os.path.dirname(image_path)
     thumb_path = os.path.join(image_dir, 'thumb', image_name)
@@ -560,7 +570,7 @@ def handle_text_message(event):
         line_bot_api.reply_message(event.reply_token,
                                    [
                                        TextSendMessage(text=send_text),
-                                       image_send_message_s3("")
+                                       image_send_message_s3('')
                                    ]
                                    )
 
