@@ -544,7 +544,7 @@ def handle_text_message(event):
     # test判定
     send_text = ''
     if message_pattern == 'test':
-        send_text = 'Amazon S3 test'
+        send_text = 'Amazon S3 から画像を取得します'
 
     # if send_text != '':
     #     image_name = random.choice(os.listdir(img_dir))
@@ -835,25 +835,25 @@ def handle_image_message(event):
           + ' user_name=' + str(user_name)
           )
 
-    if user_id == USER_ID_IIZUKA:
+    #if user_id == USER_ID_IIZUKA:
 
-        message_content = line_bot_api.get_message_content(event.message.id)
+    message_content = line_bot_api.get_message_content(event.message.id)
 
-        with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=str_now+'-', delete=False) as tf:
-            for chunk in message_content.iter_content():
-                tf.write(chunk)
-            tf_path = tf.name
+    with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=str_now+'-', delete=False) as tf:
+        for chunk in message_content.iter_content():
+            tf.write(chunk)
+        tf_path = tf.name
 
-        dist_path = tf_path + extension
-        os.rename(tf_path, dist_path)
-        
-        upload_image_to_s3(dist_path,"")
+    dist_path = tf_path + extension
+    os.rename(tf_path, dist_path)
+    
+    upload_image_to_s3(dist_path,"")
 
-        line_bot_api.reply_message(event.reply_token,
-                                   [
-                                       TextSendMessage(text='イメージを Amazon S3 にアップロードしました')
-                                   ]
-                                   )
+    line_bot_api.reply_message(event.reply_token,
+                                [
+                                    TextSendMessage(text='画像を Amazon S3 にアップロードしました\n[テスト]コマンドで確認できます')
+                                ]
+                                )
 
 
 
