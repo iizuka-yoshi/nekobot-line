@@ -74,21 +74,57 @@ USER_ID_IIZUKA = 'U35bca0dfb497d294737b7b25f4261a0b'
 
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
-def put_image_to_s3(source_image_path):
+def upload_image_to_s3(source_image_path,prefix):
+
+    image_key = os.path.join('image', prefix, os.path.basename(source_image_path))
+    
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
-    bucket.upload_file(source_image_path, os.path.basename(source_image_path))
+    bucket.upload_file(source_image_path, image_key)
 
+    return image_key
 
-def shrink_image(image_path, target_width, target_height):
-    img = Image.open(image_path)
+def download_image_from_s3(prefix):
+
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
+
+    image_list = bucket.objects.filter(Prefix=prefix)
+    image_key = random.choice(image_list)
+    download_path = os.path.join(static_tmp_path,os.path.basename(image_key))
+
+    bucket.download_file(image_key, download_path)
+
+    return download_path
+
+def image_send_message_s3(prefix):
+
+    image_path = download_image_from_s3(prefix)
+    image_name = os.path.basename(image_path)
+    image_dir = os.path.dirname(image_path)
+    thumb_path = os.path.join(image_dir, 'thumb', image_name)
+
+    shrink_image(image_path,thumb_path,240,240)
+
+    image_url = os.path.join(AP_URL, 'static','tmp', image_name)
+    image_thumb_url = os.path.join(AP_URL, 'static', 'tmp', 'thumb', image_name)
+
+    message = ImageSendMessage(
+        original_content_url=image_url,
+        preview_image_url=image_thumb_url
+    )
+    print('[Image Log] image_send_message_s3 image_url=' + image_url)
+    return message
+
+def shrink_image(source_path,save_path, target_width, target_height):
+    img = Image.open(source_path)
     w, h = img.size
 
     if target_width < w or target_height < h:
         img.thumbnail((target_width,target_height),Image.ANTIALIAS)
-        img.save(image_path)
+        img.save(save_path)
     
-    return image_path
+    return save_path
 
 
 
@@ -427,7 +463,7 @@ def handle_text_message(event):
         user_name = 'Unknown'
 
     print('[Event Log]'
-        + ' image_message'
+        + ' text_message'
         + ' user_id=' + str(user_id)
         + ' user_name=' + str(user_name)
         + ' text=' + str(text)
@@ -494,30 +530,37 @@ def handle_text_message(event):
         elif isinstance(event.source, SourceRoom):
             line_bot_api.leave_room(event.source.room_id)
 
-    # test判定（画像のパスを送信）
+    # test判定
     send_text = ''
     if message_pattern == 'test':
-        send_text = 'path test'
+        send_text = 'Amazon S3 test'
 
-    if send_text != '':
-        image_name = random.choice(os.listdir(img_dir))
-        image_url = os.path.join(AP_URL, img_dir, image_name)
-        image_thumb_url = os.path.join(AP_URL, img_dir, 'thumb', image_name)
+    # if send_text != '':
+    #     image_name = random.choice(os.listdir(img_dir))
+    #     image_url = os.path.join(AP_URL, img_dir, image_name)
+    #     image_thumb_url = os.path.join(AP_URL, img_dir, 'thumb', image_name)
+    #     line_bot_api.reply_message(event.reply_token,
+    #         [
+    #             # TextSendMessage(text=send_text),
+    #             # TextSendMessage(text=image_url),
+    #             # TextSendMessage(text=image_thumb_url),
+    #             TextSendMessage(
+    #                 text='random test [0-1]'),
+    #             TextSendMessage(
+    #                 text=str(random.random())),
+    #             TextSendMessage(
+    #                 text='choice test [0-9]'),
+    #             TextSendMessage(text=random.choice(
+    #                 ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']))
+    #         ]
+    #     )
+
         line_bot_api.reply_message(event.reply_token,
-            [
-                # TextSendMessage(text=send_text),
-                # TextSendMessage(text=image_url),
-                # TextSendMessage(text=image_thumb_url),
-                TextSendMessage(
-                    text='random test [0-1]'),
-                TextSendMessage(
-                    text=str(random.random())),
-                TextSendMessage(
-                    text='choice test [0-9]'),
-                TextSendMessage(text=random.choice(
-                    ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']))
-            ]
-        )
+                                   [
+                                       TextSendMessage(text=send_text),
+                                       image_send_message_s3("")
+                                   ]
+                                   )
 
     # スペシャル判定（テキストとイメージを返信。場合によって退出）
     send_text = ''
@@ -792,9 +835,14 @@ def handle_image_message(event):
 
         dist_path = tf_path + extension
         os.rename(tf_path, dist_path)
+        
+        upload_image_to_s3(dist_path,"")
 
-        shrink_image(dist_path,1024,1024)
-        put_image_to_s3(dist_path)
+        line_bot_api.reply_message(event.reply_token,
+                                   [
+                                       TextSendMessage(text='イメージを Amazon S3 にアップロードしました')
+                                   ]
+                                   )
 
 
 
