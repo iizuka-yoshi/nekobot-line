@@ -145,6 +145,8 @@ def get_entitｙ(text):
             curs.execute('SELECT name FROM entities WHERE %s = ANY (synonym);',(text,))
             entity = curs.fetchone()
 
+    print(entity)
+
     return entity
 
 
