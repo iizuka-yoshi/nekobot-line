@@ -140,11 +140,9 @@ def shrink_image(source_path,save_path, target_width, target_height):
 
 def get_entitｙ(text):
 
-    sql = 'SELECT name FROM entities \'にゃんこ\' = ANY (synonym);'
-
     with psycopg2.connect(DB_URL) as conn:
         with conn.cursor() as curs:
-            curs.execute(sql)
+            curs.execute('SELECT name FROM entities %s = ANY (synonym);',(text,))
             entity = curs.fetchone()
 
     return entity
