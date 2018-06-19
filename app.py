@@ -405,16 +405,19 @@ def handle_text_message(event):
     try:
         if isinstance(event.source, SourceUser):
             profile = line_bot_api.get_profile(event.source.user_id)
+            user_id = event.source.user_id
             user_name = profile.display_name
 
         elif isinstance(event.source, SourceGroup):
             profile = line_bot_api.get_group_member_profile(
                 event.source.group_id, event.source.user_id)
+            user_id = event.source.user_id
             user_name = profile.display_name
 
         elif isinstance(event.source, SourceRoom):
             profile = line_bot_api.get_room_member_profile(
                 event.source.room_id, event.source.user_id)
+            user_id = event.source.user_id
             user_name = profile.display_name
 
     except:
@@ -750,10 +753,10 @@ def handle_image_message(event):
     with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=str_now+'-', delete=False) as tf:
         for chunk in message_content.iter_content():
             tf.write(chunk)
-        temp_path = tf.name
+        tf_path = tf.name
 
-    dist_path = temp_path + extension
-    os.rename(temp_path, dist_path)
+    dist_path = tf_path + extension
+    os.rename(tf_path, dist_path)
 
     shrink_image(dist_path,1024,1024)
     put_image_to_s3(dist_path)
