@@ -70,6 +70,8 @@ AWS_S3_BUCKET_NAME = 'nekobot'
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', None)
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', None)
 
+USER_ID_IIZUKA = 'U35bca0dfb497d294737b7b25f4261a0b'
+
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
 def put_image_to_s3(source_image_path):
@@ -421,14 +423,16 @@ def handle_text_message(event):
             user_name = profile.display_name
 
     except:
+        user_id = 'Unknown'
         user_name = 'Unknown'
 
     print('[Event Log]'
-          + ' user_id=' + str(user_id)
-          + ' user_name=' + str(user_name)
-          + ' text=' + str(text)
-          + ' message_pattern=' + str(message_pattern)
-          )
+        + ' image_message'
+        + ' user_id=' + str(user_id)
+        + ' user_name=' + str(user_name)
+        + ' text=' + str(text)
+        + ' message_pattern=' + str(message_pattern)
+    )
 
     # ねこ判定（テキストとイメージを返信）
     send_text = ''
@@ -749,18 +753,50 @@ def handle_image_message(event):
     dt_now = datetime.datetime.now()
     str_now = dt_now.strftime('%Y%m%d-%H%M')
 
-    message_content = line_bot_api.get_message_content(event.message.id)
+    try:
+        if isinstance(event.source, SourceUser):
+            profile = line_bot_api.get_profile(event.source.user_id)
+            user_id = profile.user_id
+            user_name = profile.display_name
 
-    with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=str_now+'-', delete=False) as tf:
-        for chunk in message_content.iter_content():
-            tf.write(chunk)
-        tf_path = tf.name
+        elif isinstance(event.source, SourceGroup):
+            profile = line_bot_api.get_group_member_profile(
+                event.source.group_id, event.source.user_id)
+            user_id = profile.user_id
+            user_name = profile.display_name
 
-    dist_path = tf_path + extension
-    os.rename(tf_path, dist_path)
+        elif isinstance(event.source, SourceRoom):
+            profile = line_bot_api.get_room_member_profile(
+                event.source.room_id, event.source.user_id)
+            user_id = profile.user_id
+            user_name = profile.display_name
 
-    shrink_image(dist_path,1024,1024)
-    put_image_to_s3(dist_path)
+    except:
+        user_id = 'Unknown'
+        user_name = 'Unknown'
+
+    print('[Event Log]'
+          + ' image_message'
+          + ' user_id=' + str(user_id)
+          + ' user_name=' + str(user_name)
+          )
+
+    if user_id == USER_ID_IIZUKA:
+
+        message_content = line_bot_api.get_message_content(event.message.id)
+
+        with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=str_now+'-', delete=False) as tf:
+            for chunk in message_content.iter_content():
+                tf.write(chunk)
+            tf_path = tf.name
+
+        dist_path = tf_path + extension
+        os.rename(tf_path, dist_path)
+
+        shrink_image(dist_path,1024,1024)
+        put_image_to_s3(dist_path)
+
+
 
 @handler.add(JoinEvent)
 def handle_join(event):
