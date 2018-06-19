@@ -97,8 +97,7 @@ def download_image_from_s3(img_category):
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
 
-    #objects = bucket.objects.filter(Prefix=prefix)
-    obj_collection = bucket.objects.all()
+    obj_collection = bucket.objects.filter(Prefix=prefix)
     keys = [obj_summary.key for obj_summary in obj_collection]
 
     image_key = random.choice(keys)
