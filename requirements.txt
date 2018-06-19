@@ -2,3 +2,4 @@ Flask==0.12.2
 line-bot-sdk==1.5.0
 psycopg2==2.7.4
 Pillow==5.1.0
+boto3==1.7.40

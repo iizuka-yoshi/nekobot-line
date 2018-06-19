@@ -22,6 +22,7 @@ import tempfile
 import random
 import time
 import psycopg2
+import boto3
 from PIL import Image
 
 from argparse import ArgumentParser
@@ -63,9 +64,17 @@ handler = WebhookHandler(CHANNEL_SECRET)
 
 AP_URL = 'https://nekobot-line.herokuapp.com'
 DB_URL = os.getenv('DATABASE_URL', None)
+
+AWS_S3_BUCKET_NAME = 'nekobot'
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', None)
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', None)
+
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
-#def save_image():
+def put_image_to_s3(source_image_path):
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
+    bucket.upload_file(source_image_path, os.path.basename(source_image_path))
 
 
 def shrink_image(image_path, target_width, target_height):
@@ -746,9 +755,12 @@ def handle_content_message(event):
     dist_name = os.path.basename(dist_path)
     os.rename(tempfile_path, dist_path)
 
+    put_image_to_s3(dist_path)
+
     line_bot_api.reply_message(
         event.reply_token, [
-            TextSendMessage(text='Save content.'),
+            TextSendMessage(text='tempfile_path'+tempfile_path),
+            TextSendMessage(text='distpath'+dist_path),
             TextSendMessage(text=request.host_url +
                             os.path.join('static', 'tmp', dist_name))
         ])
