@@ -142,7 +142,7 @@ def get_entitｙ(text):
 
     with psycopg2.connect(DB_URL) as conn:
         with conn.cursor() as curs:
-            curs.execute('SELECT name FROM entities %s = ANY (synonym);',(text,))
+            curs.execute('SELECT name FROM entities WHERE %s = ANY (synonym);',(text,))
             entity = curs.fetchone()
 
     return entity
