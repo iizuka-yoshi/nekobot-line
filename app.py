@@ -16,11 +16,12 @@ from __future__ import unicode_literals
 
 import errno
 import os
+import datetime
+import time
 import glob
 import sys
 import tempfile
 import random
-import time
 import psycopg2
 import boto3
 from PIL import Image
@@ -739,32 +740,23 @@ def handle_text_message(event):
                                    )
 
 @handler.add(MessageEvent, message=ImageMessage)
-def handle_content_message(event):
-    if isinstance(event.message, ImageMessage):
-        ext = 'jpg'
-    else:
-        return
+def handle_image_message(event):
+    extension = '.jpg'
+    dt_now = datetime.datetime.now()
+    str_now = dt_now.strftime('%Y%m%d-%H%M')
 
     message_content = line_bot_api.get_message_content(event.message.id)
-    with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=ext + '-', delete=False) as tf:
+
+    with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=str_now+'-', delete=False) as tf:
         for chunk in message_content.iter_content():
             tf.write(chunk)
-        tempfile_path = tf.name
+        temp_path = tf.name
 
-    dist_path = tempfile_path + '.' + ext
-    dist_name = os.path.basename(dist_path)
-    os.rename(tempfile_path, dist_path)
+    dist_path = temp_path + extension
+    os.rename(temp_path, dist_path)
 
+    shrink_image(dist_path,1024,1024)
     put_image_to_s3(dist_path)
-
-    line_bot_api.reply_message(
-        event.reply_token, [
-            TextSendMessage(text='tempfile_path'+tempfile_path),
-            TextSendMessage(text='distpath'+dist_path),
-            TextSendMessage(text=request.host_url +
-                            os.path.join('static', 'tmp', dist_name))
-        ])
-
 
 @handler.add(JoinEvent)
 def handle_join(event):
