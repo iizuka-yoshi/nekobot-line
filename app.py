@@ -592,7 +592,12 @@ def handle_text_message(event):
         send_text = 'PostgreSQL からパターン判定します'
 
         message_pattern = get_entitｙ('にゃんこ')
+        
         img_dir = get_img_dir(message_pattern)
+
+        print('message_pattern: ' + message_pattern)
+        print('img_dir: '+img_dir)
+
         line_bot_api.reply_message(event.reply_token,
                                    [
                                        TextSendMessage(text=send_text),
