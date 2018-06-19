@@ -138,6 +138,15 @@ def shrink_image(source_path,save_path, target_width, target_height):
     return save_path
 
 
+def get_entitｙ(text):
+
+    with psycopg2.connect(DB_URL) as conn:
+        with conn.cursor() as curs:
+            curs.execute('SELECT name FROM entities WHERE ' + text + ' = ANY (synonym);')
+            entity = curs.fetchone()
+
+    return entity
+
 
 def get_message_pattern(text):
     text = text.replace(' ', '')
@@ -293,7 +302,10 @@ def get_message_pattern(text):
         return 'carousel'
 
     elif text in{'てすと', 'テスト', 'ﾃｽﾄ', 'test'}:
-        return 'test'
+        return 'test1'
+
+    elif text in{'db'}:
+        return 'test2'
 
 
 def get_img_dir(message_pattern):
@@ -543,7 +555,7 @@ def handle_text_message(event):
 
     # test判定
     send_text = ''
-    if message_pattern == 'test':
+    if message_pattern == 'test1':
         send_text = 'Amazon S3 から画像を取得します'
 
     # if send_text != '':
@@ -570,6 +582,19 @@ def handle_text_message(event):
                                    [
                                        TextSendMessage(text=send_text),
                                        image_send_message_s3('')
+                                   ]
+                                   )
+
+    send_text = ''
+    if message_pattern == 'test2':
+        send_text = 'PostgreSQL からパターン判定します'
+
+        message_pattern = get_entitｙ('にゃんこ')
+        img_dir = get_img_dir(message_pattern)
+        line_bot_api.reply_message(event.reply_token,
+                                   [
+                                       TextSendMessage(text=send_text),
+                                       image_send_message_dir(img_dir)
                                    ]
                                    )
 
