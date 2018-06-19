@@ -143,8 +143,11 @@ def get_entitｙ(text):
 
     with psycopg2.connect(DB_URL) as conn:
         with conn.cursor() as curs:
-            curs.execute('SELECT name FROM entities WHERE %s = ANY (synonym);',(text,))
-            (entity,) = curs.fetchone()
+            curs.execute('SELECT name FROM entities WHERE %s = ANY (synonym);', (text,))
+            if 0 < curs.rowcount:
+                (entity,) = curs.fetchone()
+            else:
+                entity = 'Unknown'
 
     return entity
 
@@ -591,18 +594,19 @@ def handle_text_message(event):
         send_text = 'PostgreSQL からパターン判定します'
 
         message_pattern = get_entitｙ('あああ')
-        
-        img_dir = get_img_dir(message_pattern)
-
         print('message_pattern: '+message_pattern)
-        print('img_dir: '+img_dir)
 
-        line_bot_api.reply_message(event.reply_token,
-                                   [
-                                       TextSendMessage(text=send_text),
-                                       image_send_message_dir(img_dir)
-                                   ]
-                                   )
+        if message_pattern == 'neko_hiragana':
+
+            img_dir = get_img_dir(message_pattern)
+            print('img_dir: '+img_dir)
+
+            line_bot_api.reply_message(event.reply_token,
+                                    [
+                                        TextSendMessage(text=send_text),
+                                        image_send_message_dir(img_dir)
+                                    ]
+                                    )
 
     # スペシャル判定（テキストとイメージを返信。場合によって退出）
     send_text = ''
