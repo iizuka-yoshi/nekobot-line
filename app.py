@@ -1040,7 +1040,7 @@ def handle_image_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             [
-                TextSendMessage(text='画像ゲット')
+                TextSendMessage(text=send_text)
             ]
         )
 
