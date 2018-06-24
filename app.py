@@ -242,6 +242,7 @@ class Setting():
                 ret = True
                 break
 
+        print('check_admin_line_user 'str(ret))
         return ret
 
     def check_access_allow(self, line_user_id):
