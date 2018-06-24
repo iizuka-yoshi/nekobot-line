@@ -638,6 +638,8 @@ def handle_text_message(event):
         + ' message_pattern=' + str(message_pattern)
     )
 
+    send_text = ''
+
     #Entity完全一致の判定
     if entity_exact.match:
         
@@ -711,10 +713,10 @@ def handle_text_message(event):
 
                         if setting.enable_access_management == 'True':
                             setting = setting.update_enable_access_management('False')
-                            send_text = 'アクセス管理無効'
+                            send_text = 'アクセス管理 オフ'
                         else:
                             setting = setting.update_enable_access_management('True')
-                            send_text = 'アクセス管理有効'
+                            send_text = 'アクセス管理 オン'
 
                 if send_text != '':
                     line_bot_api.reply_message(
