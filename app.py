@@ -286,6 +286,8 @@ def text_send_messages_db(entity):
     else:
         reply_texts = []
 
+    print('reply_texts '+ reply_texts[0])
+
     messages = []
     for reply_text in reply_texts:
         messages.append(ImageSendMessage(text=reply_text))
@@ -721,8 +723,6 @@ def handle_text_message(event):
             'neko_hime', 'neko_hiragana', 'neko_kanji', 'neko_kana',
             'neko_roma', 'neko_eng', 'neko_emoji',
         }:
-
-            print('ねこ判定')
 
             line_bot_api.reply_message(
                 event.reply_token,
