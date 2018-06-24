@@ -128,6 +128,7 @@ class Entity:
         self.synonym = ''
         self.weight = 0
         self.position = 0
+        self.category = ''
 
     def reset_text(self, target_text):
         self.text = target_text
@@ -157,8 +158,32 @@ class Entity:
                 else:
                     entity = (0, 'Unknown', '', 0, 0)
 
-            (self.id, self.name, self.synonym, self.weight, self.position) = entity
-            return self
+        (self.id, self.name, self.synonym, self.weight, self.position) = entity
+        self.category = self._get_category()
+        return self
+
+    def _get_category(self):
+        
+        sql = 'SELECT name '\
+                'FROM public.categories '\
+                'WHERE entity = %s ;'
+        
+        if self.match:
+
+            with psycopg2.connect(DB_URL) as conn:
+                with conn.cursor() as curs:
+
+                    curs.execute(sql, (self.name, ))
+                    if 0 < curs.rowcount:
+                        category = curs.fetchone()
+                    else:
+                        category = 'Unknown'
+
+        else:
+            category = 'Unknown'
+
+        return category
+
 
 class Setting():
 
@@ -228,15 +253,38 @@ class Setting():
         else:
             ret = False
         
-        return ret
+        return ret    
 
 
-
+def text_send_messages_db(entity):
     
+    sql = 'SELECT DISTINCT ON (reply_order) text, reply_order '\
+            'FROM public.replies '\
+            'WHERE entity = %s '\
+            'ORDER BY reply_order ASC, RANDOM() ;'
+    
+    if entity.match:
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(sql, (entity.name, ))
+                if 0 < curs.rowcount:
+                    reply_texts = curs.fetchall()
+                else:
+                    reply_texts = []
+
+    else:
+        reply_texts = []
+
+    messages = []
+    for reply_text in reply_texts:
+        messages.append(ImageSendMessage(text=reply_text))
+
+    return messages
 
 
 def get_s3_image_prefix(img_category):
-    prefix = os.path.join('image', img_category)
+    prefix = img_category
     return prefix
 
 def upload_image_to_s3(source_image_path, img_category):
@@ -594,7 +642,7 @@ def callback():
 
     # get request body as text
     body = request.get_data(as_text=True)
-    app.logger.info('Request body: ' + body)
+    #app.logger.info('Request body: ' + body)
 
     # handle webhook body
     try:
@@ -659,40 +707,16 @@ def handle_text_message(event):
     if entity_exact.match:
         
         # ねこ判定（テキストとイメージを返信）
-        if entity_exact.name in{'neko_hime'}:
-            send_text = 'みゃー'
+        if entity_exact.name in {
+            'neko_hime', 'neko_hiragana', 'neko_kanji', 'neko_kana',
+            'neko_roma', 'neko_eng', 'neko_emoji',
+        }:
 
-        elif entity_exact.name in{'neko_quu'}:
-            send_text = 'にゃおーん'
-
-        elif entity_exact.name in{'neko_choco'}:
-            send_text = 'にゃっ'
-
-        elif entity_exact.name in{'neko_hiragana'}:
-            send_text = 'にゃー'
-
-        elif entity_exact.name in{'neko_kanji'}:
-            send_text = 'ミョウ'
-
-        elif entity_exact.name in{'neko_kana'}:
-            send_text = 'ニャー'
-
-        elif entity_exact.name in{'neko_roma'}:
-            send_text = 'nya-'
-
-        elif entity_exact.name in{'neko_eng'}:
-            send_text = random.choice(['meow（ミャウ）', 'mew（ミュー）'])
-
-        elif entity_exact.name in{'neko_emoji'}:
-            send_text = random.choice(
-                ['🐈', '🐱', '😸', '😹', '😺', '😻', '😼', '😽', '😾', '😿', '🙀'])
-
-        if send_text != '':
             line_bot_api.reply_message(
                 event.reply_token,
                 [
-                    TextSendMessage(text=send_text),
-                    image_send_message_dir(img_dir)
+                    text_send_messages_db(entity_exact)[0],
+                    image_send_message_s3(entity_exact.category)
                 ]
             )
 
@@ -700,11 +724,11 @@ def handle_text_message(event):
 
         # イヌ判定（テシストを返信して退出）
         if entity_exact.name in{'dog'}:
-            send_text = text + random.choice(['きらい', 'やめて'])
 
-        if send_text != '':
             line_bot_api.reply_message(
-                event.reply_token, TextMessage(text=send_text))
+                event.reply_token, text_send_messages_db(entity_exact)[0]
+            )
+
             if isinstance(event.source, SourceGroup):
                 line_bot_api.leave_group(event.source.group_id)
             elif isinstance(event.source, SourceRoom):
@@ -717,7 +741,7 @@ def handle_text_message(event):
 
         if intent.name == 'change_setting':
             
-            if setting.check_access_allow(user_id):
+            if setting.check_admin_line_user(user_id):
 
                 #Entity部分一致の判定
                 if entity_partial.match:
@@ -1050,7 +1074,7 @@ def handle_image_message(event):
         dist_path = tf_path + extension
         os.rename(tf_path, dist_path)
         
-        upload_image_to_s3(dist_path, "")
+        upload_image_to_s3(dist_path, 'image/neko/')
         
         send_text = 'にゃー（画像ゲット）'
 
