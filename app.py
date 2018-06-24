@@ -699,6 +699,10 @@ def handle_text_message(event):
     entity_exact = Entity(textn).check_entity(True)
     entity_partial = Entity(textn).check_entity(False)
     setting = Setting()
+
+    print('Intent.name ' + intent.name)
+    print('entity_exact.name ' + entity_exact.name)
+    print('entity_partial.name '+entity_partial.name)
     
     #古い判定
     message_pattern = get_message_pattern(textn)
