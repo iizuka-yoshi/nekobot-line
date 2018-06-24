@@ -243,8 +243,6 @@ class Setting():
     def check_admin_line_user(self, line_user_id):
         ret = False
         for admin_line_user in self.admin_line_users:
-            print('line_user_id    ' + line_user_id + 'EOF')
-            print('admin_line_user ' + admin_line_user + 'EOF')
             if line_user_id == admin_line_user:
                 ret = True
                 break
@@ -276,7 +274,12 @@ def text_send_messages_db(entity):
 
                 curs.execute(sql, (entity.name, ))
                 if 0 < curs.rowcount:
-                    reply_texts = curs.fetchall()
+                    reply_texts_tp = curs.fetchall()
+
+                    reply_texts = []
+                    for reply_text in reply_texts_tp:
+                        reply_texts.append(reply_text[0].strip())
+
                 else:
                     reply_texts = []
 
@@ -1067,7 +1070,6 @@ def handle_image_message(event):
           )
 
     setting = Setting()
-    print('allow ' + str(setting.check_access_allow(user_id)))
 
     if setting.check_access_allow(user_id):
 
