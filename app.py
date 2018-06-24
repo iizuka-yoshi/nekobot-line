@@ -1060,7 +1060,7 @@ def handle_image_message(event):
           )
 
     setting = Setting()
-    print('allow ' + str(setting.check_access_allow(user_id))
+    print('allow ' + str(setting.check_access_allow(user_id)))
 
     if setting.check_access_allow(user_id):
 
