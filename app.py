@@ -218,11 +218,18 @@ class Setting():
 
                 curs.execute(self._sql_select, ('admin_line_user',))
                 if 0 < curs.rowcount:
-                    admin_line_users = curs.fetchall()
+                    admin_line_users_tp = curs.fetchall()
+
+                    admin_line_users = []
+                    for admin_line_user in admin_line_users_tp:
+                        admin_line_users.append(admin_line_user[0])
+                        print('admin_line_user[0] '+ admin_line_user[0])
+
                 else:
                     admin_line_users = []
 
-        print('admin_line_users ' + admin_line_users[0])
+
+
         return admin_line_users
 
     def update_enable_access_management(self,value):
