@@ -825,7 +825,7 @@ def handle_text_message(event):
                             send_text = 'にゃー（ねこ画像追加して）'
 
                         elif entity_partial.name == 'neko_cyu-ru_image':
-                            setting.update_current_image_upload_category('image/neko/')
+                            setting.update_current_image_upload_category('image/neko_cyu-ru/')
                             send_text = 'にゃー（ちゅーる画像追加して）'
 
                     if send_text != '':
@@ -1145,7 +1145,7 @@ def handle_image_message(event):
         dist_path = tf_path + extension
         os.rename(tf_path, dist_path)
         
-        upload_image_to_s3(dist_path, 'image/neko/')
+        upload_image_to_s3(dist_path, setting.current_image_upload_category())
         
         send_text = 'にゃー（画像ゲット）'
 
