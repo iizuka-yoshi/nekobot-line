@@ -286,10 +286,9 @@ def text_send_messages_db(entity):
     else:
         reply_texts = []
 
-    print('reply_texts '+ reply_texts[0])
-
     messages = []
     for reply_text in reply_texts:
+        print('reply_text '+ reply_text)
         messages.append(ImageSendMessage(text=reply_text))
 
     return messages
