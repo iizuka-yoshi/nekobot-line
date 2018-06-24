@@ -1148,6 +1148,8 @@ def handle_image_message(event):
 
         dist_path = tf_path + extension
         os.rename(tf_path, dist_path)
+
+        print('setting.current_image_upload_category() '+setting.current_image_upload_category())
         
         upload_image_to_s3(dist_path, setting.current_image_upload_category())
         
