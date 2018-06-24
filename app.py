@@ -254,7 +254,7 @@ class Setting():
         if self.enable_access_management == 'False':
             ret = True
         elif self.enable_access_management == 'True':
-            print('self.enable_access_management == True:')
+            print('self.check_admin_line_user(line_user_id) '+ str(self.check_admin_line_user(line_user_id)))
             ret = self.check_admin_line_user(line_user_id)
         else:
             ret = False
