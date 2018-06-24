@@ -223,12 +223,9 @@ class Setting():
                     admin_line_users = []
                     for admin_line_user in admin_line_users_tp:
                         admin_line_users.append(admin_line_user[0])
-                        print('admin_line_user[0] '+ admin_line_user[0])
 
                 else:
                     admin_line_users = []
-
-
 
         return admin_line_users
 
@@ -246,6 +243,7 @@ class Setting():
     def check_admin_line_user(self, line_user_id):
         ret = False
         for admin_line_user in self.admin_line_users:
+            print('admin_line_user '+admin_line_user)
             if line_user_id == admin_line_user:
                 ret = True
                 break
