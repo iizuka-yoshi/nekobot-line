@@ -199,6 +199,7 @@ class Setting():
 
         self.enable_access_management = self._get_enable_access_management()
         self.admin_line_users = self._get_admin_line_users()
+        self.current_image_upload_category = self._get_current_image_upload_category()
 
     def _get_enable_access_management(self):
         with psycopg2.connect(DB_URL) as conn:
@@ -229,6 +230,18 @@ class Setting():
 
         return admin_line_users
 
+    def _get_current_image_upload_category(self):
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(self._sql_select, ('current_image_upload_category',))
+                if 0 < curs.rowcount:
+                    (current_image_upload_category,) = curs.fetchone()
+                else:
+                    current_image_upload_category = ''
+
+        return current_image_upload_category
+
     def update_enable_access_management(self,value):
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as curs:
@@ -237,6 +250,17 @@ class Setting():
                 conn.commit()
 
         self.enable_access_management = self._get_enable_access_management()
+
+        return self
+
+    def update_current_image_upload_category(self,value):
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(self._sql_update, (value, 'current_image_upload_category',))
+                conn.commit()
+
+        self.current_image_upload_category = self._get_current_image_upload_category()
 
         return self
 
@@ -732,6 +756,21 @@ def handle_text_message(event):
 
             return
 
+        #チャオチュール判定（テキストとイメージを返信）
+        if entity_exact.name in {
+            'neko_cyu-ru', 
+        }:
+
+            line_bot_api.reply_message(
+                event.reply_token,
+                [
+                    text_send_messages_db(entity_exact)[0],
+                    image_send_message_s3(entity_exact.category)
+                ]
+            )
+
+            return
+
         # イヌ判定（テシストを返信して退出）
         if entity_exact.name in{'dog'}:
 
@@ -766,6 +805,28 @@ def handle_text_message(event):
                             else:
                                 setting = setting.update_enable_access_management('True')
                                 send_text = 'にゃー（アクセス管理 オン）'
+
+                    if send_text != '':
+                        line_bot_api.reply_message(
+                            event.reply_token, TextMessage(text=send_text))
+
+                    return
+
+        if intent.name == 'change_upload_target':
+
+            if setting.check_access_allow(user_id):
+
+                if entity_partial.match:
+
+                    if entity_partial.position < intent.position:
+
+                        if entity_partial.name == 'neko_image':
+                            setting.update_current_image_upload_category('image/neko/')
+                            send_text = 'にゃー（ねこ画像追加して）'
+
+                        elif entity_partial.name == 'neko_cyu-ru_image':
+                            setting.update_current_image_upload_category('image/neko/')
+                            send_text = 'にゃー（ちゅーる画像追加して）'
 
                     if send_text != '':
                         line_bot_api.reply_message(
