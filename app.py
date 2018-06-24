@@ -722,6 +722,8 @@ def handle_text_message(event):
             'neko_roma', 'neko_eng', 'neko_emoji',
         }:
 
+            print('ねこ判定')
+
             line_bot_api.reply_message(
                 event.reply_token,
                 [
