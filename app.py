@@ -261,7 +261,7 @@ class Setting():
         return ret    
 
 
-def text_send_messages_db(entity):
+def text_send_messages_db(entity,prefix='',suffix=''):
     
     sql = 'SELECT DISTINCT ON (reply_order) text, reply_order '\
             'FROM public.replies '\
@@ -288,7 +288,7 @@ def text_send_messages_db(entity):
 
     messages = []
     for reply_text in reply_texts:
-        messages.append(TextSendMessage(text=reply_text))
+        messages.append(TextSendMessage(text=prefix + reply_text + suffix))
 
     return messages
 
@@ -736,7 +736,7 @@ def handle_text_message(event):
         if entity_exact.name in{'dog'}:
 
             line_bot_api.reply_message(
-                event.reply_token, text_send_messages_db(entity_exact)[0]
+                event.reply_token, text_send_messages_db(entity_exact,textn)[0]
             )
 
             if isinstance(event.source, SourceGroup):
