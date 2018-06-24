@@ -24,6 +24,8 @@ import tempfile
 import random
 import psycopg2
 import boto3
+import neologdn
+
 from PIL import Image
 
 from argparse import ArgumentParser
@@ -73,6 +75,151 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', None)
 USER_ID_IIZUKA = 'U35bca0dfb497d294737b7b25f4261a0b'
 
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
+
+
+class Intent:
+    def __init__(self, target_text):
+        self.match = False
+        self.text = target_text
+        self.id = 0
+        self.name = ''
+        self.example = ''
+        self.weight = 0
+        self.position = 0
+
+    def reset_text(self, target_text):
+        self.text = target_text
+        return self
+
+    def check_intent(self, exact_match=False):
+
+        if exact_match:
+            sql = 'SELECT id, name, example, weight, POSITION(example IN %s) '\
+                'FROM public.intents '\
+                'WHERE example = %s '\
+                'ORDER BY weight DESC;'
+
+        else:
+            sql = 'SELECT id, name, example, weight, POSITION(example IN %s) '\
+                'FROM public.intents '\
+                'WHERE 0 < POSITION(example IN %s) '\
+                'ORDER BY weight DESC;'
+
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(sql, (self.text, self.text,))
+                if 0 < curs.rowcount:
+                    intent = curs.fetchone()
+                    self.match = True
+                else:
+                    intent = (0, 'Unknown', '', 0, 0)
+
+        (self.id, self.name, self.example, self.weight, self.position) = intent
+        return self
+
+
+class Entity:
+    def __init__(self, target_text):
+        self.match = False
+        self.text = target_text
+        self.id = 0
+        self.name = ''
+        self.synonym = ''
+        self.weight = 0
+        self.position = 0
+
+    def reset_text(self, target_text):
+        self.text = target_text
+        return self
+
+    def check_entity(self, exact_match=False):
+
+        if exact_match:
+            sql = 'SELECT id, name, synonym, weight, POSITION(synonym IN %s) '\
+                    'FROM public.entities '\
+                    'WHERE synonym = %s '\
+                    'ORDER BY weight DESC;'
+
+        else:
+            sql = 'SELECT id, name, synonym, weight, POSITION(synonym IN %s) '\
+                    'FROM public.entities '\
+                    'WHERE 0 < POSITION(synonym IN %s) '\
+                    'ORDER BY weight DESC;'
+
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(sql, (self.text, self.text,))
+                if 0 < curs.rowcount:
+                    entity = curs.fetchone()
+                    self.match = True
+                else:
+                    entity = (0, 'Unknown', '', 0, 0)
+
+            (self.id, self.name, self.synonym, self.weight, self.position) = entity
+            return self
+
+class Setting():
+
+    _sql_select = 'SELECT value '\
+                    'FROM public.settings '\
+                    'WHERE name = %s ;'
+
+    _sql_update = 'UPDATE public.settings '\
+                    'SET value = %s '\
+                    'WHERE name = %s ;'
+
+    def __init__(self):
+
+        self.enable_access_management = self._get_enable_access_management()
+        self.admin_line_users = self._get_admin_line_users()
+
+    def _get_enable_access_management(self):
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(self._sql_select, ('enable_access_management',))
+                if 0 < curs.rowcount:
+                    (enable_access_management,) = curs.fetchone()
+                else:
+                    enable_access_management = 'True'
+
+        return enable_access_management
+
+    def _get_admin_line_users(self):
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(self._sql_select, ('admin_line_user',))
+                if 0 < curs.rowcount:
+                    admin_line_users = curs.fetchall()
+                else:
+                    admin_line_users = []
+
+        return admin_line_users
+
+    def update_enable_access_management(self,value):
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(self._sql_update, (value, 'enable_access_management',))
+                conn.commit()
+
+        self.enable_access_management = self._get_enable_access_management()
+
+        return self
+
+    def check_admin_line_user(self, line_user_id):
+        ret = False
+        for admin_line_user in self.admin_line_users:
+            if line_user_id == admin_line_user:
+                ret = True
+                break
+
+        return ret
+    
+
 
 def get_s3_image_prefix(img_category):
     prefix = os.path.join('image', img_category)
@@ -139,19 +286,6 @@ def shrink_image(source_path,save_path, target_width, target_height):
     return save_path
 
 
-def get_entitｙ(text):
-
-    with psycopg2.connect(DB_URL) as conn:
-        with conn.cursor() as curs:
-            curs.execute('SELECT name FROM entities WHERE %s = ANY (synonym);', (text,))
-            if 0 < curs.rowcount:
-                (entity,) = curs.fetchone()
-            else:
-                entity = 'Unknown'
-
-    return entity
-
-
 def get_message_pattern(text):
     text = text.replace(' ', '')
     text = text.replace('　', '')
@@ -206,7 +340,7 @@ def get_message_pattern(text):
         'ちゅーる', 'チュール',
         'いなば食品', 'いなば', 'イナバ', 'inaba',
             'おやつ', 'オヤツ'}:
-        return 'cyu-ru'
+        return 'neko_cyu-ru'
 
     elif text in{
         '犬', 'いぬ', 'イヌ', 'ｲﾇ', 'わんちゃん', 'ワンちゃん', 'ワンチャン', 'ﾜﾝﾁｬﾝ',
@@ -459,11 +593,18 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
-    random.seed()
 
     epsilon = 0.05
     text = event.message.text
-    message_pattern = get_message_pattern(text)
+    textn = neologdn.normalize(text)
+    textn = textn.lower()
+
+    intent = Intent(textn).check_intent(False)
+    entity_exact = Entity(textn).check_entity(True)
+    entity_partial = Entity(textn).check_entity(False)
+    
+    #古い判定
+    message_pattern = get_message_pattern(textn)
     img_dir = get_img_dir(message_pattern)
 
     # log
@@ -497,65 +638,90 @@ def handle_text_message(event):
         + ' message_pattern=' + str(message_pattern)
     )
 
-    # ねこ判定（テキストとイメージを返信）
-    send_text = ''
-    if message_pattern in{'neko_hime'}:
-        send_text = 'みゃー'
+    #Entity完全一致の判定
+    if entity_exact.match:
+        
+        # ねこ判定（テキストとイメージを返信）
+        if entity_exact.name in{'neko_hime'}:
+            send_text = 'みゃー'
 
-    elif message_pattern in{'neko_quu'}:
-        send_text = 'にゃおーん'
+        elif entity_exact.name in{'neko_quu'}:
+            send_text = 'にゃおーん'
 
-    elif message_pattern in{'neko_choco'}:
-        send_text = 'にゃっ'
+        elif entity_exact.name in{'neko_choco'}:
+            send_text = 'にゃっ'
 
-    elif message_pattern in{'neko_hiragana'}:
-        send_text = 'にゃー'
+        elif entity_exact.name in{'neko_hiragana'}:
+            send_text = 'にゃー'
 
-    elif message_pattern in{'neko_kanji'}:
-        send_text = 'ミョウ'
+        elif entity_exact.name in{'neko_kanji'}:
+            send_text = 'ミョウ'
 
-    elif message_pattern in{'neko_kana_full'}:
-        send_text = 'ニャー'
+        elif entity_exact.name in{'neko_kana'}:
+            send_text = 'ニャー'
 
-    elif message_pattern in{'neko_kana_half'}:
-        send_text = 'ﾆｬｰ'
+        elif entity_exact.name in{'neko_roma'}:
+            send_text = 'nya-'
 
-    elif message_pattern in{'neko_roma_full'}:
-        send_text = 'ｎｙａ−'
+        elif entity_exact.name in{'neko_eng'}:
+            send_text = random.choice(['meow（ミャウ）', 'mew（ミュー）'])
 
-    elif message_pattern in{'neko_roma_half'}:
-        send_text = 'nya-'
+        elif entity_exact.name in{'neko_emoji'}:
+            send_text = random.choice(
+                ['🐈', '🐱', '😸', '😹', '😺', '😻', '😼', '😽', '😾', '😿', '🙀'])
 
-    elif message_pattern in{'neko_eng_full'}:
-        send_text = random.choice(['ｍｅｏｗ（ミャウ）', 'ｍｅｗ（ミュー）'])
+        if send_text != '':
+            line_bot_api.reply_message(
+                event.reply_token,
+                [
+                    TextSendMessage(text=send_text),
+                    image_send_message_dir(img_dir)
+                ]
+            )
 
-    elif message_pattern in{'neko_eng_half'}:
-        send_text = random.choice(['meow（ミャウ）', 'mew（ミュー）'])
+            return
 
-    elif message_pattern in{'neko_emoji'}:
-        send_text = random.choice(
-            ['🐈', '🐱', '😸', '😹', '😺', '😻', '😼', '😽', '😾', '😿', '🙀'])
+        # イヌ判定（テシストを返信して退出）
+        if entity_exact.name in{'dog'}:
+            send_text = text + random.choice(['きらい', 'やめて'])
 
-    if send_text != '':
-        line_bot_api.reply_message(event.reply_token,
-                                   [
-                                       TextSendMessage(text=send_text),
-                                       image_send_message_dir(img_dir)
-                                   ]
-                                   )
+        if send_text != '':
+            line_bot_api.reply_message(
+                event.reply_token, TextMessage(text=send_text))
+            if isinstance(event.source, SourceGroup):
+                line_bot_api.leave_group(event.source.group_id)
+            elif isinstance(event.source, SourceRoom):
+                line_bot_api.leave_room(event.source.room_id)
 
-    # イヌ判定（テシストを返信して退出）
-    send_text = ''
-    if message_pattern in{'dog'}:
-        send_text = text + random.choice(['きらい', 'やめて'])
+            return
 
-    if send_text != '':
-        line_bot_api.reply_message(
-            event.reply_token, TextMessage(text=send_text))
-        if isinstance(event.source, SourceGroup):
-            line_bot_api.leave_group(event.source.group_id)
-        elif isinstance(event.source, SourceRoom):
-            line_bot_api.leave_room(event.source.room_id)
+    #Intent一致の判定
+    if intent.match:
+
+        if intent.name == 'change_setting':
+
+            setting = Setting()
+            
+            #Entity部分一致の判定
+            if entity_partial.match:
+                
+                if entity_partial.name == 'access_management':
+
+                    if entity_partial.position < intent.position:
+
+                        if setting.enable_access_management == 'True':
+                            setting = setting.update_enable_access_management('False')
+                            send_text = 'アクセス管理無効'
+                        else:
+                            setting = setting.update_enable_access_management('True')
+                            send_text = 'アクセス管理有効'
+
+                if send_text != '':
+                    line_bot_api.reply_message(
+                        event.reply_token, TextMessage(text=send_text))
+
+                return
+
 
     # test判定
     send_text = ''
@@ -589,24 +755,6 @@ def handle_text_message(event):
                                    ]
                                    )
 
-    send_text = ''
-    if message_pattern == 'test2':
-        send_text = 'PostgreSQL からパターン判定します'
-
-        message_pattern = get_entitｙ('ねこ')
-        print('message_pattern: '+message_pattern)
-
-        if message_pattern == 'neko_hiragana':
-
-            img_dir = get_img_dir(message_pattern)
-            print('img_dir: '+img_dir)
-
-            line_bot_api.reply_message(event.reply_token,
-                                    [
-                                        TextSendMessage(text=send_text),
-                                        image_send_message_dir(img_dir)
-                                    ]
-                                    )
 
     # スペシャル判定（テキストとイメージを返信。場合によって退出）
     send_text = ''
@@ -870,25 +1018,31 @@ def handle_image_message(event):
           + ' user_name=' + str(user_name)
           )
 
-    #if user_id == USER_ID_IIZUKA:
+    setting = Setting()
 
-    message_content = line_bot_api.get_message_content(event.message.id)
+    if setting.enable_access_management == 'False' or setting.check_admin_line_user(user_id):
 
-    with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=str_now+'-', delete=False) as tf:
-        for chunk in message_content.iter_content():
-            tf.write(chunk)
-        tf_path = tf.name
+        message_content = line_bot_api.get_message_content(event.message.id)
 
-    dist_path = tf_path + extension
-    os.rename(tf_path, dist_path)
-    
-    upload_image_to_s3(dist_path,"")
+        with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=str_now+'-', delete=False) as tf:
+            for chunk in message_content.iter_content():
+                tf.write(chunk)
+            
+            tf_path = tf.name
 
-    line_bot_api.reply_message(event.reply_token,
-                                [
-                                    TextSendMessage(text='Amazon S3 へ画像をアップロードしました\n[テスト]コマンドで確認できます')
-                                ]
-                                )
+        dist_path = tf_path + extension
+        os.rename(tf_path, dist_path)
+        
+        upload_image_to_s3(dist_path, "")
+        
+        send_text = '画像ゲット'
+
+        line_bot_api.reply_message(
+            event.reply_token,
+            [
+                TextSendMessage(text='画像ゲット')
+            ]
+        )
 
 
 
