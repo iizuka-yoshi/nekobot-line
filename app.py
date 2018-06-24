@@ -222,6 +222,7 @@ class Setting():
                 else:
                     admin_line_users = []
 
+        print('admin_line_users ' + admin_line_users[0])
         return admin_line_users
 
     def update_enable_access_management(self,value):
@@ -242,7 +243,6 @@ class Setting():
                 ret = True
                 break
 
-        print('check_admin_line_user ' + str(ret))
         return ret
 
     def check_access_allow(self, line_user_id):
