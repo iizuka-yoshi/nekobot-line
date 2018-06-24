@@ -243,8 +243,6 @@ class Setting():
     def check_admin_line_user(self, line_user_id):
         ret = False
         for admin_line_user in self.admin_line_users:
-            print('admin_line_user ' + admin_line_user)
-            print('line_user_id '+line_user_id)
             if line_user_id == admin_line_user:
                 ret = True
                 break
@@ -256,6 +254,7 @@ class Setting():
         if self.enable_access_management == 'False':
             ret = True
         elif self.enable_access_management == 'True':
+            print('self.enable_access_management == True:')
             ret = self.check_admin_line_user(line_user_id)
         else:
             ret = False
