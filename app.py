@@ -1060,6 +1060,7 @@ def handle_image_message(event):
           )
 
     setting = Setting()
+    print('allow '+setting.check_access_allow(user_id))
 
     if setting.check_access_allow(user_id):
 
@@ -1073,8 +1074,6 @@ def handle_image_message(event):
 
         dist_path = tf_path + extension
         os.rename(tf_path, dist_path)
-
-        print('dist_path '+dist_path)
         
         upload_image_to_s3(dist_path, 'image/neko/')
         
