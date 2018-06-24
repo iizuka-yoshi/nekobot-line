@@ -218,6 +218,20 @@ class Setting():
                 break
 
         return ret
+
+    def check_access_allow(self, line_user_id):
+        ret = False
+        if self.enable_access_management == 'False':
+            ret = True
+        elif self.enable_access_management == 'True':
+            ret = self.check_admin_line_user(line_user_id)
+        else:
+            ret = False
+        
+        return ret
+
+
+
     
 
 
@@ -602,6 +616,7 @@ def handle_text_message(event):
     intent = Intent(textn).check_intent(False)
     entity_exact = Entity(textn).check_entity(True)
     entity_partial = Entity(textn).check_entity(False)
+    setting = Setting()
     
     #古い判定
     message_pattern = get_message_pattern(textn)
@@ -701,28 +716,28 @@ def handle_text_message(event):
     if intent.match:
 
         if intent.name == 'change_setting':
-
-            setting = Setting()
             
-            #Entity部分一致の判定
-            if entity_partial.match:
-                
-                if entity_partial.name == 'access_management':
+            if setting.check_access_allow(user_id):
 
-                    if entity_partial.position < intent.position:
+                #Entity部分一致の判定
+                if entity_partial.match:
+                    
+                    if entity_partial.name == 'access_management':
 
-                        if setting.enable_access_management == 'True':
-                            setting = setting.update_enable_access_management('False')
-                            send_text = 'アクセス管理 オフ'
-                        else:
-                            setting = setting.update_enable_access_management('True')
-                            send_text = 'アクセス管理 オン'
+                        if entity_partial.position < intent.position:
 
-                if send_text != '':
-                    line_bot_api.reply_message(
-                        event.reply_token, TextMessage(text=send_text))
+                            if setting.enable_access_management == 'True':
+                                setting = setting.update_enable_access_management('False')
+                                send_text = 'にゃー（アクセス管理 オフ）'
+                            else:
+                                setting = setting.update_enable_access_management('True')
+                                send_text = 'にゃー（アクセス管理 オン）'
 
-                return
+                    if send_text != '':
+                        line_bot_api.reply_message(
+                            event.reply_token, TextMessage(text=send_text))
+
+                    return
 
 
     # test判定
@@ -1037,7 +1052,7 @@ def handle_image_message(event):
         
         upload_image_to_s3(dist_path, "")
         
-        send_text = '画像ゲット'
+        send_text = 'にゃー（画像ゲット）'
 
         line_bot_api.reply_message(
             event.reply_token,
