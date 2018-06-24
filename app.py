@@ -175,7 +175,7 @@ class Entity:
 
                     curs.execute(sql, (self.name, ))
                     if 0 < curs.rowcount:
-                        category = curs.fetchone()
+                        (category,) = curs.fetchone()
                     else:
                         category = 'Unknown'
 
