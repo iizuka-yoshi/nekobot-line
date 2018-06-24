@@ -243,8 +243,8 @@ class Setting():
     def check_admin_line_user(self, line_user_id):
         ret = False
         for admin_line_user in self.admin_line_users:
-            print('line_user_id    ' + line_user_id)
-            print('admin_line_user ' + admin_line_user)
+            print('line_user_id    ' + line_user_id + 'EOF')
+            print('admin_line_user ' + admin_line_user + 'EOF')
             if line_user_id == admin_line_user:
                 ret = True
                 break
