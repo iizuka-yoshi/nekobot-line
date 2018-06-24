@@ -222,7 +222,7 @@ class Setting():
 
                     admin_line_users = []
                     for admin_line_user in admin_line_users_tp:
-                        admin_line_users.append(admin_line_user[0])
+                        admin_line_users.append(admin_line_user[0].strip())
 
                 else:
                     admin_line_users = []
