@@ -25,7 +25,6 @@ import random
 import psycopg2
 import boto3
 import neologdn
-from botocore.exceptions import ClientError
 from PIL import Image
 from argparse import ArgumentParser
 from flask import Flask, request, abort
@@ -374,10 +373,11 @@ def exist_key_s3(key):
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
     
     try:
-        obj = bucket.Object(key)
-        return True
-    except ClientError:
+        bucket.Object(key).load()
+    except:
         return False
+    else:
+        return True
 
 def download_from_s3(key):
 
