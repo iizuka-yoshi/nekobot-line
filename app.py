@@ -417,7 +417,7 @@ def image_send_message_s3(category):
         original_content_url=image_url,
         preview_image_url=thumb_url
     )
-    print('[Image Log] image_send_message_s3 image_url=' + image_url)
+    print('[Image Log] image_send_message_s3 image_url=' + image_url + ' thumb_url=' + thumb_url)
     return message
 
 
