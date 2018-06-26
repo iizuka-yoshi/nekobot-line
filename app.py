@@ -312,41 +312,18 @@ def text_send_messages_db(entity,prefix='',suffix=''):
 
     return messages
 
-
-def download_image_from_s3_old(category):
-
-    prefix = category
-
-    s3 = boto3.resource('s3')
-    bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
-
-    obj_collection = bucket.objects.filter(Prefix=prefix)
-    keys = [obj_summary.key for obj_summary in obj_collection]
-
-    image_key = random.choice(keys)
-    download_path = os.path.join(static_tmp_path,os.path.basename(image_key))
-
-    bucket.download_file(image_key, download_path)
-
-    return download_path
-
 def genelate_image_url_s3(category):
 
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
 
-    prefix = category
-
-    obj_collections = bucket.objects.filter(Prefix=prefix)
+    obj_collections = bucket.objects.filter(Prefix=category)
     keys = [obj_summary.key for obj_summary in obj_collections]
 
     image_key = random.choice(keys)
     thumb_key = os.path.join('thumb', image_key)
-    print('image_key ' + image_key)
-    print('thumb_key ' + thumb_key)
 
     if not exist_key_s3(thumb_key):
-        print('create thumb')
         thumb_path = download_from_s3(image_key)
         thumb_path = shrink_image(thumb_path, thumb_path, 240, 240)
         thumb_key = upload_to_s3(thumb_path, thumb_key)
@@ -379,6 +356,7 @@ def exist_key_s3(key):
     else:
         return True
 
+
 def download_from_s3(key):
 
     s3 = boto3.resource('s3')
@@ -388,6 +366,7 @@ def download_from_s3(key):
     bucket.download_file(key, download_path)
 
     return download_path
+
 
 def upload_to_s3(source_path, key):
     
@@ -401,22 +380,20 @@ def upload_to_s3(source_path, key):
 
 def upload_to_s3_category(source_path, category):
 
-    prefix = category
-    key = os.path.join(prefix, os.path.basename(source_path))
-    
+    key = os.path.join(category, os.path.basename(source_path))
     key = upload_to_s3(source_path,key)
 
     return key
 
 
-def image_send_message_s3(category):
+def image_send_messages_s3(category):
 
     image_url, thumb_url = genelate_image_url_s3(category)
 
-    message = ImageSendMessage(
+    message = [ImageSendMessage(
         original_content_url=image_url,
         preview_image_url=thumb_url
-    )
+    )]
     print('[Image Log] image_send_message_s3 image_url=' + image_url + ' thumb_url=' + thumb_url)
     return message
 
@@ -452,6 +429,7 @@ def shrink_image(source_path,save_path, target_width, target_height):
     img = convert_image[orientation](img)
     img.save(save_path)
     return save_path
+
 
 def get_message_pattern(text):
     text = text.replace(' ', '')
@@ -815,43 +793,26 @@ def handle_text_message(event):
     #Entity完全一致の判定
     if entity_exact.match:
         
-        # ねこ判定（テキストとイメージを返信）
+        # スペシャル判定
         if entity_exact.name in {
-            'neko_hime', 'neko_hiragana', 'neko_kanji', 'neko_kana',
-            'neko_roma', 'neko_eng', 'neko_emoji',
+            '@foo',
         }:
 
-            line_bot_api.reply_message(
-                event.reply_token,
-                [
-                    text_send_messages_db(entity_exact)[0],
-                    image_send_message_s3(entity_exact.category)
-                ]
-            )
-
-            return
-
-        #チャオチュール判定（テキストとイメージを返信）
-        if entity_exact.name in {
-            'neko_cyu-ru', 
-        }:
-
-            line_bot_api.reply_message(
-                event.reply_token,
-                [
-                    text_send_messages_db(entity_exact)[0],
-                    image_send_message_s3(entity_exact.category)
-                ]
-            )
+            # line_bot_api.reply_message(
+            #     event.reply_token,
+            #     [
+            #         text_send_messages_db(entity_exact)[0],
+            #         image_send_messages_s3(entity_exact.category)
+            #     ]
+            # )
 
             return
 
         # イヌ判定（テシストを返信して退出）
-        if entity_exact.name in{'dog'}:
+        if entity_exact.name in{'@dog'}:
 
-            line_bot_api.reply_message(
-                event.reply_token, text_send_messages_db(entity_exact,textn)[0]
-            )
+            replies = text_send_messages_db(entity_exact, textn)
+            line_bot_api.reply_message(event.reply_token, replies)
 
             if isinstance(event.source, SourceGroup):
                 line_bot_api.leave_group(event.source.group_id)
@@ -860,17 +821,26 @@ def handle_text_message(event):
 
             return
 
+        #ノーマル返信判定
+        else:
+
+            replies = text_send_messages_db(entity_exact) + image_send_messages_s3(entity_exact.category)
+            line_bot_api.reply_message(event.reply_token,replies)
+
+            return
+
+
     #Intent一致の判定
     if intent.match:
 
-        if intent.name == 'change_setting':
+        if intent.name == '#change_setting':
             
             if setting.check_admin_line_user(user_id):
 
                 #Entity部分一致の判定
                 if entity_partial.match:
                     
-                    if entity_partial.name == 'access_management':
+                    if entity_partial.name == '@access_management':
 
                         if entity_partial.position < intent.position:
 
@@ -887,7 +857,7 @@ def handle_text_message(event):
 
                     return
 
-        if intent.name == 'change_upload_target':
+        if intent.name == '#change_upload_target':
 
             if setting.check_access_allow(user_id):
 
@@ -895,11 +865,11 @@ def handle_text_message(event):
 
                     if entity_partial.position < intent.position:
 
-                        if entity_partial.name == 'neko_image':
+                        if entity_partial.name == '@neko_image':
                             setting.update_current_image_upload_category('image/neko/')
                             send_text = 'にゃー（ねこ画像追加して）'
 
-                        elif entity_partial.name == 'neko_cyu-ru_image':
+                        elif entity_partial.name == '@neko_cyu-ru_image':
                             setting.update_current_image_upload_category('image/neko_cyu-ru/')
                             send_text = 'にゃー（ちゅーる画像追加して）'
 
@@ -938,7 +908,7 @@ def handle_text_message(event):
         line_bot_api.reply_message(event.reply_token,
                                    [
                                        TextSendMessage(text=send_text),
-                                       image_send_message_s3('')
+                                       image_send_messages_s3('')
                                    ]
                                    )
 
