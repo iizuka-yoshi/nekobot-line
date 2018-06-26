@@ -278,8 +278,20 @@ class Setting():
         else:
             ret = False
         
-        return ret    
+        return ret
 
+def my_normalize(text):
+
+    text = neologdn.normalize(text)
+    text = text.replace(' ', '')
+    text = text.replace('〜', 'ー')
+    text = text.replace('!', '')
+    text = text.replace('?', '')
+    text = text.replace('、', '')
+    text = text.replace('。', '')
+    text = text.lower()
+
+    return text
 
 def text_send_messages_db(entity,prefix='',suffix=''):
     
@@ -311,6 +323,7 @@ def text_send_messages_db(entity,prefix='',suffix=''):
         messages.append(TextSendMessage(text=prefix + reply_text + suffix))
 
     return messages
+
 
 def genelate_image_url_s3(category):
 
@@ -740,9 +753,7 @@ def callback():
 def handle_text_message(event):
 
     epsilon = 0.05
-    text = event.message.text
-    textn = neologdn.normalize(text)
-    textn = textn.lower()
+    textn = my_normalize(event.message.text)
 
     intent = Intent(textn).check_intent(False)
     entity_exact = Entity(textn).check_entity(True)
@@ -784,7 +795,7 @@ def handle_text_message(event):
         + ' text_message'
         + ' user_id=' + str(user_id)
         + ' user_name=' + str(user_name)
-        + ' text=' + str(text)
+        + ' text=' + str(textn)
         + ' message_pattern=' + str(message_pattern)
     )
 
@@ -821,7 +832,7 @@ def handle_text_message(event):
 
             return
 
-        #ノーマル返信判定
+        #ノーマル返信判定（テキストとイメージを返信）
         else:
 
             replies = text_send_messages_db(entity_exact) + image_send_messages_s3(entity_exact.category)
