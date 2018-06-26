@@ -344,7 +344,7 @@ def genelate_image_url_s3(category):
     image_key = random.choice(keys)
     thumb_key = os.path.join(os.path.dirname(image_key),'thumb',os.path.basename(image_key))
 
-    if exist_s3_key(thumb_key):
+    if exist_key_s3(thumb_key):
         thumb_path = download_from_s3(image_key)
         thumb_path = shrink_image(thumb_path, thumb_path, 240, 240)
         thumb_key = upload_to_s3(thumb_path, thumb_key)
@@ -366,12 +366,12 @@ def genelate_image_url_s3(category):
     return image_url, thumb_url
 
 
-def exist_s3_key(key):
+def exist_key_s3(key):
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
     
     try:
-        bucket.object(key)
+        bucket.Object(key)
         return True
     except ClientError:
         return False
