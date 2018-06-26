@@ -342,10 +342,12 @@ def genelate_image_url_s3(category):
     keys = [obj_summary.key for obj_summary in obj_collections]
 
     image_key = random.choice(keys)
-    thumb_key = os.path.join('thumb',image_key)
+    thumb_key = os.path.join('thumb', image_key)
+    print('image_key ' + image_key)
+    print('thumb_key ' + thumb_key)
 
     if not exist_key_s3(thumb_key):
-        print('thumb not exist' + thumb_key)
+        print('create thumb')
         thumb_path = download_from_s3(image_key)
         thumb_path = shrink_image(thumb_path, thumb_path, 240, 240)
         thumb_key = upload_to_s3(thumb_path, thumb_key)
