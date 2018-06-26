@@ -162,7 +162,8 @@ class Entity:
         
         sql = 'SELECT name '\
                 'FROM public.categories '\
-                'WHERE entity = %s ;'
+                'WHERE entity = %s '\
+                'ORDER BY RANDOM() ;'
         
         if self.match:
 
@@ -337,10 +338,17 @@ def genelate_image_url_s3(category):
     image_key = random.choice(keys)
     thumb_key = os.path.join('thumb', image_key)
 
+    #サムネイルが無ければ作成
     if not exist_key_s3(thumb_key):
         thumb_path = download_from_s3(image_key)
         thumb_path = shrink_image(thumb_path, thumb_path, 240, 240)
         thumb_key = upload_to_s3(thumb_path, thumb_key)
+
+        print('[Image Log] genelate_image_url_s3'
+            + ' create_thumb'
+            + ' image_key=' + image_key
+            + ' thumb_key=' + thumb_key
+        )
         
     s3_client = boto3.client('s3')
     image_url = s3_client.generate_presigned_url(
