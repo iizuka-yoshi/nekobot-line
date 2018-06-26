@@ -25,13 +25,10 @@ import random
 import psycopg2
 import boto3
 import neologdn
-
+from botocore.exceptions import ClientError
 from PIL import Image
-
 from argparse import ArgumentParser
-
 from flask import Flask, request, abort
-
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -317,25 +314,9 @@ def text_send_messages_db(entity,prefix='',suffix=''):
     return messages
 
 
-def get_s3_image_prefix(img_category):
-    prefix = img_category
-    return prefix
+def download_image_from_s3_old(category):
 
-def upload_image_to_s3(source_image_path, img_category):
-
-    prefix = get_s3_image_prefix(img_category)
-
-    image_key = os.path.join(prefix, os.path.basename(source_image_path))
-    
-    s3 = boto3.resource('s3')
-    bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
-    bucket.upload_file(source_image_path, image_key)
-
-    return image_key
-
-def download_image_from_s3(img_category):
-
-    prefix = get_s3_image_prefix(img_category)
+    prefix = category
 
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
@@ -350,22 +331,88 @@ def download_image_from_s3(img_category):
 
     return download_path
 
+def genelate_image_url_s3(category):
 
-def image_send_message_s3(img_category):
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
 
-    image_path = download_image_from_s3(img_category)
-    image_name = os.path.basename(image_path)
-    image_dir = os.path.dirname(image_path)
-    thumb_path = os.path.join(image_dir, 'thumb', image_name)
+    prefix = category
 
-    shrink_image(image_path,thumb_path,240,240)
+    obj_collections = bucket.objects.filter(Prefix=prefix)
+    keys = [obj_summary.key for obj_summary in obj_collections]
 
-    image_url = os.path.join(AP_URL, 'static','tmp', image_name)
-    image_thumb_url = os.path.join(AP_URL, 'static', 'tmp', 'thumb', image_name)
+    image_key = random.choice(keys)
+    thumb_key = os.path.join(os.path.dirname(image_key),'thumb',os.path.basename(image_key))
+
+    if exist_s3_key(thumb_key):
+        thumb_path = download_from_s3(image_key)
+        thumb_path = shrink_image(thumb_path, thumb_path, 240, 240)
+        thumb_key = upload_to_s3(thumb_path, thumb_key)
+        
+    s3_client = boto3.client('s3')
+    image_url = s3_client.generate_presigned_url(
+                    ClientMethod = 'get_object',
+                    Params = {'Bucket' : AWS_S3_BUCKET_NAME, 'Key' : image_key},
+                    ExpiresIn = 604800,
+                    HttpMethod = 'GET'
+                )
+    thumb_url = s3_client.generate_presigned_url(
+                    ClientMethod = 'get_object',
+                    Params = {'Bucket' : AWS_S3_BUCKET_NAME, 'Key' : thumb_key},
+                    ExpiresIn = 604800,
+                    HttpMethod = 'GET'
+                )
+
+    return image_url, thumb_url
+
+
+def exist_s3_key(key):
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
+    
+    try:
+        bucket.object(key)
+        return True
+    except ClientError:
+        return False
+
+def download_from_s3(key):
+
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
+
+    download_path = os.path.join(static_tmp_path,os.path.basename(key))
+    bucket.download_file(key, download_path)
+
+    return download_path
+
+def upload_to_s3(source_path, key):
+    
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
+
+    bucket.upload_file(source_path, key)
+
+    return key
+
+
+def upload_to_s3_category(source_path, category):
+
+    prefix = category
+    key = os.path.join(prefix, os.path.basename(source_path))
+    
+    key = upload_to_s3(source_path,key)
+
+    return key
+
+
+def image_send_message_s3(category):
+
+    image_url, thumb_url = genelate_image_url_s3(category)
 
     message = ImageSendMessage(
         original_content_url=image_url,
-        preview_image_url=image_thumb_url
+        preview_image_url=thumb_url
     )
     print('[Image Log] image_send_message_s3 image_url=' + image_url)
     return message
@@ -398,7 +445,6 @@ def shrink_image(source_path,save_path, target_width, target_height):
 
     if target_width < w or target_height < h:
         img.thumbnail((target_width, target_height), Image.ANTIALIAS)
-        img.save(save_path)
 
     img = convert_image[orientation](img)
     img.save(save_path)
@@ -1171,10 +1217,9 @@ def handle_image_message(event):
         dist_path = tf_path + extension
         os.rename(tf_path, dist_path)
         
-        upload_image_to_s3(dist_path, setting.current_image_upload_category)
+        upload_to_s3_category(dist_path, setting.current_image_upload_category)
         
         send_text = 'にゃー（画像ゲット）'
-
         line_bot_api.reply_message(
             event.reply_token,
             [
