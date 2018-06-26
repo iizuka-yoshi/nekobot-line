@@ -374,7 +374,7 @@ def exist_key_s3(key):
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
     
     try:
-        bucket.Object(key)
+        obj = bucket.Object(key)
         return True
     except ClientError:
         return False
