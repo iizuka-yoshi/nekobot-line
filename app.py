@@ -280,8 +280,8 @@ class Setting():
         
         return ret
 
-def my_normalize(text):
 
+def my_normalize(text):
     text = neologdn.normalize(text)
     text = text.replace(' ', '')
     text = text.replace('〜', 'ー')
@@ -292,6 +292,7 @@ def my_normalize(text):
     text = text.lower()
 
     return text
+
 
 def text_send_messages_db(entity,prefix='',suffix=''):
     
@@ -407,7 +408,12 @@ def image_send_messages_s3(category):
         original_content_url=image_url,
         preview_image_url=thumb_url
     )]
-    print('[Image Log] image_send_message_s3 image_url=' + image_url + ' thumb_url=' + thumb_url)
+
+    print('[Image Log] image_send_message_s3'
+        + ' image_url=' + image_url
+        + ' thumb_url=' + thumb_url
+    )
+
     return message
 
 
@@ -445,100 +451,11 @@ def shrink_image(source_path,save_path, target_width, target_height):
 
 
 def get_message_pattern(text):
-    text = text.replace(' ', '')
-    text = text.replace('　', '')
-    text = text.replace('〜', 'ー')
-    text = text.replace('！', '')
-    text = text.replace('？', '')
-    text = text.replace('!', '')
-    text = text.replace('?', '')
-    text = text.replace('、', '')
-    text = text.replace('。', '')
-    text = text.strip()
-    text = text.lower()
-
-    if text in{'ひめ', 'ヒメ', 'ﾋﾒ', '姫', 'hime', 'ひめちゃん', 'ヒメちゃん', 'ヒメチャン'}:
-        return 'neko_hime'
-
-    elif text in{'くーちゃん', 'クーちゃん', 'クーチャン', 'ｸｰﾁｬﾝ', 'くー', 'クー', 'ｸｰ'}:
+    if text in{'くーちゃん', 'クーちゃん', 'クーチャン', 'ｸｰﾁｬﾝ', 'くー', 'クー', 'ｸｰ'}:
         return 'neko_quu'
 
     elif text in{'ちょこ', 'チョコ', 'ﾁｮｺ'}:
         return 'neko_choco'
-
-    elif text in{'ねこ', 'ねこちゃん', 'にゃんこ'}:
-        return 'neko_hiragana'
-
-    elif text in{'猫', '寝子', '猫ちゃん'}:
-        return 'neko_kanji'
-
-    elif text in{'ネコ', 'ネコちゃん', 'ネコチャン', 'キティ', 'キティちゃん'}:
-        return 'neko_kana_full'
-
-    elif text in{'ﾈｺ', 'ﾈｺﾁｬﾝ'}:
-        return 'neko_kana_half'
-
-    elif text in{'ｎｅｋｏ', 'ｎｅｃｏ'}:
-        return 'neko_roma_full'
-
-    elif text in{'neko', 'neco'}:
-        return 'neko_roma_half'
-
-    elif text in{'ｃａｔ'}:
-        return 'neko_eng_full'
-
-    elif text in{'cat', 'cats', 'kitty'}:
-        return 'neko_eng_half'
-
-    elif text in{'🐈', '🐱', '😸', '😹', '😺', '😻', '😼', '😽', '😾', '😿', '🙀'}:
-        return 'neko_emoji'
-
-    elif text in{
-        'チャオちゅーる', 'ちゃおちゅーる', 'チャオチュール', 'ciaoチュール',
-        'ちゅーる', 'チュール',
-        'いなば食品', 'いなば', 'イナバ', 'inaba',
-            'おやつ', 'オヤツ'}:
-        return 'neko_cyu-ru'
-
-    elif text in{
-        '犬', 'いぬ', 'イヌ', 'ｲﾇ', 'わんちゃん', 'ワンちゃん', 'ワンチャン', 'ﾜﾝﾁｬﾝ',
-        'ｄｏｇ', 'dog',
-        '🐕', '🐩', '🐶'
-    }:
-        return 'dog'
-
-    elif text in{
-        '北田', 'きただ', 'キタダ', 'ｷﾀﾀﾞﾞ', 'ｋｉｔａｄａ', 'kitada',
-        '北田さん', 'きたださん', 'キタダサン', 'ｷﾀﾀﾞｻﾝ',
-        '北', 'きた', 'キタ', 'ｷﾀ', 'ｋｉｔａ', 'kita'
-    }:
-        return 'kitada'
-
-    elif text in{
-        '若松', 'わかまつ', 'ワカマツ', 'ﾜｶﾏﾂ',
-        '若松さん', 'わかまつさん', 'ワカマツサン', 'ﾜｶﾏﾂｻﾝ',
-        'ｗａｋａｍａｔｓｕ', 'wakamatsu',
-        '若', 'わか', 'ワカ', 'ﾜｶ', 'ｗａｋａ', 'waka',
-        '若さま', 'わかさま', 'ワカサマ', 'ﾜｶｻﾏ', 'wakasama',
-        'トリミングおじさん', 'トリミング', 'トリマー'
-    }:
-        return 'wakamatsu'
-
-    elif text in{
-        'あご', 'アゴ', 'ｱｺﾞ', 'あご松', 'あごまつ', 'アゴマツ', 'ｱｺﾞﾏﾂ',
-        'ａｇｏ', 'ago'
-    }:
-        return 'ago'
-
-    elif text in{
-        '米田', 'よねだ', 'ヨネダ', 'ﾖﾈﾀﾞ',
-        '米田さん', 'よねださん', 'ヨネダサン', 'ﾖﾈﾀﾞｻﾝ',
-        'ｙｏｎｅｄａ', 'yoneda',
-        '米', 'よね', 'ヨネ', 'ﾖﾈ', 'ｙｏｎｅ', 'yone',
-        '米さま', 'よねさま', 'ヨネサマ', 'ﾖﾈｻﾏ', 'ｙｏｎｅｓａｍａ', 'yonesama',
-        '米さん', 'よねさん', 'ヨネサン', 'ﾖﾈｻﾝ', 'ｙｏｎｅｓａｎ', 'yonesan'
-    }:
-        return 'yoneda'
 
     elif text in{
         '漫画太郎', '漫☆画太郎',
@@ -549,34 +466,6 @@ def get_message_pattern(text):
 
     elif text in{'おわかりいただけただろうか'}:
         return 'ghost'
-
-    elif text in{'きむたく', 'キムタク', 'ｷﾑﾀｸ', 'ｋｉｍｕｔａｋｕ', 'kimutaku'}:
-        return 'kimutaku'
-
-    elif text in{'竹内涼真', '涼真', 'りょうま', 'りょーま', 'リョウマ', 'リョーマ'}:
-        return 'ryoma'
-
-    elif text in{
-        '新田真剣佑', '真剣佑', '前田真剣佑',
-        'あらたまっけんゆう', 'まっけんゆう', 'まえだまっけんゆう',
-        'アラタマッケンユウ', 'マッケンユウ', 'マエダマッケンユウ',
-        'まっけん', 'マッケン'
-    }:
-        return 'makken'
-
-    elif text in{
-        'お疲れ様です', 'お疲れさまです', 'おつかれさまです', 'オツカレサマデス',
-        'お疲れ様', 'お疲れさま', 'おつかれさま', 'オツカレサマ',
-        'お疲れ', 'おつかれ', 'オツカレ',
-        'お疲れー', 'おつかれー', 'オツカレー',
-        '乙', 'おつ', 'オツ',
-        '乙ー', 'おつー', 'オツー',
-        'お疲れ様でした', 'お疲れさまでした', 'おつかれさまでした', 'オツカレサマデシタ',
-        '疲れた', 'つかれた', 'ツカレタ',
-        'ご苦労様', 'ご苦労さま', 'ごくろうさま', 'ゴクロウサマ',
-        'ご苦労', 'ごくろう', 'ゴクロウ'
-    }:
-        return 'goodjob'
 
     elif text in{
         'carousel',
@@ -597,26 +486,12 @@ def get_message_pattern(text):
     }:
         return 'carousel'
 
-    elif text in{'てすと', 'テスト', 'ﾃｽﾄ', 'test'}:
-        return 'test1'
-
-    elif text in{'db'}:
-        return 'test2'
+    elif text in{'てすと', 'テスト', 'test'}:
+        return 'test'
 
 
 def get_img_dir(message_pattern):
     if message_pattern in{
-        'neko_hime', 'neko_hiragana', 'neko_kanji', 'neko_kana_full', 'neko_kana_half',
-        'neko_roma_full', 'neko_roma_half', 'neko_eng_full', 'neko_eng_half', 'neko_emoji'
-    }:
-        return 'static/nekoimg'
-
-    elif message_pattern in{
-        'cyu-ru'
-    }:
-        return 'static/cyu-ruimg'
-
-    elif message_pattern in{
         'neko_quu'
     }:
         return 'static/quuimg'
@@ -625,46 +500,6 @@ def get_img_dir(message_pattern):
         'neko_choco'
     }:
         return 'static/chocoimg'
-
-    elif message_pattern in{
-        'kitada'
-    }:
-        return 'static/kitadaimg'
-
-    elif message_pattern in{
-        'ago'
-    }:
-        return 'static/wakamatsuimg'
-
-    elif message_pattern in{
-        'wakamatsu'
-    }:
-        return 'static/gakkiimg'
-
-    elif message_pattern in{
-        'yoneda'
-    }:
-        return 'static/yonedaimg'
-
-    elif message_pattern in{
-        'kimutaku'
-    }:
-        return 'static/kimutakuimg'
-
-    elif message_pattern in{
-        'ryoma'
-    }:
-        return 'static/ryomaimg'
-
-    elif message_pattern in{
-        'makken'
-    }:
-        return 'static/makkenimg'
-
-    elif message_pattern in{
-        'goodjob'
-    }:
-        return 'static/goodjobimg'
 
     elif message_pattern in{
         'test'
@@ -685,7 +520,7 @@ def image_send_message_dir(img_dir):
         original_content_url=image_url,
         preview_image_url=image_thumb_url
     )
-    print('[Image Log] image_url=' + image_url)
+    print('[Image Log] image_send_message_dir image_url=' + image_url)
     return message
 
 
@@ -698,7 +533,7 @@ def image_send_message_list(img_dir, img_list):
         original_content_url=image_url,
         preview_image_url=image_thumb_url
     )
-    print('[Image Log] image_url=' + image_url)
+    print('[Image Log] image_send_message_list image_url=' + image_url)
     return message
 
 
@@ -721,10 +556,63 @@ def warning_message_text():
 
 def restaurant_message_text():
     text = random.choice([
-        '猫', 'ねこ', 'ネコ', 'cat', 'neko', 'ﾈｺﾁｬﾝ', 'ひめ',
+        '猫', 'ねこ', 'ネコ', 'cat', 'neko', 'ひめ','ちゅーる'
     ])
     return text
 
+
+def get_line_id(event):
+    """
+    LINEに関するIDを取得する
+
+    Parameters
+    ----------
+    event : Event Object
+    LINEのイベントオブジェクト
+
+    Returns
+    -------
+    user_name : str
+    user_id : str
+    group_id : str
+    room_id : str
+
+    """
+
+    try:
+        if isinstance(event.source, SourceUser):
+            profile = line_bot_api.get_profile(event.source.user_id)
+
+            user_name = profile.display_name
+            user_id = event.source.user_id
+            group_id = ''
+            room_id = ''
+
+        elif isinstance(event.source, SourceGroup):
+            profile = line_bot_api.get_group_member_profile(
+                event.source.group_id, event.source.user_id)
+
+            user_name = profile.display_name
+            user_id = event.source.user_id
+            group_id = event.source.group_id
+            room_id = ''
+
+        elif isinstance(event.source, SourceRoom):
+            profile = line_bot_api.get_room_member_profile(
+                event.source.room_id, event.source.user_id)
+
+            user_name = profile.display_name
+            user_id = event.source.user_id
+            group_id = ''
+            room_id = event.source.room_id
+
+    except:
+        user_name = 'Unknown'
+        user_id = ''
+        group_id = ''
+        room_id = ''
+
+    return user_name, user_id, group_id, room_id
 
 @app.route('/')
 def hello_world():
@@ -759,44 +647,22 @@ def handle_text_message(event):
     entity_exact = Entity(textn).check_entity(True)
     entity_partial = Entity(textn).check_entity(False)
     setting = Setting()
-
-    print('Intent.name ' + intent.name)
-    print('entity_exact.name ' + entity_exact.name)
-    print('entity_partial.name '+entity_partial.name)
     
     #古い判定
     message_pattern = get_message_pattern(textn)
     img_dir = get_img_dir(message_pattern)
 
-    # log
-    try:
-        if isinstance(event.source, SourceUser):
-            profile = line_bot_api.get_profile(event.source.user_id)
-            user_id = profile.user_id
-            user_name = profile.display_name
-
-        elif isinstance(event.source, SourceGroup):
-            profile = line_bot_api.get_group_member_profile(
-                event.source.group_id, event.source.user_id)
-            user_id = profile.user_id
-            user_name = profile.display_name
-
-        elif isinstance(event.source, SourceRoom):
-            profile = line_bot_api.get_room_member_profile(
-                event.source.room_id, event.source.user_id)
-            user_id = profile.user_id
-            user_name = profile.display_name
-
-    except:
-        user_id = 'Unknown'
-        user_name = 'Unknown'
-
+    user_name, user_id, group_id, room_id = get_line_id(event)
     print('[Event Log]'
         + ' text_message'
-        + ' user_id=' + str(user_id)
         + ' user_name=' + str(user_name)
+        + ' user_id=' + str(user_id)
+        + ' group_id=' + str(group_id)
+        + ' room_id=' + str(room_id)
         + ' text=' + str(textn)
-        + ' message_pattern=' + str(message_pattern)
+        + ' intent.name=' + str(intent.name)
+        + ' entity_exact.name=' + str(entity_exact.name)
+        + ' entity_partial.name=' + str(entity_partial.name)
     )
 
     send_text = ''
@@ -893,109 +759,18 @@ def handle_text_message(event):
 
     # test判定
     send_text = ''
-    if message_pattern == 'test1':
+    if message_pattern == 'test':
         send_text = 'Amazon S3 から画像を取得します'
 
-    # if send_text != '':
-    #     image_name = random.choice(os.listdir(img_dir))
-    #     image_url = os.path.join(AP_URL, img_dir, image_name)
-    #     image_thumb_url = os.path.join(AP_URL, img_dir, 'thumb', image_name)
-    #     line_bot_api.reply_message(event.reply_token,
-    #         [
-    #             # TextSendMessage(text=send_text),
-    #             # TextSendMessage(text=image_url),
-    #             # TextSendMessage(text=image_thumb_url),
-    #             TextSendMessage(
-    #                 text='random test [0-1]'),
-    #             TextSendMessage(
-    #                 text=str(random.random())),
-    #             TextSendMessage(
-    #                 text='choice test [0-9]'),
-    #             TextSendMessage(text=random.choice(
-    #                 ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']))
-    #         ]
-    #     )
-
         line_bot_api.reply_message(event.reply_token,
-                                   [
-                                       TextSendMessage(text=send_text),
-                                       image_send_messages_s3('')
-                                   ]
-                                   )
+            [
+                TextSendMessage(text=send_text),
+                image_send_messages_s3('image/neko')
+            ]
+        )
+        return
 
-
-    # スペシャル判定（テキストとイメージを返信。場合によって退出）
-    send_text = ''
-
-    if message_pattern == 'cyu-ru':
-        send_text = 'ぺろぺろ'
-        line_bot_api.reply_message(event.reply_token,
-                                   [
-                                       TextSendMessage(text=send_text),
-                                       image_send_message_dir(img_dir)
-                                   ]
-                                   )
-
-    if message_pattern == 'kitada':
-        line_bot_api.reply_message(event.reply_token,
-                                   image_send_message_dir(img_dir)
-                                   )
-
-    elif message_pattern == 'wakamatsu':
-        line_bot_api.reply_message(event.reply_token,
-                                   image_send_message_dir(img_dir)
-                                   )
-
-    elif message_pattern == 'ago':
-        send_text = 'こら'
-        line_bot_api.reply_message(event.reply_token,
-                                   [
-                                       TextSendMessage(text=send_text),
-                                       image_send_message_dir(img_dir)
-                                   ]
-                                   )
-
-    elif message_pattern == 'yoneda':
-        line_bot_api.reply_message(event.reply_token,
-                                   image_send_message_dir(img_dir)
-                                   )
-
-    elif message_pattern == 'kimutaku':
-        send_text = 'まてよ'
-        line_bot_api.reply_message(event.reply_token,
-                                   [
-                                       TextSendMessage(text=send_text),
-                                       image_send_message_dir(img_dir)
-                                   ]
-                                   )
-
-    elif message_pattern == 'ryoma':
-        send_text = 'あいしてる'
-        line_bot_api.reply_message(event.reply_token,
-                                   [
-                                       TextSendMessage(text=send_text),
-                                       image_send_message_dir(img_dir)
-                                   ]
-                                   )
-
-    elif message_pattern == 'makken':
-        send_text = 'おまえのこと好きと言ってなかったな'
-        line_bot_api.reply_message(event.reply_token,
-                                   [
-                                       TextSendMessage(text=send_text),
-                                       image_send_message_dir(img_dir)
-                                   ]
-                                   )
-
-    elif message_pattern == 'goodjob':
-        send_text = 'おつかれさま'
-        line_bot_api.reply_message(event.reply_token,
-                                   [
-                                       TextSendMessage(text=send_text),
-                                       image_send_message_dir(img_dir)
-                                   ]
-                                   )
-
+    # 古いスペシャル判定
     elif message_pattern == 'ghost':
         if epsilon <= random.random():
             send_text = warning_message_text()
@@ -1014,6 +789,7 @@ def handle_text_message(event):
                                            TextSendMessage(text='エラー')
                                        ]
                                        )
+        return
 
     elif message_pattern == 'gatarou':
         if epsilon <= random.random():
@@ -1033,6 +809,7 @@ def handle_text_message(event):
                                            TextSendMessage(text='エラー')
                                        ]
                                        )
+        return
 
     elif message_pattern == 'carousel':
         carousel_template = CarouselTemplate(columns=[
@@ -1146,11 +923,12 @@ def handle_text_message(event):
             alt_text='Carousel alt text', template=carousel_template)
 
         line_bot_api.reply_message(event.reply_token,
-                                   [
-                                       TextSendMessage(text='どこにしよう'),
-                                       template_message,
-                                   ]
-                                   )
+            [
+                TextSendMessage(text=random.choice(['どこにしよう','かるくで]'])),
+                template_message,
+            ]
+        )
+    return
 
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image_message(event):
@@ -1158,35 +936,18 @@ def handle_image_message(event):
     dt_now = datetime.datetime.now()
     str_now = dt_now.strftime('%Y%m%d-%H%M')
 
-    try:
-        if isinstance(event.source, SourceUser):
-            profile = line_bot_api.get_profile(event.source.user_id)
-            user_id = profile.user_id
-            user_name = profile.display_name
-
-        elif isinstance(event.source, SourceGroup):
-            profile = line_bot_api.get_group_member_profile(
-                event.source.group_id, event.source.user_id)
-            user_id = profile.user_id
-            user_name = profile.display_name
-
-        elif isinstance(event.source, SourceRoom):
-            profile = line_bot_api.get_room_member_profile(
-                event.source.room_id, event.source.user_id)
-            user_id = profile.user_id
-            user_name = profile.display_name
-
-    except:
-        user_id = 'Unknown'
-        user_name = 'Unknown'
-
-    print('[Event Log]'
-          + ' image_message'
-          + ' user_id=' + str(user_id)
-          + ' user_name=' + str(user_name)
-    )
-
     setting = Setting()
+    caregory = setting.current_image_upload_category
+
+    user_name, user_id, group_id, room_id = get_line_id(event)
+    print('[Event Log]'
+        + ' image_message'
+        + ' user_name=' + str(user_name)
+        + ' user_id=' + str(user_id)
+        + ' group_id=' + str(group_id)
+        + ' room_id=' + str(room_id)
+        + ' current_image_upload_category=' + str(caregory)
+    )
 
     if setting.check_access_allow(user_id):
 
@@ -1201,7 +962,7 @@ def handle_image_message(event):
         dist_path = tf_path + extension
         os.rename(tf_path, dist_path)
         
-        upload_to_s3_category(dist_path, setting.current_image_upload_category)
+        upload_to_s3_category(dist_path, caregory)
         
         send_text = 'にゃー（画像ゲット）'
         line_bot_api.reply_message(
