@@ -375,12 +375,34 @@ def shrink_image(source_path,save_path, target_width, target_height):
     img = Image.open(source_path)
     w, h = img.size
 
-    if target_width < w or target_height < h:
-        img.thumbnail((target_width,target_height),Image.ANTIALIAS)
-        img.save(save_path)
-    
-    return save_path
+    exif = img._getexif()
+    orientation = exif.get(0x112, 1)
+    convert_image = {
+        # そのまま
+        1: lambda img: img,
+        # 左右反転
+        2: lambda img: img.transpose(Image.FLIP_LEFT_RIGHT),
+        # 180度回転
+        3: lambda img: img.transpose(Image.ROTATE_180),
+        # 上下反転
+        4: lambda img: img.transpose(Image.FLIP_TOP_BOTTOM),
+        # 左右反転＆反時計回りに90度回転
+        5: lambda img: img.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_90),
+        # 反時計回りに270度回転
+        6: lambda img: img.transpose(Image.ROTATE_270),
+        # 左右反転＆反時計回りに270度回転
+        7: lambda img: img.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_270), 
+        # 反時計回りに90度回転
+        8: lambda img: img.transpose(Image.ROTATE_90),
+    }
 
+    if target_width < w or target_height < h:
+        img.thumbnail((target_width, target_height), Image.ANTIALIAS)
+        img.save(save_path)
+
+    img = convert_image[orientation](img)
+    img.save(save_path)
+    return save_path
 
 def get_message_pattern(text):
     text = text.replace(' ', '')
@@ -1132,7 +1154,7 @@ def handle_image_message(event):
           + ' image_message'
           + ' user_id=' + str(user_id)
           + ' user_name=' + str(user_name)
-          )
+    )
 
     setting = Setting()
 
@@ -1159,7 +1181,6 @@ def handle_image_message(event):
                 TextSendMessage(text=send_text)
             ]
         )
-
 
 
 @handler.add(JoinEvent)
