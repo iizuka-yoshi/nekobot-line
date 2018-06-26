@@ -342,7 +342,7 @@ def genelate_image_url_s3(category):
     keys = [obj_summary.key for obj_summary in obj_collections]
 
     image_key = random.choice(keys)
-    thumb_key = os.path.join(os.path.dirname(image_key),'thumb',os.path.basename(image_key))
+    thumb_key = os.path.join('thumb',image_key)
 
     if not exist_key_s3(thumb_key):
         print('thumb not exist' + thumb_key)
@@ -372,7 +372,7 @@ def exist_key_s3(key):
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
     
     try:
-        obj = bucket.Object(key)
+        bucket.Object(key)
         return True
     except ClientError:
         return False
