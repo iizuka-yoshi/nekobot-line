@@ -751,12 +751,20 @@ def handle_text_message(event):
                     if entity_partial.position < intent.position:
 
                         if entity_partial.name == '@neko_image':
-                            setting.update_current_image_upload_category('image/neko/')
+                            setting.update_current_image_upload_category('image/neko')
                             send_text = 'にゃー（ねこ画像追加して）'
 
                         elif entity_partial.name == '@neko_cyu-ru_image':
-                            setting.update_current_image_upload_category('image/neko_cyu-ru/')
+                            setting.update_current_image_upload_category('image/neko_cyu-ru')
                             send_text = 'にゃー（ちゅーる画像追加して）'
+
+                        elif entity_partial.name == '@kitada_image':
+                            setting.update_current_image_upload_category('image/kitada')
+                            send_text = 'にゃー（北田さん画像追加して）'
+
+                        elif entity_partial.name == '@wakamatsu_image':
+                            setting.update_current_image_upload_category('image/gakky')
+                            send_text = 'にゃー（若松さん（ガッキー）画像追加して）'
 
                     if send_text != '':
                         line_bot_api.reply_message(
