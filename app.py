@@ -878,23 +878,23 @@ def handle_text_message(event):
                     if entity_partial.position < intent.position:
 
                         if entity_partial.name == '@neko_image':
-                            setting.update_current_image_upload_category('image/neko')
+                            setting.update_current_upload_category('image/neko')
                             send_text = 'にゃー（ねこ画像を送って）'
 
                         elif entity_partial.name == '@neko_cyu-ru_image':
-                            setting.update_current_image_upload_category('image/neko_cyu-ru')
+                            setting.update_current_upload_category('image/neko_cyu-ru')
                             send_text = 'にゃー（ちゅーる画像を送って）'
 
                         elif entity_partial.name == '@kitada_image':
-                            setting.update_current_image_upload_category('image/kitada')
+                            setting.update_current_upload_category('image/kitada')
                             send_text = 'にゃー（北田さん画像を送って）'
 
                         elif entity_partial.name == '@wakamatsu_image':
-                            setting.update_current_image_upload_category('image/gakky')
+                            setting.update_current_upload_category('image/gakky')
                             send_text = 'にゃー（若松さん（ガッキー）画像を送って）'
 
                         elif entity_partial.name == '@tebelog_link':
-                            setting.update_current_image_upload_category('tabelog/godrinking')
+                            setting.update_current_upload_category('tabelog/godrinking')
                             send_text = 'にゃー（おすすめの食べログのリンク送って）'
 
                     if send_text != '':
@@ -1083,7 +1083,7 @@ def handle_text_message(event):
 
 
 def insert_tabelog_link(tebelog_url):
-        html = urllib.request.urlopen(text).read()
+        html = urllib.request.urlopen(tebelog_url).read()
         soup = BeautifulSoup(html, 'html.parser')
 
         #name
@@ -1096,6 +1096,8 @@ def insert_tabelog_link(tebelog_url):
         station = soup.find(class_='rdheader-subinfo__item rdheader-subinfo__item--station').find(class_='linktree__parent-target-text').string
 
         #genre,hour
+        genre = ''
+        hour = ''
         rstinfo_tables = soup.find_all('table', class_='c-table c-table--form rstinfo-table__table')
         for rstinfo_table in rstinfo_tables:
             rows = rstinfo_table.find_all('tr')
@@ -1105,7 +1107,7 @@ def insert_tabelog_link(tebelog_url):
                 elif row.find('th').string == '営業時間':
                     lines = row.find_all('p')
                     for line in lines:
-                        hour += line.string + ' '
+                        hour =+ line.string + ' '
                         
         
 
