@@ -25,8 +25,11 @@ import random
 import psycopg2
 import boto3
 import neologdn
+import urllib.parse
+import urllib.request
 from PIL import Image
 from argparse import ArgumentParser
+from bs4 import BeautifulSoup
 from flask import Flask, request, abort
 from linebot import (
     LineBotApi, WebhookHandler
@@ -196,7 +199,7 @@ class Setting():
 
         self.enable_access_management = self._get_enable_access_management()
         self.admin_line_users = self._get_admin_line_users()
-        self.current_image_upload_category = self._get_current_image_upload_category()
+        self.current_upload_category = self._get_current_upload_category()
 
     def _get_enable_access_management(self):
         with psycopg2.connect(DB_URL) as conn:
@@ -227,17 +230,17 @@ class Setting():
 
         return admin_line_users
 
-    def _get_current_image_upload_category(self):
+    def _get_current_upload_category(self):
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as curs:
 
-                curs.execute(self._sql_select, ('current_image_upload_category',))
+                curs.execute(self._sql_select, ('current_upload_category',))
                 if 0 < curs.rowcount:
-                    (current_image_upload_category,) = curs.fetchone()
+                    (current_upload_category,) = curs.fetchone()
                 else:
-                    current_image_upload_category = ''
+                    current_upload_category = ''
 
-        return current_image_upload_category
+        return current_upload_category
 
     def update_enable_access_management(self,value):
         with psycopg2.connect(DB_URL) as conn:
@@ -250,14 +253,14 @@ class Setting():
 
         return self
 
-    def update_current_image_upload_category(self,value):
+    def update_current_upload_category(self,value):
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as curs:
 
-                curs.execute(self._sql_update, (value, 'current_image_upload_category',))
+                curs.execute(self._sql_update, (value, 'current_upload_category',))
                 conn.commit()
 
-        self.current_image_upload_category = self._get_current_image_upload_category()
+        self.current_upload_category = self._get_current_upload_category()
 
         return self
 
@@ -649,7 +652,8 @@ def callback():
 def handle_text_message(event):
 
     epsilon = 0.05
-    textn = my_normalize(event.message.text)
+    text = event.message.text
+    textn = my_normalize(text)
 
     intent = Intent(textn).check_intent(False)
     entity_exact = Entity(textn).check_entity(True)
@@ -693,8 +697,131 @@ def handle_text_message(event):
 
             return
 
+        #飲みいく判定（食べログカルーセルを表示）
+        elif entity_exact.name in {
+            '@godrinking'
+        }:
+            carousel_template = CarouselTemplate(columns=[
+                CarouselColumn(
+                    thumbnail_image_url=restaurant_image_url('zoot'),
+                    text='ラーメン、居酒屋、焼きとん\n'+'営業時間:17:00～24:00',
+                    title='ZOOT [浜松町]',
+                    actions=[
+                        URITemplateAction(
+                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
+                        MessageTemplateAction(
+                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13058997/'),
+                        MessageTemplateAction(
+                            label='ねこ', text=restaurant_message_text()),
+                    ]),
+
+                CarouselColumn(
+                    thumbnail_image_url=restaurant_image_url('seiren'),
+                    text='中華料理、中国鍋・火鍋、ラーメン\n'+'営業時間:17:00～23:00(L.O. 22:30)',
+                    title='青蓮 [浜松町]',
+                    actions=[
+                        URITemplateAction(
+                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13109938/'),
+                        MessageTemplateAction(
+                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13109938/'),
+                        MessageTemplateAction(
+                            label='ねこ', text=restaurant_message_text()),
+                    ]),
+
+                CarouselColumn(
+                    thumbnail_image_url=restaurant_image_url('uokin'),
+                    text='魚介料理・海鮮料理、居酒屋\n'+'営業時間:17:00～23:30',
+                    title='魚金 [浜松町]',
+                    actions=[
+                        URITemplateAction(
+                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13052364/'),
+                        MessageTemplateAction(
+                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13052364/'),
+                        MessageTemplateAction(
+                            label='ねこ', text=restaurant_message_text()),
+                    ]),
+
+                CarouselColumn(
+                    thumbnail_image_url=restaurant_image_url('risuke'),
+                    text='牛タン、麦とろ、カレーライス\n'+'営業時間:17:30～22:30',
+                    title='利助 [浜松町]',
+                    actions=[
+                        URITemplateAction(
+                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/'),
+                        MessageTemplateAction(
+                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13014253/'),
+                        MessageTemplateAction(
+                            label='ねこ', text=restaurant_message_text()),
+                    ]),
+
+                CarouselColumn(
+                    thumbnail_image_url=restaurant_image_url('bonanza'),
+                    text='ダイニングバー、ワインバー\n' +
+                    '営業時間:17:00～23:30(L.O.22:30、ドリンクL.O.23:00)',
+                    title='bonanza [浜松町]',
+                    actions=[
+                        URITemplateAction(
+                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13143248/'),
+                        MessageTemplateAction(
+                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13143248/'),
+                        MessageTemplateAction(
+                            label='ねこ', text=restaurant_message_text()),
+                    ]),
+
+                CarouselColumn(
+                    thumbnail_image_url=restaurant_image_url('tokaihntn'),
+                    text='王様のブランチ第２位の餃子\n'+'営業時間:17:00～23:00(L.O.22:20)',
+                    title='東海飯店 [浜松町]',
+                    actions=[
+                        URITemplateAction(
+                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13023334/'),
+                        MessageTemplateAction(
+                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13023334/'),
+                        MessageTemplateAction(
+                            label='ねこ', text=restaurant_message_text()),
+                    ]),
+
+                CarouselColumn(
+                    thumbnail_image_url=restaurant_image_url('settsu'),
+                    text='居酒屋、インドカレー、和食\n'+'営業時間:14:30〜23:00(L.O.22:15)',
+                    title='摂津 [浜松町]',
+                    actions=[
+                        URITemplateAction(
+                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13097178/'),
+                        MessageTemplateAction(
+                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13097178/'),
+                        MessageTemplateAction(
+                            label='ねこ', text=restaurant_message_text()),
+                    ]),
+
+                CarouselColumn(
+                    thumbnail_image_url=restaurant_image_url('uma8'),
+                    text='居酒屋、くじら料理\n'+'営業時間:16:30～23:30',
+                    title='旨蔵 うま八 [新橋]',
+                    actions=[
+                        URITemplateAction(
+                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1301/A130103/13045442/'),
+                        MessageTemplateAction(
+                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1301/A130103/13045442/'),
+                        MessageTemplateAction(
+                            label='ねこ', text=restaurant_message_text()),
+                    ]),
+
+            ])
+            template_message = TemplateSendMessage(
+                alt_text='Carousel alt text', template=carousel_template)
+
+            line_bot_api.reply_message(event.reply_token,
+                [
+                    TextSendMessage(text=random.choice(['どこにしよう','かるくで'])),
+                    template_message,
+                ]
+            )
+            return
+
+
         # イヌ判定（テシストを返信して退出）
-        if entity_exact.name in{'@dog'}:
+        elif entity_exact.name in{'@dog'}:
 
             replies = text_send_messages_db(entity_exact, textn)
             line_bot_api.reply_message(event.reply_token, replies)
@@ -742,7 +869,7 @@ def handle_text_message(event):
 
                     return
 
-        if intent.name == '#change_upload_target':
+        elif intent.name == '#change_upload_target':
 
             if setting.check_access_allow(user_id):
 
@@ -752,19 +879,23 @@ def handle_text_message(event):
 
                         if entity_partial.name == '@neko_image':
                             setting.update_current_image_upload_category('image/neko')
-                            send_text = 'にゃー（ねこ画像追加して）'
+                            send_text = 'にゃー（ねこ画像を送って）'
 
                         elif entity_partial.name == '@neko_cyu-ru_image':
                             setting.update_current_image_upload_category('image/neko_cyu-ru')
-                            send_text = 'にゃー（ちゅーる画像追加して）'
+                            send_text = 'にゃー（ちゅーる画像を送って）'
 
                         elif entity_partial.name == '@kitada_image':
                             setting.update_current_image_upload_category('image/kitada')
-                            send_text = 'にゃー（北田さん画像追加して）'
+                            send_text = 'にゃー（北田さん画像を送って）'
 
                         elif entity_partial.name == '@wakamatsu_image':
                             setting.update_current_image_upload_category('image/gakky')
-                            send_text = 'にゃー（若松さん（ガッキー）画像追加して）'
+                            send_text = 'にゃー（若松さん（ガッキー）画像を送って）'
+
+                        elif entity_partial.name == '@tebelog_link':
+                            setting.update_current_image_upload_category('tabelog/godrinking')
+                            send_text = 'にゃー（おすすめの食べログのリンク送って）'
 
                     if send_text != '':
                         line_bot_api.reply_message(
@@ -944,7 +1075,44 @@ def handle_text_message(event):
                 template_message,
             ]
         )
-    return
+        return
+
+    #食べログのリンク判定
+    #url_parse = urllib.parse.urlunparse(text)
+    #if url_parse.netloc == 'tabelog.com':
+
+
+def insert_tabelog_link(tebelog_url):
+        html = urllib.request.urlopen(text).read()
+        soup = BeautifulSoup(html, 'html.parser')
+
+        #name
+        name = soup.find(class_='display-name').span.string.strip()
+
+        #score
+        score = float(soup.find(class_='rdheader-rating__score-val-dtl').string)
+
+        #station
+        station = soup.find(class_='rdheader-subinfo__item rdheader-subinfo__item--station').find(class_='linktree__parent-target-text').string
+
+        #genre,hour
+        rstinfo_tables = soup.find_all('table', class_='c-table c-table--form rstinfo-table__table')
+        for rstinfo_table in rstinfo_tables:
+            rows = rstinfo_table.find_all('tr')
+            for row in rows:
+                if row.find('th').string == 'ジャンル':
+                    genre = row.find('span').string
+                elif row.find('th').string == '営業時間':
+                    lines = row.find_all('p')
+                    for line in lines:
+                        hour += line.string + ' '
+                        
+        
+
+
+    
+
+
 
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image_message(event):
@@ -953,7 +1121,7 @@ def handle_image_message(event):
     str_now = dt_now.strftime('%Y%m%d-%H%M')
 
     setting = Setting()
-    caregory = setting.current_image_upload_category
+    caregory = setting.current_upload_category
 
     user_name, user_id, group_id, room_id = get_line_id(event)
     print('[Event Log]'
@@ -962,7 +1130,7 @@ def handle_image_message(event):
         + ' user_id=' + str(user_id)
         + ' group_id=' + str(group_id)
         + ' room_id=' + str(room_id)
-        + ' current_image_upload_category=' + str(caregory)
+        + ' current_upload_category=' + str(caregory)
     )
 
     if setting.check_access_allow(user_id):
