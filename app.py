@@ -983,7 +983,9 @@ def handle_text_message(event):
                             setting.update_current_upload_category('image/gakky')
                             send_text = 'にゃー（若松さん（ガッキー）画像を送って）'
 
-                        elif entity_partial.name == '@tebelog_link':
+                        elif entity_partial.name in {
+                            '@tebelog_link', '@tabelog_izakaya',
+                        }:
                             setting.update_current_upload_category('tabelog/godrinking')
                             send_text = 'にゃー（おすすめの食べログのリンク送って）'
 
@@ -1071,14 +1073,21 @@ def handle_text_message(event):
         return
 
     #食べログのリンク判定
-    url_parse = urllib.parse.urlparse(text)
-    
-    if url_parse.netloc == 's.tabelog.com' or url_parse.netloc == 'tabelog.com':
-        tabelog_url = normalize_tabelog_url(text)
-        
-        print(urllib.parse.urlparse(tabelog_url))
+    if setting.check_access_allow(user_id):
+        if setting.current_upload_category == 'tabelog/godrinking':
 
-        insert_tabelog_link(tabelog_url)
+            url_parse = urllib.parse.urlparse(text)
+            
+            if url_parse.netloc == 's.tabelog.com' or url_parse.netloc == 'tabelog.com':
+
+                send_text = 'もらった（食べログのリンク）'
+                line_bot_api.reply_message(
+                    event.reply_token,TextSendMessage(text=send_text)
+                )
+
+                tabelog_url = normalize_tabelog_url(text)
+                insert_tabelog_link(tabelog_url)
+
 
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image_message(event):
