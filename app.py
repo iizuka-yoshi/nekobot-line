@@ -284,62 +284,116 @@ class Setting():
         
         return ret
 
-def normalize_tabelog_url(tebelog_url):
-    tebelog_urln = tebelog_url
-    url_parse = urllib.parse.urlparse(tebelog_url)
 
-    if url_parse.netloc == 's.tabelog.com':
-        netlocn = 'tabelog.com'
-        tebelog_urln = tebelog_urln.replace(url_parse.netloc, netlocn)
+class Tabelog:
 
-    if url_parse.path.count('/') > 5:
-        ps = url_parse.path.split('/')
-        pathn = '/' + ps[1] + '/' + ps[2] + '/' + ps[3] + '/' + ps[4] + '/'
-        tebelog_urln = tebelog_urln.replace(url_parse.path, pathn)
+    _DOMAIN = ('tabelog.com', 's.tabelog.com')
+    _PATH_DIR_LEVEL = 5
+
+    def __init__(self):
+        self.url = ''
+        self.values = ()
+
+    def set_tabelog_url(self, url):
+        if not self._is_tabelog_url(url):
+            return False
+
+        if self._url_exits(url):
+            return False
+
+        self.url = self._normalize_tabelog_url(url)
+        return self
+
+    def _is_tabelog_url(self, url):
+        url_parse = urllib.parse.urlparse(url)
+        if url_parse.netloc in self._DOMAIN:
+            return True
+        else:
+            return False
     
-    return tebelog_urln
+    def _url_exits(self,url):
+        sql = 'SELECT name \
+                FROM public.tabelog \
+                WHERE url = % s; '
+                
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
 
-
-def insert_tabelog_link(tebelog_url):
-    html = urllib.request.urlopen(tebelog_url).read()
-    soup = BeautifulSoup(html, 'html.parser')
-
-    #name
-    name = soup.find(class_='display-name').span.string.strip()
-
-    #score
-    score = float(soup.find(class_='rdheader-rating__score-val-dtl').string)
-
-    #station
-    station = soup.find(class_='rdheader-subinfo__item rdheader-subinfo__item--station').find(class_='linktree__parent-target-text').string
-
-    #genre,hour
-    genre = ''
-    hours = ''
-    rstinfo_tables = soup.find_all('table', class_='c-table c-table--form rstinfo-table__table')
-    for rstinfo_table in rstinfo_tables:
-        rows = rstinfo_table.find_all('tr')
-        for row in rows:
-            if row.find('th').string == 'ジャンル':
-                genre = row.find('span').string
-            elif row.find('th').string == '営業時間':
-                lines = row.find_all('p')
-                for line in lines:
-                    hours += line.string + ' '
-                    
-
-    #image_key
-    image_key = 'nekobot/image/tabelog/uokin.jpg'
+                curs.execute(sql, (url,))
+                if 0 < curs.rowcount:
+                    return True
+                else:
+                    return False
     
-    sql = 'INSERT INTO public.tabelog(\
-            name, image_key, url, score, station, genre, hours) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s);'
-            
-    with psycopg2.connect(DB_URL) as conn:
-        with conn.cursor() as curs:
+    def _normalize_tabelog_url(self,url):
+        urln = url
+        url_parse = urllib.parse.urlparse(url)
 
-            curs.execute(sql, (name, image_key, tebelog_url, score, station, genre, hours))
-            conn.commit()
+        if url_parse.netloc != self._DOMAIN[0]:
+            netlocn = self._DOMAIN[0]
+            urln = url.replace(url_parse.netloc, netlocn)
+
+        if url_parse.path.count('/') > self._PATH_DIR_LEVEL:
+            ps = url_parse.path.split('/')
+            pathn = '/' + ps[1] + '/' + ps[2] + '/' + ps[3] + '/' + ps[4] + '/'
+            urln = url.replace(url_parse.path, pathn)
+
+        return urln
+
+    def insert_tabelog_link(self):
+        
+        self.values = self._tabelog_scraping()
+
+        sql = 'INSERT INTO public.tabelog(\
+                name, image_key, url, score, station, genre, hours) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s);'
+                
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(sql, self.values)
+                conn.commit()
+
+        print('[Event Log]'
+            + ' insert_tabelog_link'
+            + ' values=' + self.values
+        )
+
+        return self
+
+    
+    def _tabelog_scraping(self):
+        url = self.url
+        html = urllib.request.urlopen(self.url).read()
+        soup = BeautifulSoup(html, 'html.parser')
+
+        #name
+        name = soup.find(class_='display-name').span.string.strip()
+
+        #score
+        score = float(soup.find(class_='rdheader-rating__score-val-dtl').string)
+
+        #station
+        station = soup.find(class_='rdheader-subinfo__item rdheader-subinfo__item--station').find(class_='linktree__parent-target-text').string
+
+        #genre,hour
+        genre = ''
+        hours = ''
+        rstinfo_tables = soup.find_all('table', class_='c-table c-table--form rstinfo-table__table')
+        for rstinfo_table in rstinfo_tables:
+            rows = rstinfo_table.find_all('tr')
+            for row in rows:
+                if row.find('th').string == 'ジャンル':
+                    genre = row.find('span').string
+                elif row.find('th').string == '営業時間':
+                    lines = row.find_all('p')
+                    for line in lines:
+                        hours += line.string + ' '
+
+        #image_key
+        image_key = 'nekobot/image/tabelog/uokin.jpg'
+
+        return (name, image_key, url, score, station, genre, hours,)   
 
 
 def my_normalize(text):
@@ -696,6 +750,7 @@ def handle_text_message(event):
     intent = Intent(textn).check_intent(False)
     entity_exact = Entity(textn).check_entity(True)
     entity_partial = Entity(textn).check_entity(False)
+    tabelog = Tabelog().set_tabelog_url(text)
     setting = Setting()
     
     #古い判定
@@ -969,25 +1024,25 @@ def handle_text_message(event):
 
                         if entity_partial.name == '@neko_image':
                             setting.update_current_upload_category('image/neko')
-                            send_text = 'にゃー（ねこ画像を送って）'
+                            send_text = 'ねこ画像を送って'
 
                         elif entity_partial.name == '@neko_cyu-ru_image':
                             setting.update_current_upload_category('image/neko_cyu-ru')
-                            send_text = 'にゃー（ちゅーる画像を送って）'
+                            send_text = 'ちゅーる画像を送って'
 
                         elif entity_partial.name == '@kitada_image':
                             setting.update_current_upload_category('image/kitada')
-                            send_text = 'にゃー（北田さん画像を送って）'
+                            send_text = '北田さん画像を送って'
 
                         elif entity_partial.name == '@wakamatsu_image':
                             setting.update_current_upload_category('image/gakky')
-                            send_text = 'にゃー（若松さん（ガッキー）画像を送って）'
+                            send_text = '若松さん（ガッキー）画像を送って'
 
                         elif entity_partial.name in {
                             '@tebelog_link', '@tabelog_izakaya',
                         }:
                             setting.update_current_upload_category('tabelog/godrinking')
-                            send_text = 'にゃー（おすすめの食べログのリンク送って）'
+                            send_text = '食べログのリンク送って'
 
                         if send_text != '':
                             line_bot_api.reply_message(
@@ -1075,19 +1130,14 @@ def handle_text_message(event):
     #食べログのリンク判定
     if setting.check_access_allow(user_id):
         if setting.current_upload_category == 'tabelog/godrinking':
+            if tabelog.url != '':
 
-            url_parse = urllib.parse.urlparse(text)
-            
-            if url_parse.netloc == 's.tabelog.com' or url_parse.netloc == 'tabelog.com':
-
-                send_text = 'もらった（食べログのリンク）'
+                send_text = '食べログのリンクもらった'
                 line_bot_api.reply_message(
                     event.reply_token,TextSendMessage(text=send_text)
                 )
 
-                tabelog_url = normalize_tabelog_url(text)
-                insert_tabelog_link(tabelog_url)
-
+                tabelog = tabelog.insert_tabelog_link()
 
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image_message(event):
@@ -1108,7 +1158,7 @@ def handle_image_message(event):
     )
 
     if setting.check_access_allow(user_id):
-        if setting.current_upload_category != '':
+        if setting.current_upload_category.split('/')[0] == 'image':
 
             message_content = line_bot_api.get_message_content(event.message.id)
 
