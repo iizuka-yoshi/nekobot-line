@@ -325,7 +325,8 @@ def insert_tabelog_link(tebelog_url):
             elif row.find('th').string == '営業時間':
                 lines = row.find_all('p')
                 for line in lines:
-                    hours = +line.string + ' '
+                    hours += line.string + ' '
+                    
 
     #image_key
     image_key = 'nekobot/image/tabelog/uokin.jpg'
@@ -1073,7 +1074,10 @@ def handle_text_message(event):
     url_parse = urllib.parse.urlparse(text)
     
     if url_parse.netloc == 's.tabelog.com' or url_parse.netloc == 'tabelog.com':
-        tabelog_url= normalize_tabelog_url(text)
+        tabelog_url = normalize_tabelog_url(text)
+        
+        print(urllib.parse.urlparse(tabelog_url))
+
         insert_tabelog_link(tabelog_url)
 
 @handler.add(MessageEvent, message=ImageMessage)
