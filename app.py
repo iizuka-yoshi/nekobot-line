@@ -333,8 +333,8 @@ def insert_tabelog_link(tebelog_url):
     
     sql = 'INSERT INTO public.tabelog(\
             name, image_key, url, score, station, genre, hours) \
-            VALUES (%s, %s, %s, %f, %s, %s, %s);'
-                    
+            VALUES (%s, %s, %s, %s, %s, %s, %s);'
+            
     with psycopg2.connect(DB_URL) as conn:
         with conn.cursor() as curs:
 
