@@ -295,6 +295,7 @@ class Tabelog:
         self.values = ()
 
     def set_tabelog_url(self, url):
+        print('_is_tabelog_url=' + self._is_tabelog_url(url))
         if not self._is_tabelog_url(url):
             return False
 
