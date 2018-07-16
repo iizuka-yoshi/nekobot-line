@@ -331,12 +331,12 @@ class Tabelog:
 
         if url_parse.netloc != self._DOMAIN[0]:
             netlocn = self._DOMAIN[0]
-            urln = url.replace(url_parse.netloc, netlocn)
+            urln = urln.replace(url_parse.netloc, netlocn)
 
         if url_parse.path.count('/') > self._PATH_DIR_LEVEL:
             ps = url_parse.path.split('/')
             pathn = '/' + ps[1] + '/' + ps[2] + '/' + ps[3] + '/' + ps[4] + '/'
-            urln = url.replace(url_parse.path, pathn)
+            urln = urln.replace(url_parse.path, pathn)
 
         return urln
 
