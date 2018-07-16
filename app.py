@@ -292,6 +292,7 @@ class Tabelog:
 
     def __init__(self):
         self.url = ''
+        self.exist = False
         self.values = ()
 
     def set_tabelog_url(self, url):
@@ -299,6 +300,7 @@ class Tabelog:
             return self
 
         if self._url_exits(url):
+            self.exist = True
             return self
 
         self.url = self._normalize_tabelog_url(url)
@@ -1150,6 +1152,14 @@ def handle_text_message(event):
                 )
 
                 tabelog = tabelog.insert_tabelog_link()
+
+            elif tabelog.exist:
+                
+                send_text = 'もう知ってる'
+                line_bot_api.reply_message(
+                    event.reply_token,TextSendMessage(text=send_text)
+                )
+
 
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image_message(event):
