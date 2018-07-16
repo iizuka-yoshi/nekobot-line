@@ -391,7 +391,7 @@ class Tabelog:
                         hours += line.string + ' '
 
         #image_key
-        image_key = 'nekobot/image/tabelog/uokin.jpg'
+        image_key = 'nekobot/tabelog/godrinking/uokin.jpg'
 
         return (name, image_key, url, score, station, genre, hours,)   
 
