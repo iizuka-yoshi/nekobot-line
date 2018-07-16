@@ -356,7 +356,14 @@ class Tabelog:
 
         print('[Event Log]'
             + ' insert_tabelog_link'
-            + ' values=' + self.values
+            + ' values=('
+            + self.values[0] + ' ,'
+            + self.values[1] + ' ,'
+            + self.values[2] + ' ,'
+            + self.values[3] + ' ,'
+            + self.values[4] + ' ,'
+            + self.values[5] + ' ,'
+            + self.values[6] + ')'
         )
 
         return self
