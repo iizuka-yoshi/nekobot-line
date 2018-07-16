@@ -411,7 +411,7 @@ class Tabelog:
 
     def select_tabelog_link(self):
 
-        sql = 'SELECT id, name, image_key, url, score, station, genre, hours \
+        sql = 'SELECT name, image_key, url, score, station, genre, hours \
 	            FROM public.tabelog; '
                 
         with psycopg2.connect(DB_URL) as conn:
