@@ -296,10 +296,10 @@ class Tabelog:
 
     def set_tabelog_url(self, url):
         if not self._is_tabelog_url(url):
-            return False
+            return self
 
         if self._url_exits(url):
-            return False
+            return self
 
         self.url = self._normalize_tabelog_url(url)
         return self
@@ -357,12 +357,12 @@ class Tabelog:
         print('[Event Log]'
             + ' insert_tabelog_link'
             + ' values=('
-            + str(self.values[0]) + ' ,'
-            + str(self.values[1]) + ' ,'
-            + str(self.values[2]) + ' ,'
-            + str(self.values[3]) + ' ,'
-            + str(self.values[4]) + ' ,'
-            + str(self.values[5]) + ' ,'
+            + str(self.values[0]) + ', '
+            + str(self.values[1]) + ', '
+            + str(self.values[2]) + ', '
+            + str(self.values[3]) + ', '
+            + str(self.values[4]) + ', '
+            + str(self.values[5]) + ', '
             + str(self.values[6]) + ')'
         )
 
@@ -376,12 +376,14 @@ class Tabelog:
 
         #name
         name = soup.find(class_='display-name').span.string.strip()
+        name = name.strip()
 
         #score
         score = float(soup.find(class_='rdheader-rating__score-val-dtl').string)
 
         #station
         station = soup.find(class_='rdheader-subinfo__item rdheader-subinfo__item--station').find(class_='linktree__parent-target-text').string
+        station = station.strip()
 
         #genre,hour
         genre = ''
@@ -396,6 +398,9 @@ class Tabelog:
                     lines = row.find_all('p')
                     for line in lines:
                         hours += line.string + ' '
+
+        genre = genre.strip()
+        hours = hours.strip()
 
         #image_key
         image_key = 'nekobot/tabelog/godrinking/uokin.jpg'
