@@ -284,45 +284,61 @@ class Setting():
         
         return ret
 
+def normalize_tabelog_url(tebelog_url):
+    tebelog_urln = tebelog_url
+    url_parse = urllib.parse.urlparse(tebelog_url)
+
+    if url_parse.netloc == 's.tabelog.com':
+        netlocn = 'tabelog.com'
+        tebelog_urln = tebelog_urln.replace(url_parse.netloc, netlocn)
+
+    if url_parse.path.count('/') > 5:
+        ps = url_parse.path.split('/')
+        pathn = '/' + ps[1] + '/' + ps[2] + '/' + ps[3] + '/' + ps[4] + '/'
+        tebelog_urln = tebelog_urln.replace(url_parse.path, pathn)
+    
+    return tebelog_urln
+
+
 def insert_tabelog_link(tebelog_url):
-        html = urllib.request.urlopen(tebelog_url).read()
-        soup = BeautifulSoup(html, 'html.parser')
+    html = urllib.request.urlopen(tebelog_url).read()
+    soup = BeautifulSoup(html, 'html.parser')
 
-        #name
-        name = soup.find(class_='display-name').span.string.strip()
+    #name
+    name = soup.find(class_='display-name').span.string.strip()
 
-        #score
-        score = float(soup.find(class_='rdheader-rating__score-val-dtl').string)
+    #score
+    score = float(soup.find(class_='rdheader-rating__score-val-dtl').string)
 
-        #station
-        station = soup.find(class_='rdheader-subinfo__item rdheader-subinfo__item--station').find(class_='linktree__parent-target-text').string
+    #station
+    station = soup.find(class_='rdheader-subinfo__item rdheader-subinfo__item--station').find(class_='linktree__parent-target-text').string
 
-        #genre,hour
-        genre = ''
-        hours = ''
-        rstinfo_tables = soup.find_all('table', class_='c-table c-table--form rstinfo-table__table')
-        for rstinfo_table in rstinfo_tables:
-            rows = rstinfo_table.find_all('tr')
-            for row in rows:
-                if row.find('th').string == 'ジャンル':
-                    genre = row.find('span').string
-                elif row.find('th').string == '営業時間':
-                    lines = row.find_all('p')
-                    for line in lines:
-                        hours = +line.string + ' '
+    #genre,hour
+    genre = ''
+    hours = ''
+    rstinfo_tables = soup.find_all('table', class_='c-table c-table--form rstinfo-table__table')
+    for rstinfo_table in rstinfo_tables:
+        rows = rstinfo_table.find_all('tr')
+        for row in rows:
+            if row.find('th').string == 'ジャンル':
+                genre = row.find('span').string
+            elif row.find('th').string == '営業時間':
+                lines = row.find_all('p')
+                for line in lines:
+                    hours = +line.string + ' '
 
-        #image_key
-        image_key = 'nekobot/image/tabelog/uokin.jpg'
-        
-        sql = 'INSERT INTO public.tabelog(\
-                name, image_key, url, score, station, genre, hours) \
-	            VALUES (%s, %s, %s, %f, %s, %s, %s);'
-                        
-        with psycopg2.connect(DB_URL) as conn:
-            with conn.cursor() as curs:
+    #image_key
+    image_key = 'nekobot/image/tabelog/uokin.jpg'
+    
+    sql = 'INSERT INTO public.tabelog(\
+            name, image_key, url, score, station, genre, hours) \
+            VALUES (%s, %s, %s, %f, %s, %s, %s);'
+                    
+    with psycopg2.connect(DB_URL) as conn:
+        with conn.cursor() as curs:
 
-                curs.execute(sql, (name, image_key, tebelog_url, score, station, genre, hours))
-                conn.commit()
+            curs.execute(sql, (name, image_key, tebelog_url, score, station, genre, hours))
+            conn.commit()
 
 
 def my_normalize(text):
@@ -1054,10 +1070,11 @@ def handle_text_message(event):
         return
 
     #食べログのリンク判定
-    url_parse = urllib.parse.urlunparse(text)
-    if url_parse.netloc == 'tabelog.com':
-        insert_tabelog_link(text)
-
+    url_parse = urllib.parse.urlparse(text)
+    
+    if url_parse.netloc == 's.tabelog.com' or url_parse.netloc == 'tabelog.com':
+        tabelog_url= normalize_tabelog_url(text)
+        insert_tabelog_link(tabelog_url)
 
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_image_message(event):
