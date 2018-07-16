@@ -295,7 +295,6 @@ class Tabelog:
         self.values = ()
 
     def set_tabelog_url(self, url):
-        print('_is_tabelog_url=' + str(self._is_tabelog_url(url)))
         if not self._is_tabelog_url(url):
             return False
 
@@ -315,7 +314,7 @@ class Tabelog:
     def _url_exits(self,url):
         sql = 'SELECT name \
                 FROM public.tabelog \
-                WHERE url = % s; '
+                WHERE url = %s;'
                 
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as curs:
