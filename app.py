@@ -71,7 +71,7 @@ AWS_S3_BUCKET_NAME = 'nekobot'
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', None)
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', None)
 
-USER_ID_IIZUKA = 'U35bca0dfb497d294737b7b25f4261a0b'
+USER_ID_YOSHI = 'U35bca0dfb497d294737b7b25f4261a0b'
 
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
@@ -284,6 +284,46 @@ class Setting():
         
         return ret
 
+def insert_tabelog_link(tebelog_url):
+        html = urllib.request.urlopen(tebelog_url).read()
+        soup = BeautifulSoup(html, 'html.parser')
+
+        #name
+        name = soup.find(class_='display-name').span.string.strip()
+
+        #score
+        score = float(soup.find(class_='rdheader-rating__score-val-dtl').string)
+
+        #station
+        station = soup.find(class_='rdheader-subinfo__item rdheader-subinfo__item--station').find(class_='linktree__parent-target-text').string
+
+        #genre,hour
+        genre = ''
+        hours = ''
+        rstinfo_tables = soup.find_all('table', class_='c-table c-table--form rstinfo-table__table')
+        for rstinfo_table in rstinfo_tables:
+            rows = rstinfo_table.find_all('tr')
+            for row in rows:
+                if row.find('th').string == 'ジャンル':
+                    genre = row.find('span').string
+                elif row.find('th').string == '営業時間':
+                    lines = row.find_all('p')
+                    for line in lines:
+                        hours = +line.string + ' '
+
+        #image_key
+        image_key = 'nekobot/image/tabelog/uokin.jpg'
+        
+        sql = 'INSERT INTO public.tabelog(\
+                name, image_key, url, score, station, genre, hours) \
+	            VALUES (%s, %s, %s, %f, %s, %s, %s);'
+                        
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(sql, (name, image_key, tebelog_url, score, station, genre, hours))
+                conn.commit()
+
 
 def my_normalize(text):
     text = neologdn.normalize(text)
@@ -478,25 +518,6 @@ def get_message_pattern(text):
     elif text in{'おわかりいただけただろうか'}:
         return 'ghost'
 
-    elif text in{
-        'carousel',
-        '行きますか', 'いきますか', 'イキマスカ',
-        '行きます', 'いきます', 'イキマス',
-        '行く', 'いく', 'イク',
-        'どうしますか', 'ドウシマスカ',
-        'どうします', 'ドウシマス',
-        'どうする', 'ドウスル',
-        '終わった', 'おわった', 'オワッタ',
-        '終わる', 'おわる', 'オワル',
-        'そろそろ', 'ソロソロ',
-        '飲み', 'のみ', 'ノミ',
-        '飲み会', 'のみかい', 'ノミカイ',
-        '飲み行きますか', '飲みいきますか', 'のみいきますか', 'ノミイキマスカ',
-        '飲み行きます', '飲みいきます', 'のみいきます', 'ノミイキマス',
-        '飲み行く', '飲みいく', 'のみいく', 'ノミイク',
-    }:
-        return 'carousel'
-
     elif text in{'てすと', 'テスト', 'test'}:
         return 'test'
 
@@ -671,7 +692,8 @@ def handle_text_message(event):
         + ' user_id=' + str(user_id)
         + ' group_id=' + str(group_id)
         + ' room_id=' + str(room_id)
-        + ' text=' + str(textn)
+        + ' text=' + str(text)
+        + ' textn=' + str(textn)
         + ' intent.name=' + str(intent.name)
         + ' entity_exact.name=' + str(entity_exact.name)
         + ' entity_partial.name=' + str(entity_partial.name)
@@ -849,12 +871,10 @@ def handle_text_message(event):
             
             if setting.check_admin_line_user(user_id):
 
-                #Entity部分一致の判定
                 if entity_partial.match:
+                    if entity_partial.position < intent.position:
                     
-                    if entity_partial.name == '@access_management':
-
-                        if entity_partial.position < intent.position:
+                        if entity_partial.name == '@access_management':
 
                             if setting.enable_access_management == 'True':
                                 setting = setting.update_enable_access_management('False')
@@ -863,18 +883,71 @@ def handle_text_message(event):
                                 setting = setting.update_enable_access_management('True')
                                 send_text = 'にゃー（アクセス管理 オン）'
 
-                    if send_text != '':
-                        line_bot_api.reply_message(
-                            event.reply_token, TextMessage(text=send_text))
+                        if send_text != '':
+                            line_bot_api.reply_message(
+                                event.reply_token, TextMessage(text=send_text))
 
-                    return
+                        return
+
+        elif intent.name == '#change_setting_on':
+            
+            if setting.check_admin_line_user(user_id):
+
+                if entity_partial.match:
+                    if entity_partial.position < intent.position:
+                    
+                        if entity_partial.name == '@access_management':
+
+                            if setting.enable_access_management == 'True':
+                                send_text = 'すでにアクセス管理は有効だよ'
+                            else:
+                                setting = setting.update_enable_access_management('True')
+                                send_text = 'にゃー（アクセス管理 オン）'
+
+                        if send_text != '':
+                            line_bot_api.reply_message(
+                                event.reply_token, TextMessage(text=send_text))
+
+                        return
+
+        elif intent.name == '#change_setting_off':
+            
+            if setting.check_admin_line_user(user_id):
+
+                if entity_partial.match:
+                    if entity_partial.position < intent.position:
+                    
+                        if entity_partial.name == '@access_management':
+
+                            if setting.enable_access_management == 'True':
+                                setting = setting.update_enable_access_management('False')
+                                send_text = 'にゃー（アクセス管理 オフ）'
+                            else:
+                                send_text = 'すでにアクセス管理は無効だよ'
+
+                            if send_text != '':
+                                line_bot_api.reply_message(
+                                    event.reply_token, TextMessage(text=send_text))
+
+                            return
+                    
+                        elif entity_partial.name == '@current_upload_category':
+                            if entity_partial.position < intent.position:
+
+                                setting.update_current_upload_category('')
+                                send_text = 'にゃー（アップロード機能 オフ）'
+
+                            if send_text != '':
+                                line_bot_api.reply_message(
+                                    event.reply_token, TextMessage(text=send_text))
+
+                            return
 
         elif intent.name == '#change_upload_target':
 
             if setting.check_access_allow(user_id):
 
                 if entity_partial.match:
-
                     if entity_partial.position < intent.position:
 
                         if entity_partial.name == '@neko_image':
@@ -897,12 +970,34 @@ def handle_text_message(event):
                             setting.update_current_upload_category('tabelog/godrinking')
                             send_text = 'にゃー（おすすめの食べログのリンク送って）'
 
+                        if send_text != '':
+                            line_bot_api.reply_message(
+                                event.reply_token, TextMessage(text=send_text))
+
+                        return
+
+        elif intent.name == '#check_setting':
+
+            if entity_partial.match:
+                if entity_partial.position < intent.position:
+
+                    if entity_partial.name == '@access_management':
+                        if setting.enable_access_management == 'True':
+                            send_text = 'アクセス管理 オンだよ'
+                        else:
+                            send_text = 'アクセス管理 オフだよ'
+
+                    elif entity_partial.name == '@current_upload_category':
+                        if setting.current_upload_category == '':
+                            send_text = 'アップロード機能はオフだよ'
+                        else:
+                            send_text = '現在のアップロードカテゴリ： ' + setting.current_upload_category
+
                     if send_text != '':
                         line_bot_api.reply_message(
                             event.reply_token, TextMessage(text=send_text))
 
                     return
-
 
     # test判定
     send_text = ''
@@ -927,193 +1022,41 @@ def handle_text_message(event):
 
         else:
             line_bot_api.reply_message(event.reply_token,
-                                       [
-                                           TextSendMessage(text=random.choice(
-                                               ['笞??冗┌蜉ｹ縺ｪ繧ｳ繝槭Φ繝', '縺翫ｏ縺九ｊ縺?◆縺?縺代◆縺?繧阪≧縺'])),
-                                           image_send_message_list(
-                                               img_dir, ['IMG_0775.jpg', 'IMG_0847.jpg', 'IMG_0775.jpg', 'IMG_0847.jpg']),
-                                           TextSendMessage(text='...'),
-                                           TextSendMessage(text='エラー')
-                                       ]
-                                       )
+                [
+                    TextSendMessage(text=random.choice(
+                        ['笞??冗┌蜉ｹ縺ｪ繧ｳ繝槭Φ繝', '縺翫ｏ縺九ｊ縺?◆縺?縺代◆縺?繧阪≧縺'])),
+                    image_send_message_list(
+                        img_dir, ['IMG_0775.jpg', 'IMG_0847.jpg', 'IMG_0775.jpg', 'IMG_0847.jpg']),
+                    TextSendMessage(text='...'),
+                    TextSendMessage(text='エラー')
+                ]
+            )
         return
 
     elif message_pattern == 'gatarou':
         if epsilon <= random.random():
             send_text = warning_message_text()
             line_bot_api.reply_message(event.reply_token,
-                                       TextSendMessage(text=send_text)
-                                       )
+                TextSendMessage(text=send_text)
+            )
 
         else:
             line_bot_api.reply_message(event.reply_token,
-                                       [
-                                           TextSendMessage(text=random.choice(
-                                               ['??ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ', '･ｷ･罍ｼ｡｡･ｷ･罍ｼ｡｡･ｷ･罍ｼ'])),
-                                           image_send_message_list(
-                                               img_dir, ['IMG_0761.jpg', 'IMG_0761_2.jpg', 'IMG_0761.jpg', 'IMG_0761_2.jpg']),
-                                           TextSendMessage(text='...'),
-                                           TextSendMessage(text='エラー')
-                                       ]
-                                       )
-        return
-
-    elif message_pattern == 'carousel':
-        carousel_template = CarouselTemplate(columns=[
-            CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('zoot'),
-                text='ラーメン、居酒屋、焼きとん\n'+'営業時間:17:00～24:00',
-                title='ZOOT [浜松町]',
-                actions=[
-                    URITemplateAction(
-                        label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
-                    MessageTemplateAction(
-                        label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13058997/'),
-                    MessageTemplateAction(
-                        label='ねこ', text=restaurant_message_text()),
-                ]),
-
-            CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('seiren'),
-                text='中華料理、中国鍋・火鍋、ラーメン\n'+'営業時間:17:00～23:00(L.O. 22:30)',
-                title='青蓮 [浜松町]',
-                actions=[
-                    URITemplateAction(
-                        label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13109938/'),
-                    MessageTemplateAction(
-                        label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13109938/'),
-                    MessageTemplateAction(
-                        label='ねこ', text=restaurant_message_text()),
-                ]),
-
-            CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('uokin'),
-                text='魚介料理・海鮮料理、居酒屋\n'+'営業時間:17:00～23:30',
-                title='魚金 [浜松町]',
-                actions=[
-                    URITemplateAction(
-                        label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13052364/'),
-                    MessageTemplateAction(
-                        label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13052364/'),
-                    MessageTemplateAction(
-                        label='ねこ', text=restaurant_message_text()),
-                ]),
-
-            CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('risuke'),
-                text='牛タン、麦とろ、カレーライス\n'+'営業時間:17:30～22:30',
-                title='利助 [浜松町]',
-                actions=[
-                    URITemplateAction(
-                        label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/'),
-                    MessageTemplateAction(
-                        label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13014253/'),
-                    MessageTemplateAction(
-                        label='ねこ', text=restaurant_message_text()),
-                ]),
-
-            CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('bonanza'),
-                text='ダイニングバー、ワインバー\n' +
-                '営業時間:17:00～23:30(L.O.22:30、ドリンクL.O.23:00)',
-                title='bonanza [浜松町]',
-                actions=[
-                    URITemplateAction(
-                        label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13143248/'),
-                    MessageTemplateAction(
-                        label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13143248/'),
-                    MessageTemplateAction(
-                        label='ねこ', text=restaurant_message_text()),
-                ]),
-
-            CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('tokaihntn'),
-                text='王様のブランチ第２位の餃子\n'+'営業時間:17:00～23:00(L.O.22:20)',
-                title='東海飯店 [浜松町]',
-                actions=[
-                    URITemplateAction(
-                        label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13023334/'),
-                    MessageTemplateAction(
-                        label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13023334/'),
-                    MessageTemplateAction(
-                        label='ねこ', text=restaurant_message_text()),
-                ]),
-
-            CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('settsu'),
-                text='居酒屋、インドカレー、和食\n'+'営業時間:14:30〜23:00(L.O.22:15)',
-                title='摂津 [浜松町]',
-                actions=[
-                    URITemplateAction(
-                        label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13097178/'),
-                    MessageTemplateAction(
-                        label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13097178/'),
-                    MessageTemplateAction(
-                        label='ねこ', text=restaurant_message_text()),
-                ]),
-
-            CarouselColumn(
-                thumbnail_image_url=restaurant_image_url('uma8'),
-                text='居酒屋、くじら料理\n'+'営業時間:16:30～23:30',
-                title='旨蔵 うま八 [新橋]',
-                actions=[
-                    URITemplateAction(
-                        label='食べログを見る', uri='https://tabelog.com/tokyo/A1301/A130103/13045442/'),
-                    MessageTemplateAction(
-                        label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1301/A130103/13045442/'),
-                    MessageTemplateAction(
-                        label='ねこ', text=restaurant_message_text()),
-                ]),
-
-        ])
-        template_message = TemplateSendMessage(
-            alt_text='Carousel alt text', template=carousel_template)
-
-        line_bot_api.reply_message(event.reply_token,
-            [
-                TextSendMessage(text=random.choice(['どこにしよう','かるくで'])),
-                template_message,
-            ]
-        )
+                [
+                    TextSendMessage(text=random.choice(
+                        ['??ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ', '･ｷ･罍ｼ｡｡･ｷ･罍ｼ｡｡･ｷ･罍ｼ'])),
+                    image_send_message_list(
+                        img_dir, ['IMG_0761.jpg', 'IMG_0761_2.jpg', 'IMG_0761.jpg', 'IMG_0761_2.jpg']),
+                    TextSendMessage(text='...'),
+                    TextSendMessage(text='エラー')
+                ]
+            )
         return
 
     #食べログのリンク判定
-    #url_parse = urllib.parse.urlunparse(text)
-    #if url_parse.netloc == 'tabelog.com':
-
-
-def insert_tabelog_link(tebelog_url):
-        html = urllib.request.urlopen(tebelog_url).read()
-        soup = BeautifulSoup(html, 'html.parser')
-
-        #name
-        name = soup.find(class_='display-name').span.string.strip()
-
-        #score
-        score = float(soup.find(class_='rdheader-rating__score-val-dtl').string)
-
-        #station
-        station = soup.find(class_='rdheader-subinfo__item rdheader-subinfo__item--station').find(class_='linktree__parent-target-text').string
-
-        #genre,hour
-        genre = ''
-        hour = ''
-        rstinfo_tables = soup.find_all('table', class_='c-table c-table--form rstinfo-table__table')
-        for rstinfo_table in rstinfo_tables:
-            rows = rstinfo_table.find_all('tr')
-            for row in rows:
-                if row.find('th').string == 'ジャンル':
-                    genre = row.find('span').string
-                elif row.find('th').string == '営業時間':
-                    lines = row.find_all('p')
-                    for line in lines:
-                        hour =+ line.string + ' '
-                        
-        
-
-
-    
-
+    url_parse = urllib.parse.urlunparse(text)
+    if url_parse.netloc == 'tabelog.com':
+        insert_tabelog_link(text)
 
 
 @handler.add(MessageEvent, message=ImageMessage)
@@ -1123,7 +1066,6 @@ def handle_image_message(event):
     str_now = dt_now.strftime('%Y%m%d-%H%M')
 
     setting = Setting()
-    caregory = setting.current_upload_category
 
     user_name, user_id, group_id, room_id = get_line_id(event)
     print('[Event Log]'
@@ -1132,31 +1074,29 @@ def handle_image_message(event):
         + ' user_id=' + str(user_id)
         + ' group_id=' + str(group_id)
         + ' room_id=' + str(room_id)
-        + ' current_upload_category=' + str(caregory)
+        + ' current_upload_category=' + str(setting.current_upload_category)
     )
 
     if setting.check_access_allow(user_id):
+        if setting.current_upload_category != '':
 
-        message_content = line_bot_api.get_message_content(event.message.id)
+            message_content = line_bot_api.get_message_content(event.message.id)
 
-        with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=str_now+'-', delete=False) as tf:
-            for chunk in message_content.iter_content():
-                tf.write(chunk)
+            with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=str_now+'-', delete=False) as tf:
+                for chunk in message_content.iter_content():
+                    tf.write(chunk)
+                
+                tf_path = tf.name
+
+            dist_path = tf_path + extension
+            os.rename(tf_path, dist_path)
             
-            tf_path = tf.name
-
-        dist_path = tf_path + extension
-        os.rename(tf_path, dist_path)
-        
-        upload_to_s3_category(dist_path, caregory)
-        
-        send_text = 'にゃー（画像ゲット）'
-        line_bot_api.reply_message(
-            event.reply_token,
-            [
-                TextSendMessage(text=send_text)
-            ]
-        )
+            upload_to_s3_category(dist_path, setting.current_upload_category)
+            
+            send_text = 'にゃー（画像ゲット）'
+            line_bot_api.reply_message(
+                event.reply_token,TextSendMessage(text=send_text)
+            )
 
 
 @handler.add(JoinEvent)
