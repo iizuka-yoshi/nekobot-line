@@ -293,7 +293,8 @@ class Tabelog:
     def __init__(self):
         self.url = ''
         self.exist = False
-        self.values = ()
+        self.insert_value = ()
+        self.select_values = []
 
     def set_tabelog_url(self, url):
         if not self._is_tabelog_url(url):
@@ -344,7 +345,7 @@ class Tabelog:
 
     def insert_tabelog_link(self):
         
-        self.values = self._tabelog_scraping()
+        self.insert_value = self._tabelog_scraping()
 
         sql = 'INSERT INTO public.tabelog(\
                 name, image_key, url, score, station, genre, hours) \
@@ -353,23 +354,22 @@ class Tabelog:
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as curs:
 
-                curs.execute(sql, self.values)
+                curs.execute(sql, self.insert_value)
                 conn.commit()
 
         print('[Event Log]'
             + ' insert_tabelog_link'
             + ' values=('
-            + str(self.values[0]) + ', '
-            + str(self.values[1]) + ', '
-            + str(self.values[2]) + ', '
-            + str(self.values[3]) + ', '
-            + str(self.values[4]) + ', '
-            + str(self.values[5]) + ', '
-            + str(self.values[6]) + ')'
+            + str(self.insert_value[0]) + ', '
+            + str(self.insert_value[1]) + ', '
+            + str(self.insert_value[2]) + ', '
+            + str(self.insert_value[3]) + ', '
+            + str(self.insert_value[4]) + ', '
+            + str(self.insert_value[5]) + ', '
+            + str(self.insert_value[6]) + ')'
         )
 
         return self
-
     
     def _tabelog_scraping(self):
         url = self.url
@@ -405,9 +405,23 @@ class Tabelog:
         hours = hours.strip()
 
         #image_key
-        image_key = 'nekobot/tabelog/godrinking/uokin.jpg'
+        image_key = 'nekobot/tabelog/tabelog_default.jpg'
 
         return (name, image_key, url, score, station, genre, hours,)   
+
+    def select_tabelog_link(self):
+
+        sql = 'SELECT id, name, image_key, url, score, station, genre, hours \
+	            FROM public.tabelog; '
+                
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(sql)
+                if 0 < curs.rowcount:
+                    self.select_values = curs.fetchall()
+
+        return self
 
 
 def my_normalize(text):
@@ -1090,15 +1104,48 @@ def handle_text_message(event):
     # test判定
     send_text = ''
     if message_pattern == 'test':
-        send_text = 'Amazon S3 から画像を取得します'
 
-        line_bot_api.reply_message(event.reply_token,
-            [
-                TextSendMessage(text=send_text),
-                image_send_messages_s3('image/neko')
-            ]
-        )
-        return
+        name = tabelog.select_tabelog_link().select_values[0][0]
+        print(name)
+
+        # carousel_template = CarouselTemplate(columns=[
+        #     CarouselColumn(
+        #         thumbnail_image_url=restaurant_image_url('zoot'),
+        #         text='ラーメン、居酒屋、焼きとん\n'+'営業時間:17:00～24:00',
+        #         title='ZOOT [浜松町]',
+        #         actions=[
+        #             URITemplateAction(
+        #                 label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
+        #             MessageTemplateAction(
+        #                 label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13058997/'),
+        #             MessageTemplateAction(
+        #                 label='ねこ', text=restaurant_message_text()),
+        #         ]),
+
+        #     CarouselColumn(
+        #         thumbnail_image_url=restaurant_image_url('seiren'),
+        #         text='中華料理、中国鍋・火鍋、ラーメン\n'+'営業時間:17:00～23:00(L.O. 22:30)',
+        #         title='青蓮 [浜松町]',
+        #         actions=[
+        #             URITemplateAction(
+        #                 label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13109938/'),
+        #             MessageTemplateAction(
+        #                 label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13109938/'),
+        #             MessageTemplateAction(
+        #                 label='ねこ', text=restaurant_message_text()),
+        #         ]),
+
+        # ])
+        # template_message = TemplateSendMessage(
+        #     alt_text='Carousel alt text', template=carousel_template)
+
+        # line_bot_api.reply_message(event.reply_token,
+        #     [
+        #         TextSendMessage(text=random.choice(['どこにしよう','かるくで'])),
+        #         template_message,
+        #     ]
+        # )
+        # return
 
     # 古いスペシャル判定
     elif message_pattern == 'ghost':
@@ -1154,7 +1201,7 @@ def handle_text_message(event):
                 tabelog = tabelog.insert_tabelog_link()
 
             elif tabelog.exist:
-                
+
                 send_text = 'もう知ってる'
                 line_bot_api.reply_message(
                     event.reply_token,TextSendMessage(text=send_text)
