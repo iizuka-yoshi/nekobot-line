@@ -495,7 +495,10 @@ def genelate_image_url_s3(category):
         print('[Image Log] genelate_image_url_s3'
             + ' create_thumb'
             + ' thumb_path=' + thumb_path
-            + ' thumb_key=' + thumb_key
+        )
+    else:
+        print('[Image Log] genelate_image_url_s3'
+            + ' exist_thumb'
         )
         
     s3_client = boto3.client('s3')
