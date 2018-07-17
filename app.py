@@ -480,6 +480,12 @@ def genelate_image_url_s3(category):
     image_key = random.choice(keys)
     thumb_key = os.path.join('thumb', image_key)
 
+    print('[Image Log] genelate_image_url_s3'
+        + ' random_choice'
+        + ' image_key=' + image_key
+        + ' thumb_key=' + thumb_key
+    )
+
     #サムネイルが無ければ作成
     if not exist_key_s3(thumb_key):
         thumb_path = download_from_s3(image_key)
@@ -488,7 +494,7 @@ def genelate_image_url_s3(category):
 
         print('[Image Log] genelate_image_url_s3'
             + ' create_thumb'
-            + ' image_key=' + image_key
+            + ' thumb_path=' + thumb_path
             + ' thumb_key=' + thumb_key
         )
         
