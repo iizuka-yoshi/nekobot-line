@@ -475,7 +475,7 @@ def genelate_image_url_s3(category):
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
 
     obj_collections = bucket.objects.filter(Prefix=category)
-    keys = [obj_summary.key for obj_summary in obj_collections]
+    keys = [obj_summary.key for obj_summary in obj_collections if obj_summary.key.endswith('.jpg')]
 
     image_key = random.choice(keys)
     thumb_key = os.path.join('thumb', image_key)
@@ -539,8 +539,6 @@ def download_from_s3(key):
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
 
     download_path = os.path.join(static_tmp_path,os.path.basename(key))
-
-    print('[Debug] download_from_s3 key=' + key + ' download_path=' + download_path)
 
     bucket.download_file(key, download_path)
 
