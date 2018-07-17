@@ -502,13 +502,13 @@ def genelate_image_url_s3(category):
     image_url = s3_client.generate_presigned_url(
                     ClientMethod = 'get_object',
                     Params = {'Bucket' : AWS_S3_BUCKET_NAME, 'Key' : image_key},
-                    ExpiresIn = 604800,
+                    ExpiresIn = 259200,
                     HttpMethod = 'GET'
                 )
     thumb_url = s3_client.generate_presigned_url(
                     ClientMethod = 'get_object',
                     Params = {'Bucket' : AWS_S3_BUCKET_NAME, 'Key' : thumb_key},
-                    ExpiresIn = 604800,
+                    ExpiresIn = 259200,
                     HttpMethod = 'GET'
                 )
 
