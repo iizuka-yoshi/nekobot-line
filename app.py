@@ -512,6 +512,12 @@ def genelate_image_url_s3(category):
                     HttpMethod = 'GET'
                 )
 
+    print('[Image Log] genelate_image_url_s3'
+        + ' generate_presigned_url'
+        + ' image_url=' + image_url
+        + ' thumb_url=' + thumb_url
+    )
+
     return image_url, thumb_url
 
 
@@ -567,11 +573,6 @@ def image_send_messages_s3(category):
         original_content_url=image_url,
         preview_image_url=thumb_url
     )]
-
-    print('[Image Log] image_send_message_s3'
-        + ' image_url=' + image_url
-        + ' thumb_url=' + thumb_url
-    )
 
     return message
 
