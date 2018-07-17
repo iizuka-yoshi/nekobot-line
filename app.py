@@ -527,6 +527,9 @@ def download_from_s3(key):
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
 
     download_path = os.path.join(static_tmp_path,os.path.basename(key))
+
+    print('[Debug] download_from_s3 key=' + key + ' download_path=' + download_path)
+
     bucket.download_file(key, download_path)
 
     return download_path
@@ -571,8 +574,6 @@ def shrink_image(source_path,save_path, target_width, target_height):
     img = Image.open(source_path)
     w, h = img.size
 
-    exif = img._getexif()
-    orientation = exif.get(0x112, 1)
     convert_image = {
         # そのまま
         1: lambda img: img,
@@ -595,7 +596,14 @@ def shrink_image(source_path,save_path, target_width, target_height):
     if target_width < w or target_height < h:
         img.thumbnail((target_width, target_height), Image.ANTIALIAS)
 
-    img = convert_image[orientation](img)
+    try:
+        exif = img._getexif()
+        if exif:
+            orientation = exif.get(0x112, 1)
+            img = convert_image[orientation](img)
+    except:
+        print('[Except Log] def=shrink_image exif = img._getexif()')
+
     img.save(save_path)
     return save_path
 
