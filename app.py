@@ -393,6 +393,7 @@ class _Tabelog_Insert:
         hoursn = hoursn.replace('～', '-')
         hoursn = hoursn.replace('・','･')
         hoursn = neologdn.normalize(hoursn)
+        hoursn = hoursn[:100]
         return hoursn
     
     def _tabelog_scraping(self):
