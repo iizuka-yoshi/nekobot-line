@@ -468,8 +468,8 @@ class _Tabelog_Select:
             ret.append(
                 CarouselColumn(
                     thumbnail_image_url=my_s3_link_url(value.image_key),
-                    text=value.station + ' ' + value.genre + '\n' + value.hours,
-                    title=value.name + ' [' + str(value.score) + ']',
+                    title=(value.name + ' [' + str(value.score) + ']')[:40],
+                    text=(value.station + ' ' + value.genre + ' ' + value.hours)[:60],
                     actions=[
                         URITemplateAction(
                             label='食べログを見る', uri=value.url),
