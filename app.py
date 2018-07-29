@@ -390,7 +390,8 @@ class _Tabelog_Insert:
 
     def _normalize_hours(self, hours):
         hoursn = hours
-        hoursn = hoursn.replace('～','-')
+        hoursn = hoursn.replace('～', '-')
+        hoursn = hoursn.replace('・','･')
         hoursn = neologdn.normalize(hoursn)
         return hoursn
     
