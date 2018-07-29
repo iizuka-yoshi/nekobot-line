@@ -416,7 +416,11 @@ class _Tabelog_Insert:
                 elif row.find('th').string == '営業時間':
                     lines = row.find_all('p')
                     for line in lines:
-                        hours += line.string + ' '
+                        try:
+                            hours += line.string + ' '
+                        except:
+                            print('[Debug]_tabelog_scraping hours line.string=' + line.string)
+                        
 
         genre = genre.strip()
         hours = hours.strip()
@@ -453,6 +457,12 @@ class _Tabelog_Select:
 
         return _values
 
+    def _tabelog_action_text(self):
+        text = random.choice([
+            '猫', 'ねこ', 'ネコ', 'cat', 'neko', 'ひめ','ちゅーる'
+        ])
+        return text
+
     def carousel_columns(self):
         ret = []
 
@@ -468,7 +478,7 @@ class _Tabelog_Select:
                         MessageTemplateAction(
                             label='ここにする！', text='ここで！\n' + value.url),
                         MessageTemplateAction(
-                            label='ねこ', text=restaurant_message_text()),
+                            label='ねこ', text=self._tabelog_action_text()),
                     ]
                 )
             )
