@@ -1158,7 +1158,9 @@ def handle_text_message(event):
     if setting.check_access_allow(user_id):
         if setting.current_upload_category == 'tabelog/godrinking':
             
-            t_insert = Tabelog().insert.set_target_url(text)
+            t_insert = Tabelog().insert
+            t_insert.set_target_url(text)
+            print('[Debug]tabelog_url=' + t_insert.url)
 
             if t_insert.url_exists():
 
