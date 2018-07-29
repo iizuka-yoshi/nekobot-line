@@ -436,12 +436,9 @@ class _Tabelog_Select:
 
     def __init__(self):
         self.values = []
+        self.selected_count = 0
 
-        values = self._select_values()
-        for value in values:
-            self.values.append(_Tabelog_Value()._set_value_tp(value))
-
-    def _select_values(self):
+    def select_tanelog_links(self):
 
         sql = 'SELECT name, image_key, url, score, station, genre, hours \
 	           FROM public.tabelog \
@@ -451,11 +448,17 @@ class _Tabelog_Select:
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as curs:
 
-                curs.execute(sql,(self._LIMIT,))
-                if 0 < curs.rowcount:
+                curs.execute(sql, (self._LIMIT,))
+                self.selected_count = curs.rowcount
+                if 0 < self.selected_count:
                     values = curs.fetchall()
+                else:
+                    values = []
+                    
+        for value in values:
+            self.values.append(_Tabelog_Value()._set_value_tp(value))
 
-        return values
+        return self
 
     def _tabelog_action_text(self):
         text = random.choice([
@@ -1193,17 +1196,20 @@ def handle_text_message(event):
 
         t_select = Tabelog().select
 
-        carousel_template = CarouselTemplate(columns=t_select.carousel_columns())
-        template_message = TemplateSendMessage(
-            alt_text='Tabelog Carousel', template=carousel_template)
+        if t_select.selected_count > 1:
 
-        line_bot_api.reply_message(event.reply_token,
-            [
-                TextSendMessage(text=random.choice(['どこにしよう','かるくで'])),
-                template_message,
-            ]
-        )
-        return
+            carousel_template = CarouselTemplate(columns=t_select.carousel_columns())
+            template_message = TemplateSendMessage(
+                alt_text='Tabelog Carousel', template=carousel_template)
+
+            line_bot_api.reply_message(event.reply_token,
+                [
+                    TextSendMessage(text=random.choice(['どこにしよう','かるくで'])),
+                    template_message,
+                ]
+            )
+            return
+
 
     # 古いスペシャル判定
     elif message_pattern == 'ghost':
