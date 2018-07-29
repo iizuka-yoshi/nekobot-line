@@ -309,7 +309,7 @@ class _Tabelog_Value:
 
 class _Tabelog_Insert:
     _DOMAIN = ('tabelog.com', 's.tabelog.com')
-    _PATH_DIR_LEVEL = 5
+    _PATH_DIR_LEVEL = 6
 
     def __init__(self):
         self.value = _Tabelog_Value()
