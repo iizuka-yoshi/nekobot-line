@@ -419,7 +419,7 @@ class _Tabelog_Insert:
                         try:
                             hours += line.string + ' '
                         except:
-                            print('[Debug]_tabelog_scraping hours line.string=' + str(line.string)
+                            print('[Debug]_tabelog_scraping hours line.string=' + str(line.string))
 
         genre = genre.strip()
         hours = hours.strip()
