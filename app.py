@@ -461,7 +461,7 @@ class _Tabelog_Select:
                 CarouselColumn(
                     thumbnail_image_url=my_s3_presigned_url(value.image_key),
                     text=value.station + ' ' + value.genre + '\n' + value.hours,
-                    title=value.name + '[' + str(value.score) + ']',
+                    title=value.name + ' [' + str(value.score) + ']',
                     actions=[
                         URITemplateAction(
                             label='食べログを見る', uri=value.url),
@@ -469,11 +469,11 @@ class _Tabelog_Select:
                             label='ここにする！', text='ここで！\n' + value.url),
                         MessageTemplateAction(
                             label='ねこ', text=restaurant_message_text()),
-                    ])
+                    ]
+                )
             )
 
-        print('[Debug]carousel_columns ret=' + ret[0].title)
-
+        print('[Debug]carousel_columns title=' + ret[0].title + ' text=' + ret[0].text + ' thumbnail_image_url=' + ret[0].thumbnail_image_url)
         return ret
 
 
