@@ -387,6 +387,11 @@ class _Tabelog_Insert:
         )
 
         return self
+
+    def _normalize_hours(self, hours):
+        hoursn = hours
+        hoursn = neologdn.normalize(hoursn)
+        return hoursn
     
     def _tabelog_scraping(self):
         url = self.url
@@ -419,7 +424,7 @@ class _Tabelog_Insert:
                         hours += line.text + ' '
 
         genre = genre.strip()
-        hours = neologdn.normalize(hours)
+        hours = self._normalize_hours(hours)
 
         #image_key
         image_key = 'nekobot/tabelog/tabelog_default.jpg'
