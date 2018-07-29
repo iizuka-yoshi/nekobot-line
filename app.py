@@ -464,7 +464,6 @@ class _Tabelog_Select:
 
     def carousel_columns(self):
         ret = []
-
         for value in self.values:
             ret.append(
                 CarouselColumn(
@@ -483,6 +482,8 @@ class _Tabelog_Select:
             )
 
         print('[Debug]carousel_columns title=' + ret[0].title + ' text=' + ret[0].text + ' thumbnail_image_url=' + ret[0].thumbnail_image_url)
+        print('[Debug]carousel_columns title=' + ret[1].title + ' text=' + ret[1].text + ' thumbnail_image_url=' + ret[1].thumbnail_image_url)
+
         return ret
 
 
@@ -1195,9 +1196,10 @@ def handle_text_message(event):
 
         if t_select.selected_count > 0:
 
-            carousel_template = CarouselTemplate(columns=t_select.carousel_columns())
             template_message = TemplateSendMessage(
-                alt_text='Tabelog Carousel', template=carousel_template)
+                alt_text='Tabelog Carousel',
+                template=CarouselTemplate(columns=t_select.carousel_columns())
+            )
 
             line_bot_api.reply_message(event.reply_token,
                 [
