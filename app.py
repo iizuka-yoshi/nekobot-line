@@ -461,7 +461,7 @@ class _Tabelog_Select:
                 CarouselColumn(
                     thumbnail_image_url=my_s3_presigned_url(value.image_key),
                     text=value.station + ' ' + value.genre + '\n' + value.hours,
-                    title=value.name + '[' + value.score + ']',
+                    title=value.name + '[' + str(value.score) + ']',
                     actions=[
                         URITemplateAction(
                             label='食べログを見る', uri=value.url),
@@ -1287,7 +1287,7 @@ def handle_image_message(event):
             
             upload_to_s3_category(dist_path, setting.current_upload_category)
             
-            send_text = 'にゃー（画像ゲット）'
+            send_text = '画像もらった'
             line_bot_api.reply_message(
                 event.reply_token,TextSendMessage(text=send_text)
             )
