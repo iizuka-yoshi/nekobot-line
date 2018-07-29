@@ -469,8 +469,10 @@ class _Tabelog_Select:
                             label='ここにする！', text='ここで！\n' + value.url),
                         MessageTemplateAction(
                             label='ねこ', text=restaurant_message_text()),
-                    ]),
+                    ])
             )
+
+        print('[Debug]carousel_columns ret=' + ret[0].title)
 
         return ret
 
