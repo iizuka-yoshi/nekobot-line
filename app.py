@@ -914,124 +914,24 @@ def handle_text_message(event):
         elif entity_exact.name in {
             '@godrinking'
         }:
-            carousel_template = CarouselTemplate(columns=[
-                CarouselColumn(
-                    thumbnail_image_url=restaurant_image_url('zoot'),
-                    text='ラーメン、居酒屋、焼きとん\n'+'営業時間:17:00～24:00',
-                    title='ZOOT [浜松町]',
-                    actions=[
-                        URITemplateAction(
-                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
-                        MessageTemplateAction(
-                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13058997/'),
-                        MessageTemplateAction(
-                            label='ねこ', text=restaurant_message_text()),
-                    ]),
 
-                CarouselColumn(
-                    thumbnail_image_url=restaurant_image_url('seiren'),
-                    text='中華料理、中国鍋・火鍋、ラーメン\n'+'営業時間:17:00～23:00(L.O. 22:30)',
-                    title='青蓮 [浜松町]',
-                    actions=[
-                        URITemplateAction(
-                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13109938/'),
-                        MessageTemplateAction(
-                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13109938/'),
-                        MessageTemplateAction(
-                            label='ねこ', text=restaurant_message_text()),
-                    ]),
+            t_select = Tabelog().select
+            t_select.select_tanelog_links()
 
-                CarouselColumn(
-                    thumbnail_image_url=restaurant_image_url('uokin'),
-                    text='魚介料理・海鮮料理、居酒屋\n'+'営業時間:17:00～23:30',
-                    title='魚金 [浜松町]',
-                    actions=[
-                        URITemplateAction(
-                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13052364/'),
-                        MessageTemplateAction(
-                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13052364/'),
-                        MessageTemplateAction(
-                            label='ねこ', text=restaurant_message_text()),
-                    ]),
+            if t_select.selected_count > 0:
 
-                CarouselColumn(
-                    thumbnail_image_url=restaurant_image_url('risuke'),
-                    text='牛タン、麦とろ、カレーライス\n'+'営業時間:17:30～22:30',
-                    title='利助 [浜松町]',
-                    actions=[
-                        URITemplateAction(
-                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13014253/'),
-                        MessageTemplateAction(
-                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13014253/'),
-                        MessageTemplateAction(
-                            label='ねこ', text=restaurant_message_text()),
-                    ]),
+                template_message = TemplateSendMessage(
+                    alt_text='Tabelog Carousel',
+                    template=CarouselTemplate(columns=t_select.carousel_columns())
+                )
 
-                CarouselColumn(
-                    thumbnail_image_url=restaurant_image_url('bonanza'),
-                    text='ダイニングバー、ワインバー\n' +
-                    '営業時間:17:00～23:30(L.O.22:30、ドリンクL.O.23:00)',
-                    title='bonanza [浜松町]',
-                    actions=[
-                        URITemplateAction(
-                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13143248/'),
-                        MessageTemplateAction(
-                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13143248/'),
-                        MessageTemplateAction(
-                            label='ねこ', text=restaurant_message_text()),
-                    ]),
-
-                CarouselColumn(
-                    thumbnail_image_url=restaurant_image_url('tokaihntn'),
-                    text='王様のブランチ第２位の餃子\n'+'営業時間:17:00～23:00(L.O.22:20)',
-                    title='東海飯店 [浜松町]',
-                    actions=[
-                        URITemplateAction(
-                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13023334/'),
-                        MessageTemplateAction(
-                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13023334/'),
-                        MessageTemplateAction(
-                            label='ねこ', text=restaurant_message_text()),
-                    ]),
-
-                CarouselColumn(
-                    thumbnail_image_url=restaurant_image_url('settsu'),
-                    text='居酒屋、インドカレー、和食\n'+'営業時間:14:30〜23:00(L.O.22:15)',
-                    title='摂津 [浜松町]',
-                    actions=[
-                        URITemplateAction(
-                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13097178/'),
-                        MessageTemplateAction(
-                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13097178/'),
-                        MessageTemplateAction(
-                            label='ねこ', text=restaurant_message_text()),
-                    ]),
-
-                CarouselColumn(
-                    thumbnail_image_url=restaurant_image_url('uma8'),
-                    text='居酒屋、くじら料理\n'+'営業時間:16:30～23:30',
-                    title='旨蔵 うま八 [新橋]',
-                    actions=[
-                        URITemplateAction(
-                            label='食べログを見る', uri='https://tabelog.com/tokyo/A1301/A130103/13045442/'),
-                        MessageTemplateAction(
-                            label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1301/A130103/13045442/'),
-                        MessageTemplateAction(
-                            label='ねこ', text=restaurant_message_text()),
-                    ]),
-
-            ])
-            template_message = TemplateSendMessage(
-                alt_text='Carousel alt text', template=carousel_template)
-
-            line_bot_api.reply_message(event.reply_token,
-                [
-                    TextSendMessage(text=random.choice(['どこにしよう','かるくで'])),
-                    template_message,
-                ]
-            )
-            return
-
+                line_bot_api.reply_message(event.reply_token,
+                    [
+                        TextSendMessage(text=random.choice(['どこにしよう','かるくで'])),
+                        template_message,
+                    ]
+                )
+                return
 
         # イヌ判定（テシストを返信して退出）
         elif entity_exact.name in{'@dog'}:
@@ -1208,7 +1108,7 @@ def handle_text_message(event):
 
             line_bot_api.reply_message(event.reply_token,
                 [
-                    TextSendMessage(text=random.choice(['どこにしよう','かるくで'])),
+                    TextSendMessage(text=random.choice(['tabelog test','食べログ テスト'])),
                     template_message,
                 ]
             )
