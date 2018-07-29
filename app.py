@@ -416,11 +416,7 @@ class _Tabelog_Insert:
                 elif row.find('th').string == '営業時間':
                     lines = row.find_all('p')
                     for line in lines:
-                        print('[Debug]_tabelog_scraping hours line.string=' + str(line.string))
-                        try:
-                            hours += line.string + ' '
-                        except:
-                            pass
+                        hours += line.text + ' '
 
         genre = genre.strip()
         hours = hours.strip()
