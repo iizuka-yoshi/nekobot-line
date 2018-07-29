@@ -453,9 +453,9 @@ class _Tabelog_Select:
 
                 curs.execute(sql,(self._LIMIT,))
                 if 0 < curs.rowcount:
-                    _values = curs.fetchall()
+                    values = curs.fetchall()
 
-        return _values
+        return values
 
     def _tabelog_action_text(self):
         text = random.choice([
@@ -865,8 +865,6 @@ def handle_text_message(event):
     intent = Intent(textn).check_intent(False)
     entity_exact = Entity(textn).check_entity(True)
     entity_partial = Entity(textn).check_entity(False)
-    t_select = Tabelog().select
-    t_insert = Tabelog().insert.set_target_url(text)
     setting = Setting()
     
     #古い判定
@@ -1193,6 +1191,8 @@ def handle_text_message(event):
     send_text = ''
     if message_pattern == 'test':
 
+        t_select = Tabelog().select
+
         carousel_template = CarouselTemplate(columns=t_select.carousel_columns())
         template_message = TemplateSendMessage(
             alt_text='Carousel alt text', template=carousel_template)
@@ -1247,6 +1247,8 @@ def handle_text_message(event):
     #食べログのリンク判定
     if setting.check_access_allow(user_id):
         if setting.current_upload_category == 'tabelog/godrinking':
+            
+            t_insert = Tabelog().insert.set_target_url(text)
 
             if t_insert.url_exists():
 
