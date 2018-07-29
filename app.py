@@ -309,7 +309,7 @@ class _Tabelog_Value:
 
 class _Tabelog_Insert:
     _DOMAIN = ('tabelog.com', 's.tabelog.com')
-    _PATH_DIR_LEVEL = 6
+    _PATH_DIR_LEVEL = 5
 
     def __init__(self):
         self.value = _Tabelog_Value()
@@ -436,7 +436,7 @@ class _Tabelog_Insert:
         
 
 class _Tabelog_Select:
-    _LIMIT = 5
+    _LIMIT = 6
 
     def __init__(self):
         self.values = []
@@ -1160,7 +1160,6 @@ def handle_text_message(event):
             
             t_insert = Tabelog().insert
             t_insert.set_target_url(text)
-            print('[Debug]tabelog_url=' + t_insert.url)
 
             if t_insert.url_exists():
 
