@@ -459,7 +459,7 @@ class _Tabelog_Select:
         for value in self.values:
             ret.append(
                 CarouselColumn(
-                    thumbnail_image_url=my_s3_presigned_url(value.image_key),
+                    thumbnail_image_url=my_s3_link_url(value.image_key),
                     text=value.station + ' ' + value.genre + '\n' + value.hours,
                     title=value.name + ' [' + str(value.score) + ']',
                     actions=[
@@ -579,6 +579,10 @@ def my_s3_presigned_url(key):
             Params = {'Bucket' : AWS_S3_BUCKET_NAME, 'Key' : key},
             ExpiresIn = 259200,
             HttpMethod = 'GET')
+    return url
+
+def my_s3_link_url(key):
+    url = 'https://s3-ap-northeast-1.amazonaws.com/' + key
     return url
 
 def exist_key_s3(key):
