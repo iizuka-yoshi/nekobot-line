@@ -468,7 +468,7 @@ class _Tabelog_Select:
             columns.append(
                 CarouselColumn(
                     thumbnail_image_url=my_s3_link_url(value.image_key),
-                    title=(value.name + ' (' + str(value.score) + ')')[:40],
+                    title=(value.name + ' (' + '{:.2f}'.format(value.score) + ')')[:40],
                     text=(value.station + '\n' + value.hours)[:60],
                     actions=[
                         URITemplateAction(
