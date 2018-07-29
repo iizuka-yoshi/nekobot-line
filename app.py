@@ -1191,8 +1191,9 @@ def handle_text_message(event):
     if message_pattern == 'test':
 
         t_select = Tabelog().select
+        t_select.select_tanelog_links()
 
-        if t_select.selected_count > 1:
+        if t_select.selected_count > 0:
 
             carousel_template = CarouselTemplate(columns=t_select.carousel_columns())
             template_message = TemplateSendMessage(
