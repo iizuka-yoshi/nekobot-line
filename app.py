@@ -476,7 +476,7 @@ class _Tabelog_Select:
                 CarouselColumn(
                     thumbnail_image_url=my_s3_link_url(value.image_key),
                     title=(value.name + ' (' + '{:.2f}'.format(value.score) + ')')[:40],
-                    text=(value.station + '\n' + value.hours)[:60],
+                    text=(value.station + '\n' + value.genre)[:60],
                     actions=[
                         URITemplateAction(
                             label='食べログを見る', uri=value.url),
