@@ -468,8 +468,8 @@ class _Tabelog_Select:
             ret.append(
                 CarouselColumn(
                     thumbnail_image_url=my_s3_link_url(value.image_key),
-                    title=(value.name + ' [' + str(value.score) + ']')[:40],
-                    text=(value.station + ' ' + value.genre + ' ' + value.hours)[:60],
+                    title=(value.name + ' (' + str(value.score) + ')')[:40],
+                    text=(value.station + '\n' + value.hours)[:60],
                     actions=[
                         URITemplateAction(
                             label='食べログを見る', uri=value.url),
@@ -480,9 +480,6 @@ class _Tabelog_Select:
                     ]
                 )
             )
-
-        print('[Debug]carousel_columns title=' + ret[0].title + ' text=' + ret[0].text + ' thumbnail_image_url=' + ret[0].thumbnail_image_url)
-        print('[Debug]carousel_columns title=' + ret[1].title + ' text=' + ret[1].text + ' thumbnail_image_url=' + ret[1].thumbnail_image_url)
 
         return ret
 
