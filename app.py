@@ -284,37 +284,54 @@ class Setting():
         
         return ret
 
+class _Tabelog_Value:
+    def __init__(self):
+        self.name=''
+        self.image_key = ''
+        self.url = ''
+        self.score = 0.00
+        self.station = ''
+        self.genre = ''
+        self.hours = ''
 
-class Tabelog:
+    def _set_value_tp(self, value_tp):
+        self.name = value_tp[0]
+        self.image_key = value_tp[1]
+        self.url = value_tp[2]
+        self.score = value_tp[3]
+        self.station = value_tp[4]
+        self.genre = value_tp[5]
+        self.hours = value_tp[6]
+        return self
 
+    def _get_value_tp(self):
+        return (self.name,self.image_key,self.url,self.score,self.station,self.genre,self.hours)
+
+class _Tabelog_Insert:
     _DOMAIN = ('tabelog.com', 's.tabelog.com')
     _PATH_DIR_LEVEL = 5
 
     def __init__(self):
+        self.value = _Tabelog_Value()
         self.url = ''
-        self.exist = False
-        self.insert_value = ()
-        self.select_values = []
 
-    def set_tabelog_url(self, url):
-        if not self._is_tabelog_url(url):
-            return self
+    def set_target_url(self,target_url):
+        self.url = target_url
+        if self.is_tabelog_domain():
+            self.url = self._normalize_tabelog_url(self.url)
+        else:
+            self.url = ''
 
-        if self._url_exits(url):
-            self.exist = True
-            return self
-
-        self.url = self._normalize_tabelog_url(url)
         return self
 
-    def _is_tabelog_url(self, url):
-        url_parse = urllib.parse.urlparse(url)
+    def is_tabelog_domain(self):
+        url_parse = urllib.parse.urlparse(self.url)
         if url_parse.netloc in self._DOMAIN:
             return True
         else:
             return False
     
-    def _url_exits(self,url):
+    def url_exists(self):
         sql = 'SELECT name \
                 FROM public.tabelog \
                 WHERE url = %s;'
@@ -322,7 +339,7 @@ class Tabelog:
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as curs:
 
-                curs.execute(sql, (url,))
+                curs.execute(sql, (self.url,))
                 if 0 < curs.rowcount:
                     return True
                 else:
@@ -345,7 +362,7 @@ class Tabelog:
 
     def insert_tabelog_link(self):
         
-        self.insert_value = self._tabelog_scraping()
+        self.value._set_value_tp(self._tabelog_scraping())
 
         sql = 'INSERT INTO public.tabelog(\
                 name, image_key, url, score, station, genre, hours) \
@@ -354,19 +371,19 @@ class Tabelog:
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as curs:
 
-                curs.execute(sql, self.insert_value)
+                curs.execute(sql, self.value._get_value_tp())
                 conn.commit()
 
         print('[Event Log]'
             + ' insert_tabelog_link'
             + ' values=('
-            + str(self.insert_value[0]) + ', '
-            + str(self.insert_value[1]) + ', '
-            + str(self.insert_value[2]) + ', '
-            + str(self.insert_value[3]) + ', '
-            + str(self.insert_value[4]) + ', '
-            + str(self.insert_value[5]) + ', '
-            + str(self.insert_value[6]) + ')'
+            + str(self.value.name) + ', '
+            + str(self.value.image_key) + ', '
+            + str(self.value.url) + ', '
+            + str(self.value.score) + ', '
+            + str(self.value.station) + ', '
+            + str(self.value.genre) + ', '
+            + str(self.value.hours) + ')'
         )
 
         return self
@@ -407,21 +424,62 @@ class Tabelog:
         #image_key
         image_key = 'nekobot/tabelog/tabelog_default.jpg'
 
-        return (name, image_key, url, score, station, genre, hours,)   
+        return (name, image_key, url, score, station, genre, hours,)
+        
 
-    def select_tabelog_link(self):
+class _Tabelog_Select:
+    _LIMIT = 5
+
+    def __init__(self):
+        self.values = []
+
+        values = self._select_values()
+        for value in values:
+            self.values.append(_Tabelog_Value()._set_value_tp(value))
+
+    def _select_values(self):
 
         sql = 'SELECT name, image_key, url, score, station, genre, hours \
-	            FROM public.tabelog; '
-                
+	           FROM public.tabelog \
+               ORDER BY RANDOM() \
+               LIMIT %s ;'
+        
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as curs:
 
-                curs.execute(sql)
+                curs.execute(sql,(self._LIMIT,))
                 if 0 < curs.rowcount:
-                    self.select_values = curs.fetchall()
+                    _values = curs.fetchall()
 
-        return self
+        return _values
+
+    def carousel_columns(self):
+        ret = []
+
+        for value in self.values:
+            ret.append(
+                CarouselColumn(
+                    thumbnail_image_url=my_s3_presigned_url(value.image_key),
+                    text=value.station + ' ' + value.genre + '\n' + value.hours,
+                    title=value.name + '[' + value.score + ']',
+                    actions=[
+                        URITemplateAction(
+                            label='食べログを見る', uri=value.url),
+                        MessageTemplateAction(
+                            label='ここにする！', text='ここで！\n' + value.url),
+                        MessageTemplateAction(
+                            label='ねこ', text=restaurant_message_text()),
+                    ]),
+            )
+
+        return ret
+
+
+class Tabelog:
+
+    def __init__(self):
+        self.insert = _Tabelog_Insert()
+        self.select = _Tabelog_Select()
 
 
 def my_normalize(text):
@@ -501,19 +559,8 @@ def genelate_image_url_s3(category):
             + ' exist_thumb'
         )
         
-    s3_client = boto3.client('s3')
-    image_url = s3_client.generate_presigned_url(
-                    ClientMethod = 'get_object',
-                    Params = {'Bucket' : AWS_S3_BUCKET_NAME, 'Key' : image_key},
-                    ExpiresIn = 259200,
-                    HttpMethod = 'GET'
-                )
-    thumb_url = s3_client.generate_presigned_url(
-                    ClientMethod = 'get_object',
-                    Params = {'Bucket' : AWS_S3_BUCKET_NAME, 'Key' : thumb_key},
-                    ExpiresIn = 259200,
-                    HttpMethod = 'GET'
-                )
+    image_url = my_s3_presigned_url(image_key)
+    thumb_url = my_s3_presigned_url(thumb_key)
 
     print('[Image Log] genelate_image_url_s3'
         + ' generate_presigned_url'
@@ -523,6 +570,14 @@ def genelate_image_url_s3(category):
 
     return image_url, thumb_url
 
+def my_s3_presigned_url(key):
+    s3_client = boto3.client('s3')
+    url = s3_client.generate_presigned_url(
+            ClientMethod = 'get_object',
+            Params = {'Bucket' : AWS_S3_BUCKET_NAME, 'Key' : key},
+            ExpiresIn = 259200,
+            HttpMethod = 'GET')
+    return url
 
 def exist_key_s3(key):
     s3 = boto3.resource('s3')
@@ -794,7 +849,8 @@ def handle_text_message(event):
     intent = Intent(textn).check_intent(False)
     entity_exact = Entity(textn).check_entity(True)
     entity_partial = Entity(textn).check_entity(False)
-    tabelog = Tabelog().set_tabelog_url(text)
+    t_select = Tabelog().select
+    t_insert = Tabelog().insert.set_target_url(text)
     setting = Setting()
     
     #古い判定
@@ -1121,55 +1177,23 @@ def handle_text_message(event):
     send_text = ''
     if message_pattern == 'test':
 
-        name = tabelog.select_tabelog_link().select_values[0][0]
-        print(name)
+        carousel_template = CarouselTemplate(columns=t_select.carousel_columns())
+        template_message = TemplateSendMessage(
+            alt_text='Carousel alt text', template=carousel_template)
 
-        # carousel_template = CarouselTemplate(columns=[
-        #     CarouselColumn(
-        #         thumbnail_image_url=restaurant_image_url('zoot'),
-        #         text='ラーメン、居酒屋、焼きとん\n'+'営業時間:17:00～24:00',
-        #         title='ZOOT [浜松町]',
-        #         actions=[
-        #             URITemplateAction(
-        #                 label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13058997/'),
-        #             MessageTemplateAction(
-        #                 label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13058997/'),
-        #             MessageTemplateAction(
-        #                 label='ねこ', text=restaurant_message_text()),
-        #         ]),
-
-        #     CarouselColumn(
-        #         thumbnail_image_url=restaurant_image_url('seiren'),
-        #         text='中華料理、中国鍋・火鍋、ラーメン\n'+'営業時間:17:00～23:00(L.O. 22:30)',
-        #         title='青蓮 [浜松町]',
-        #         actions=[
-        #             URITemplateAction(
-        #                 label='食べログを見る', uri='https://tabelog.com/tokyo/A1314/A131401/13109938/'),
-        #             MessageTemplateAction(
-        #                 label='ここにする！', text='ここで！\n'+'https://tabelog.com/tokyo/A1314/A131401/13109938/'),
-        #             MessageTemplateAction(
-        #                 label='ねこ', text=restaurant_message_text()),
-        #         ]),
-
-        # ])
-        # template_message = TemplateSendMessage(
-        #     alt_text='Carousel alt text', template=carousel_template)
-
-        # line_bot_api.reply_message(event.reply_token,
-        #     [
-        #         TextSendMessage(text=random.choice(['どこにしよう','かるくで'])),
-        #         template_message,
-        #     ]
-        # )
-        # return
+        line_bot_api.reply_message(event.reply_token,
+            [
+                TextSendMessage(text=random.choice(['どこにしよう','かるくで'])),
+                template_message,
+            ]
+        )
+        return
 
     # 古いスペシャル判定
     elif message_pattern == 'ghost':
         if epsilon <= random.random():
             send_text = warning_message_text()
-            line_bot_api.reply_message(event.reply_token,
-                                       TextSendMessage(text=send_text)
-                                       )
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=send_text))
 
         else:
             line_bot_api.reply_message(event.reply_token,
@@ -1207,21 +1231,26 @@ def handle_text_message(event):
     #食べログのリンク判定
     if setting.check_access_allow(user_id):
         if setting.current_upload_category == 'tabelog/godrinking':
-            if tabelog.url != '':
+
+            if t_insert.url_exists():
+
+                send_text = 'もう知ってる'
+                line_bot_api.reply_message(
+                    event.reply_token,TextSendMessage(text=send_text)
+                )
+
+                return
+
+            if t_insert.is_tabelog_domain():
 
                 send_text = '食べログのリンクもらった'
                 line_bot_api.reply_message(
                     event.reply_token,TextSendMessage(text=send_text)
                 )
 
-                tabelog = tabelog.insert_tabelog_link()
+                t_insert.insert_tabelog_link()
 
-            elif tabelog.exist:
-
-                send_text = 'もう知ってる'
-                line_bot_api.reply_message(
-                    event.reply_token,TextSendMessage(text=send_text)
-                )
+                return
 
 
 @handler.add(MessageEvent, message=ImageMessage)
