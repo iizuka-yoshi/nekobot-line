@@ -1195,7 +1195,7 @@ def handle_text_message(event):
 
         carousel_template = CarouselTemplate(columns=t_select.carousel_columns())
         template_message = TemplateSendMessage(
-            alt_text='Carousel alt text', template=carousel_template)
+            alt_text='Tabelog Carousel', template=carousel_template)
 
         line_bot_api.reply_message(event.reply_token,
             [
