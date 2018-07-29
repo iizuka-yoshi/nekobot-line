@@ -419,7 +419,7 @@ class _Tabelog_Insert:
                         hours += line.text + ' '
 
         genre = genre.strip()
-        hours = hours.strip()
+        hours = neologdn.normalize(hours)
 
         #image_key
         image_key = 'nekobot/tabelog/tabelog_default.jpg'
@@ -463,9 +463,9 @@ class _Tabelog_Select:
         return text
 
     def carousel_columns(self):
-        ret = []
+        columns = []
         for value in self.values:
-            ret.append(
+            columns.append(
                 CarouselColumn(
                     thumbnail_image_url=my_s3_link_url(value.image_key),
                     title=(value.name + ' (' + str(value.score) + ')')[:40],
@@ -481,7 +481,7 @@ class _Tabelog_Select:
                 )
             )
 
-        return ret
+        return columns
 
 
 class Tabelog:
