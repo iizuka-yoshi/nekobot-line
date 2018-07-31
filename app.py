@@ -694,7 +694,16 @@ def shrink_image(source_path,save_path, target_width, target_height):
     return save_path
 
 
-def update_s3_thumb(prefix):
+def create_s3_thumb(image_key):
+    thumb_key = os.path.join('thumb', image_key)
+    thumb_path = download_from_s3(image_key)
+    thumb_path = shrink_image(thumb_path, thumb_path, 240, 240)
+    thumb_key = upload_to_s3(thumb_path, thumb_key)
+
+    return thumb_key
+
+
+def update_s3_thumb_bach(prefix):
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
 
@@ -706,16 +715,14 @@ def update_s3_thumb(prefix):
 
     #サムネイルが無ければ作成
     if not exist_key_s3(thumb_key):
-        thumb_path = download_from_s3(image_key)
-        thumb_path = shrink_image(thumb_path, thumb_path, 240, 240)
-        thumb_key = upload_to_s3(thumb_path, thumb_key)
+        thumb_key = create_s3_thumb(image_key)
 
         print('[Image Log] update_s3_thumb'
             + ' create'
             + ' image_key=' + image_key
             + ' thumb_key=' + thumb_key
-            + ' thumb_path=' + thumb_path
         )
+        
     else:
         print('[Image Log] update_s3_thumb'
             + ' exist'
@@ -1137,7 +1144,7 @@ def handle_text_message(event):
                             line_bot_api.reply_message(
                                 event.reply_token, TextMessage(text=send_text))
 
-                            update_s3_thumb('nekobot/image/')
+                            update_s3_thumb_bach('nekobot/image/')
 
                     return
 
