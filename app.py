@@ -722,13 +722,15 @@ def update_s3_thumb_bach(prefix):
             + ' image_key=' + image_key
             + ' thumb_key=' + thumb_key
         )
-        
+
     else:
         print('[Image Log] update_s3_thumb'
             + ' exist'
             + ' image_key=' + image_key
             + ' thumb_key=' + thumb_key
         )
+
+    return
 
 
 def get_message_pattern(text):
@@ -1259,6 +1261,11 @@ def handle_image_message(event):
     if setting.check_access_allow(user_id):
         if setting.current_upload_category.split('/')[0] == 'image':
 
+            send_text = '画像もらった'
+            line_bot_api.reply_message(
+                event.reply_token,TextSendMessage(text=send_text)
+            )
+
             message_content = line_bot_api.get_message_content(event.message.id)
 
             with tempfile.NamedTemporaryFile(dir=static_tmp_path, prefix=str_now+'-', delete=False) as tf:
@@ -1270,13 +1277,17 @@ def handle_image_message(event):
             dist_path = tf_path + extension
             os.rename(tf_path, dist_path)
             
-            upload_to_s3_category(dist_path, setting.current_upload_category)
-            
-            send_text = '画像もらった'
-            line_bot_api.reply_message(
-                event.reply_token,TextSendMessage(text=send_text)
+            image_key = upload_to_s3_category(dist_path, setting.current_upload_category)
+            thumb_key = create_s3_thumb(image_key)
+
+            print('[Image Log]'
+                    + ' image_message'
+                    + ' upload_image'
+                    + ' image_key=' + str(image_key)
+                    + ' thumb_key=' + str(thumb_key)
             )
 
+            return
 
 @handler.add(JoinEvent)
 def handle_join(event):
