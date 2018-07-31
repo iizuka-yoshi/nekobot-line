@@ -1149,7 +1149,7 @@ def handle_text_message(event):
                             line_bot_api.reply_message(
                                 event.reply_token, TextMessage(text=send_text))
 
-                            update_s3_thumb_bach('nekobot/image/')
+                            update_s3_thumb_bach('image')
 
                     return
 
