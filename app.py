@@ -596,9 +596,11 @@ def my_s3_presigned_url(key):
             HttpMethod = 'GET')
     return url
 
+
 def my_s3_link_url(key):
     url = 'https://s3-ap-northeast-1.amazonaws.com/' + key
     return url
+
 
 def exist_key_s3(key):
     s3 = boto3.resource('s3')
@@ -690,6 +692,36 @@ def shrink_image(source_path,save_path, target_width, target_height):
 
     img.save(save_path)
     return save_path
+
+
+def update_s3_thumb(prefix):
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
+
+    obj_collections = bucket.objects.filter(Prefix=prefix)
+    keys = [obj_summary.key for obj_summary in obj_collections if obj_summary.key.endswith('.jpg')]
+
+    for image_key in keys:
+        thumb_key = os.path.join('thumb', image_key)
+
+    #サムネイルが無ければ作成
+    if not exist_key_s3(thumb_key):
+        thumb_path = download_from_s3(image_key)
+        thumb_path = shrink_image(thumb_path, thumb_path, 240, 240)
+        thumb_key = upload_to_s3(thumb_path, thumb_key)
+
+        print('[Image Log] update_s3_thumb'
+            + ' create'
+            + ' image_key=' + image_key
+            + ' thumb_key=' + thumb_key
+            + ' thumb_path=' + thumb_path
+        )
+    else:
+        print('[Image Log] update_s3_thumb'
+            + ' exist'
+            + ' image_key=' + image_key
+            + ' thumb_key=' + thumb_key
+        )
 
 
 def get_message_pattern(text):
@@ -1089,6 +1121,23 @@ def handle_text_message(event):
                     if send_text != '':
                         line_bot_api.reply_message(
                             event.reply_token, TextMessage(text=send_text))
+
+                    return
+
+        elif intent.name == '#update':
+            
+            if entity_partial.match:
+                if entity_partial.position < intent.position:
+
+                    if entity_partial.name == '@thumb':
+                        if setting.enable_access_management == 'True':
+
+                            send_text = 'サムネイル更新しとく'
+
+                            line_bot_api.reply_message(
+                                event.reply_token, TextMessage(text=send_text))
+
+                            update_s3_thumb('nekobot/image/')
 
                     return
 
