@@ -705,8 +705,6 @@ def create_s3_thumb(image_key):
 
 def update_s3_thumb_bach(prefix):
 
-    print('[Debug] update_s3_thumb_bach start')
-
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(AWS_S3_BUCKET_NAME)
 
@@ -714,6 +712,7 @@ def update_s3_thumb_bach(prefix):
     keys = [obj_summary.key for obj_summary in obj_collections if obj_summary.key.endswith('.jpg')]
 
     for image_key in keys:
+        print('[Debug] update_s3_thumb_bach start')
 
         thumb_key = os.path.join('thumb', image_key)
 
