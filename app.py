@@ -711,6 +711,9 @@ def update_s3_thumb_bach(prefix):
     keys = [obj_summary.key for obj_summary in obj_collections if obj_summary.key.endswith('.jpg')]
 
     for image_key in keys:
+
+        print('[Debug] update_s3_thumb_bach image_key='+image_key)
+
         thumb_key = os.path.join('thumb', image_key)
 
         #サムネイルが無ければ作成
