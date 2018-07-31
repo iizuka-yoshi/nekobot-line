@@ -713,22 +713,22 @@ def update_s3_thumb_bach(prefix):
     for image_key in keys:
         thumb_key = os.path.join('thumb', image_key)
 
-    #サムネイルが無ければ作成
-    if not exist_key_s3(thumb_key):
-        thumb_key = create_s3_thumb(image_key)
+        #サムネイルが無ければ作成
+        if not exist_key_s3(thumb_key):
+            thumb_key = create_s3_thumb(image_key)
 
-        print('[Image Log] update_s3_thumb'
-            + ' create'
-            + ' image_key=' + image_key
-            + ' thumb_key=' + thumb_key
-        )
+            print('[Image Log] update_s3_thumb'
+                + ' create'
+                + ' image_key=' + image_key
+                + ' thumb_key=' + thumb_key
+            )
 
-    else:
-        print('[Image Log] update_s3_thumb'
-            + ' exist'
-            + ' image_key=' + image_key
-            + ' thumb_key=' + thumb_key
-        )
+        else:
+            print('[Image Log] update_s3_thumb'
+                + ' exist'
+                + ' image_key=' + image_key
+                + ' thumb_key=' + thumb_key
+            )
 
     return
 
