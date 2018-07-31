@@ -561,20 +561,20 @@ def genelate_image_url_s3(category):
         + ' thumb_key=' + thumb_key
     )
 
-    #サムネイルが無ければ作成
-    if not exist_key_s3(thumb_key):
-        thumb_path = download_from_s3(image_key)
-        thumb_path = shrink_image(thumb_path, thumb_path, 240, 240)
-        thumb_key = upload_to_s3(thumb_path, thumb_key)
+    # #サムネイルが無ければ作成
+    # if not exist_key_s3(thumb_key):
+    #     thumb_path = download_from_s3(image_key)
+    #     thumb_path = shrink_image(thumb_path, thumb_path, 240, 240)
+    #     thumb_key = upload_to_s3(thumb_path, thumb_key)
 
-        print('[Image Log] genelate_image_url_s3'
-            + ' create_thumb'
-            + ' thumb_path=' + thumb_path
-        )
-    else:
-        print('[Image Log] genelate_image_url_s3'
-            + ' exist_thumb'
-        )
+    #     print('[Image Log] genelate_image_url_s3'
+    #         + ' create_thumb'
+    #         + ' thumb_path=' + thumb_path
+    #     )
+    # else:
+    #     print('[Image Log] genelate_image_url_s3'
+    #         + ' exist_thumb'
+    #     )
         
     image_url = my_s3_presigned_url(image_key)
     thumb_url = my_s3_presigned_url(thumb_key)
