@@ -1153,6 +1153,19 @@ def handle_text_message(event):
 
                     return
 
+    #Entity部分一致の判定
+    if entity_partial.match:
+        
+        # 飲みニケーション判定
+        if entity_partial.name in {
+            '@nomicomm',
+        }:
+
+            line_bot_api.reply_message(
+                event.reply_token, TextMessage(text=random.choice(['いいね','いいですね','なるほど'])))
+
+        return
+
     # test判定
     send_text = ''
     if message_pattern == 'test':
