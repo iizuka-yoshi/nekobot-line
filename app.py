@@ -1019,23 +1019,22 @@ def handle_text_message(event):
         }:
         
             if entity_partial.match:
-                if entity_partial.position < intent.position:
 
-                    if entity_partial.name in {
-                        '@kitada','@wakamatsu','@yoneda','@ozeki',
-                    }:
-                        send_text = random.choice(['たしかに', '同意', 'そうね'])
-                        
-                    elif entity_partial.name in {
-                        '@yoshi'
-                    }:
-                        send_text = random.choice(['それはない'])
+                if entity_partial.name in {
+                    '@kitada','@wakamatsu','@yoneda','@ozeki',
+                }:
+                    send_text = random.choice(['たしかに', '同意', 'そうね'])
+                    
+                elif entity_partial.name in {
+                    '@yoshi'
+                }:
+                    send_text = random.choice(['それはない'])
 
-                    if send_text != '':
-                        line_bot_api.reply_message(
-                            event.reply_token, TextMessage(text=send_text))
+                if send_text != '':
+                    line_bot_api.reply_message(
+                        event.reply_token, TextMessage(text=send_text))
 
-                    return
+                return
 
         elif intent.name == '#change_setting':
             
