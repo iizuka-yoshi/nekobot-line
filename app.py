@@ -978,7 +978,9 @@ def handle_text_message(event):
                 return
 
         # イヌ判定（テシストを返信して退出）
-        elif entity_exact.name in{'@dog'}:
+        elif entity_exact.name in {
+            '@dog'
+        }:
 
             replies = text_send_messages_db(entity_exact, textn)
             line_bot_api.reply_message(event.reply_token, replies)
@@ -990,19 +992,21 @@ def handle_text_message(event):
 
             return
 
-        # 飲みニケーション判定
-        if entity_partial.name in {
+        # テキスト返信判定
+        elif entity_partial.name in {
             '@nomicomm',
         }:
 
             replies = text_send_messages_db(entity_exact)
+            line_bot_api.reply_message(event.reply_token, replies)
+            
+            return
+
+        #テキスト＋画像返信判定
+        else:
+
+            replies = text_send_messages_db(entity_exact) + image_send_messages_s3(entity_exact.category)
             line_bot_api.reply_message(event.reply_token,replies)
-
-        # #ノーマル返信判定（テキストとイメージを返信）
-        # else:
-
-        #     replies = text_send_messages_db(entity_exact) + image_send_messages_s3(entity_exact.category)
-        #     line_bot_api.reply_message(event.reply_token,replies)
 
             return
 
