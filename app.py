@@ -954,6 +954,16 @@ def handle_text_message(event):
 
             return
 
+        # 飲みニケーション判定
+        elif entity_exact.name in {
+            '@nomicomm',
+        }:
+
+            line_bot_api.reply_message(
+                event.reply_token, TextMessage(text=random.choice(['いいね','いいですね','なるほど'])))
+
+            return
+
         #飲みいく判定（食べログカルーセルを表示）
         elif entity_exact.name in {
             '@godrinking'
@@ -1164,7 +1174,7 @@ def handle_text_message(event):
             line_bot_api.reply_message(
                 event.reply_token, TextMessage(text=random.choice(['いいね','いいですね','なるほど'])))
 
-        return
+            return
 
     # test判定
     send_text = ''
