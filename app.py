@@ -1014,7 +1014,9 @@ def handle_text_message(event):
     #Intent一致の判定
     if intent.match:
 
-        if intent.name == '#is_bad':
+        if intent.name in {
+            '#is_bad','#bad_is',
+        }:
         
             if entity_partial.match:
                 if entity_partial.position < intent.position:
@@ -1034,7 +1036,6 @@ def handle_text_message(event):
                             event.reply_token, TextMessage(text=send_text))
 
                     return
-
 
         elif intent.name == '#change_setting':
             
@@ -1187,6 +1188,7 @@ def handle_text_message(event):
 
                     return
 
+
     #Entity部分一致の判定
     if entity_partial.match:
         
@@ -1199,6 +1201,7 @@ def handle_text_message(event):
             line_bot_api.reply_message(event.reply_token,replies)
 
             return
+
 
     # test判定
     send_text = ''
