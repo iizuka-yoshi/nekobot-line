@@ -954,16 +954,6 @@ def handle_text_message(event):
 
             return
 
-        # 飲みニケーション判定
-        elif entity_exact.name in {
-            '@nomicomm',
-        }:
-
-            line_bot_api.reply_message(
-                event.reply_token, TextMessage(text=random.choice(['いいね','いいですね','なるほど','ほう'])))
-
-            return
-
         #飲みいく判定（食べログカルーセルを表示）
         elif entity_exact.name in {
             '@godrinking'
@@ -1000,11 +990,19 @@ def handle_text_message(event):
 
             return
 
-        #ノーマル返信判定（テキストとイメージを返信）
-        else:
+        # 飲みニケーション判定
+        if entity_partial.name in {
+            '@nomicomm',
+        }:
 
-            replies = text_send_messages_db(entity_exact) + image_send_messages_s3(entity_exact.category)
+            replies = text_send_messages_db(entity_exact)
             line_bot_api.reply_message(event.reply_token,replies)
+
+        # #ノーマル返信判定（テキストとイメージを返信）
+        # else:
+
+        #     replies = text_send_messages_db(entity_exact) + image_send_messages_s3(entity_exact.category)
+        #     line_bot_api.reply_message(event.reply_token,replies)
 
             return
 
@@ -1012,7 +1010,29 @@ def handle_text_message(event):
     #Intent一致の判定
     if intent.match:
 
-        if intent.name == '#change_setting':
+        if intent.name == '#is_bad':
+        
+            if entity_partial.match:
+                if entity_partial.position < intent.position:
+
+                    if entity_partial.name in {
+                        '@kitada','@wakamatsu','@yoneda','@ozeki',
+                    }:
+                        send_text = random.choice(['たしかに', '同意', 'そうね'])
+                        
+                    elif entity_partial.name in {
+                        '@yoshi'
+                    }:
+                        send_text = random.choice(['それはない'])
+
+                    if send_text != '':
+                        line_bot_api.reply_message(
+                            event.reply_token, TextMessage(text=send_text))
+
+                    return
+
+
+        elif intent.name == '#change_setting':
             
             if setting.check_admin_line_user(user_id):
 
@@ -1171,8 +1191,8 @@ def handle_text_message(event):
             '@nomicomm',
         }:
 
-            line_bot_api.reply_message(
-                event.reply_token, TextMessage(text=random.choice(['いいね','いいですね','なるほど','ほう'])))
+            replies = text_send_messages_db(entity_partial)
+            line_bot_api.reply_message(event.reply_token,replies)
 
             return
 
