@@ -960,7 +960,7 @@ def handle_text_message(event):
         }:
 
             line_bot_api.reply_message(
-                event.reply_token, TextMessage(text=random.choice(['いいね','いいですね','なるほど'])))
+                event.reply_token, TextMessage(text=random.choice(['いいね','いいですね','なるほど','ほう'])))
 
             return
 
@@ -1172,7 +1172,7 @@ def handle_text_message(event):
         }:
 
             line_bot_api.reply_message(
-                event.reply_token, TextMessage(text=random.choice(['いいね','いいですね','なるほど'])))
+                event.reply_token, TextMessage(text=random.choice(['いいね','いいですね','なるほど','ほう'])))
 
             return
 
