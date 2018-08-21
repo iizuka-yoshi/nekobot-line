@@ -557,6 +557,30 @@ def insert_random_values(value, category):
 
     return
 
+def select_recent_random_value(category):
+
+    sql = 'SELECT value \
+            FROM public.random_values \
+            ORDER BY timestamp DESC \
+            LIMIT 1;'
+
+    with psycopg2.connect(DB_URL) as conn:
+        with conn.cursor() as curs:
+
+            curs.execute(sql, (category, ))
+            if 0 < curs.rowcount:
+                (value,) = curs.fetchone()
+            else:
+                value = ''
+
+    return value
+
+def same_random_value(current_value, recent_value):
+    if current_value == recent_value:
+        return True
+    else:
+        return False
+
 
 def genelate_image_url_s3(category):
 
@@ -566,8 +590,15 @@ def genelate_image_url_s3(category):
     obj_collections = bucket.objects.filter(Prefix=category)
     keys = [obj_summary.key for obj_summary in obj_collections if obj_summary.key.endswith('.jpg')]
 
-    image_key = random.choice(keys)
-    thumb_key = os.path.join('thumb', image_key)
+    same_key = True
+    while same_key:
+        image_key = random.choice(keys)
+        thumb_key = os.path.join('thumb', image_key)
+        
+        recent_key = select_recent_random_value(category)
+        same_key = same_random_value(image_key,recent_key)
+
+        print('[Debug] recent_key='+recent_key+'same_key='+same_key)
 
     insert_random_values(image_key, category)
 
