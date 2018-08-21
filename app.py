@@ -543,6 +543,20 @@ def text_send_messages_db(entity,prefix='',suffix=''):
 
     return messages
 
+def insert_random_values(value, case):
+
+    sql = 'INSERT INTO public.random_values(\
+            value, case, timestamp) \
+            VALUES(%s, %s, current_timestamp);'
+            
+    with psycopg2.connect(DB_URL) as conn:
+        with conn.cursor() as curs:
+
+            curs.execute(sql, (value,case,))
+            conn.commit()
+
+    return
+
 
 def genelate_image_url_s3(category):
 
@@ -554,6 +568,8 @@ def genelate_image_url_s3(category):
 
     image_key = random.choice(keys)
     thumb_key = os.path.join('thumb', image_key)
+
+    insert_random_values(image_key, 'image_key')
 
     print('[Image Log] genelate_image_url_s3'
         + ' random_choice'
