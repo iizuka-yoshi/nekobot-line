@@ -600,7 +600,7 @@ def genelate_image_url_s3(category):
         same_key = same_random_value(image_key, recent_key)
         counter += 1
 
-        print('[Debug] counter=' + counter
+        print('[Debug] counter=' + str(counter)
             + ' image_key=' + image_key
             + ' recent_key=' + recent_key
             + ' same_key=' + str(same_key)
