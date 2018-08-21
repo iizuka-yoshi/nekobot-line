@@ -598,7 +598,7 @@ def genelate_image_url_s3(category):
         recent_key = select_recent_random_value(category)
         same_key = same_random_value(image_key,recent_key)
 
-        print('[Debug] recent_key='+recent_key+'same_key='+same_key)
+        print('[Debug] recent_key='+recent_key+'same_key='+str(same_key))
 
     insert_random_values(image_key, category)
 
