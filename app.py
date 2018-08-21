@@ -591,14 +591,23 @@ def genelate_image_url_s3(category):
     keys = [obj_summary.key for obj_summary in obj_collections if obj_summary.key.endswith('.jpg')]
 
     same_key = True
+    counter = 0
     while same_key:
         image_key = random.choice(keys)
         thumb_key = os.path.join('thumb', image_key)
         
         recent_key = select_recent_random_value(category)
-        same_key = same_random_value(image_key,recent_key)
+        same_key = same_random_value(image_key, recent_key)
+        counter += 1
 
-        print('[Debug] recent_key='+recent_key+'same_key='+str(same_key))
+        print('[Debug] counter=' + counter
+            + ' image_key=' + image_key
+            + ' recent_key=' + recent_key
+            + ' same_key=' + str(same_key)
+        )
+
+        if counter >= 5:
+            break
 
     insert_random_values(image_key, category)
 
