@@ -22,6 +22,7 @@ import glob
 import sys
 import tempfile
 import random
+import math
 import psycopg2
 import boto3
 import neologdn
@@ -557,29 +558,39 @@ def insert_random_values(value, category):
 
     return
 
-def select_recent_random_value(category):
+def select_recent_random_values(category,limit):
 
     sql = 'SELECT value \
             FROM public.random_values \
+            WHERE category = %s \
             ORDER BY timestamp DESC \
-            LIMIT 1;'
+            LIMIT %s;'
 
     with psycopg2.connect(DB_URL) as conn:
         with conn.cursor() as curs:
 
-            curs.execute(sql, (category, ))
+            curs.execute(sql, (category,limit, ))
             if 0 < curs.rowcount:
-                (value,) = curs.fetchone()
+                values_tp = curs.fetchall()
+
+                values = []
+                for value_tp in values_tp:
+                    values.append(value_tp[0])
+
             else:
-                value = ''
+                values = []
 
-    return value
+    return values
 
-def same_random_value(current_value, recent_value):
-    if current_value == recent_value:
-        return True
-    else:
-        return False
+def same_random_value(current_value, recent_values):
+
+    ret = False
+
+    for recent_value in recent_values:
+        if current_value == recent_value:
+            ret = True
+
+    return ret
 
 
 def genelate_image_url_s3(category):
@@ -592,21 +603,27 @@ def genelate_image_url_s3(category):
 
     same_key = True
     counter = 0
+    limit = math.floor(len(keys)/2)
     while same_key:
         image_key = random.choice(keys)
         thumb_key = os.path.join('thumb', image_key)
         
-        recent_key = select_recent_random_value(category)
-        same_key = same_random_value(image_key, recent_key)
+        if limit == 0:
+            same_key = False
+
+        else:
+            recent_keys = select_recent_random_values(category,limit)
+            same_key = same_random_value(image_key, recent_keys)
+        
         counter += 1
 
         print('[Debug] counter=' + str(counter)
+            + ' limit=' + limit
             + ' image_key=' + image_key
-            + ' recent_key=' + recent_key
             + ' same_key=' + str(same_key)
         )
 
-        if counter >= 5:
+        if counter >= 3:
             break
 
     insert_random_values(image_key, category)
