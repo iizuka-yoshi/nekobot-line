@@ -618,8 +618,8 @@ def genelate_image_url_s3(category):
         counter += 1
 
         print('[Debug] counter=' + str(counter)
-            + ' limit=' + limit
-            + ' image_key=' + image_key
+            + ' limit=' + str(limit)
+            + ' image_key=' + str(image_key)
             + ' same_key=' + str(same_key)
         )
 
