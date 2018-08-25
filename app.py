@@ -1,17 +1,5 @@
 # -*- coding: utf-8 -*-
 
-#  Licensed under the Apache License, Version 2.0 (the 'License'); you may
-#  not use this file except in compliance with the License. You may obtain
-#  a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an 'AS IS' BASIS, WITHOUT
-#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#  License for the specific language governing permissions and limitations
-#  under the License.
-
 from __future__ import unicode_literals
 
 import errno
@@ -72,8 +60,6 @@ AWS_S3_BUCKET_NAME = 'nekobot'
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', None)
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', None)
 
-USER_ID_YOSHI = 'U35bca0dfb497d294737b7b25f4261a0b'
-
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
 
@@ -94,16 +80,16 @@ class Intent:
     def check_intent(self, exact_match=False):
 
         if exact_match:
-            sql = 'SELECT id, name, example, weight, POSITION(example IN %s) '\
-                'FROM public.intents '\
-                'WHERE example = %s '\
-                'ORDER BY weight DESC;'
+            sql = 'SELECT id, name, example, weight, POSITION(example IN %s) \
+                    FROM public.intents \
+                    WHERE example = %s \
+                    ORDER BY weight DESC;'
 
         else:
-            sql = 'SELECT id, name, example, weight, POSITION(example IN %s) '\
-                'FROM public.intents '\
-                'WHERE 0 < POSITION(example IN %s) '\
-                'ORDER BY weight DESC;'
+            sql = 'SELECT id, name, example, weight, POSITION(example IN %s) \
+                    FROM public.intents \
+                    WHERE 0 < POSITION(example IN %s) \
+                    ORDER BY weight DESC;'
 
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as curs:
@@ -137,16 +123,16 @@ class Entity:
     def check_entity(self, exact_match=False):
 
         if exact_match:
-            sql = 'SELECT id, name, synonym, weight, POSITION(synonym IN %s) '\
-                    'FROM public.entities '\
-                    'WHERE synonym = %s '\
-                    'ORDER BY weight DESC;'
+            sql = 'SELECT id, name, synonym, weight, POSITION(synonym IN %s) \
+                    FROM public.entities \
+                    WHERE synonym = %s \
+                    ORDER BY weight DESC;'
 
         else:
-            sql = 'SELECT id, name, synonym, weight, POSITION(synonym IN %s) '\
-                    'FROM public.entities '\
-                    'WHERE 0 < POSITION(synonym IN %s) '\
-                    'ORDER BY weight DESC;'
+            sql = 'SELECT id, name, synonym, weight, POSITION(synonym IN %s) \
+                    FROM public.entities \
+                    WHERE 0 < POSITION(synonym IN %s) \
+                    ORDER BY weight DESC;'
 
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as curs:
@@ -164,10 +150,10 @@ class Entity:
 
     def _get_category(self):
         
-        sql = 'SELECT name '\
-                'FROM public.categories '\
-                'WHERE entity = %s '\
-                'ORDER BY RANDOM() ;'
+        sql = 'SELECT name \
+                FROM public.categories \
+                WHERE entity = %s \
+                ORDER BY RANDOM();'
         
         if self.match:
 
@@ -188,13 +174,13 @@ class Entity:
 
 class Setting():
 
-    _sql_select = 'SELECT value '\
-                    'FROM public.settings '\
-                    'WHERE name = %s ;'
+    _sql_select = 'SELECT value \
+                    FROM public.settings \
+                    WHERE name = %s;'
 
-    _sql_update = 'UPDATE public.settings '\
-                    'SET value = %s '\
-                    'WHERE name = %s ;'
+    _sql_update = 'UPDATE public.settings \
+                    SET value = %s \
+                    WHERE name = %s;'
 
     def __init__(self):
 
@@ -285,6 +271,7 @@ class Setting():
         
         return ret
 
+
 class _Tabelog_Value:
     def __init__(self):
         self.name=''
@@ -307,6 +294,7 @@ class _Tabelog_Value:
 
     def _get_value_tp(self):
         return (self.name,self.image_key,self.url,self.score,self.station,self.genre,self.hours)
+
 
 class _Tabelog_Insert:
     _DOMAIN = ('tabelog.com', 's.tabelog.com')
@@ -466,9 +454,9 @@ class _Tabelog_Select:
         return self
 
     def _tabelog_action_text(self):
-        text = random.choice([
-            '猫', 'ねこ', 'ネコ', 'cat', 'neko', 'ひめ','ちゅーる'
-        ])
+        text = random.choice(
+            ['猫', 'ねこ', 'ネコ', 'cat', 'neko', 'ひめ', 'ちゅーる']
+        )
         return text
 
     def carousel_columns(self):
@@ -515,10 +503,10 @@ def my_normalize(text):
 
 def text_send_messages_db(entity,prefix='',suffix=''):
     
-    sql = 'SELECT DISTINCT ON (reply_order) text, reply_order '\
-            'FROM public.replies '\
-            'WHERE entity = %s '\
-            'ORDER BY reply_order ASC, RANDOM() ;'
+    sql = 'SELECT DISTINCT ON (reply_order) text, reply_order \
+            FROM public.replies \
+            WHERE entity = %s \
+            ORDER BY reply_order ASC, RANDOM();'
     
     if entity.match:
         with psycopg2.connect(DB_URL) as conn:
@@ -1042,12 +1030,9 @@ def handle_text_message(event):
                     template=CarouselTemplate(columns=t_select.carousel_columns())
                 )
 
-                line_bot_api.reply_message(event.reply_token,
-                    [
-                        TextSendMessage(text=random.choice(['どこにしよう','かるくで'])),
-                        template_message,
-                    ]
-                )
+                replies = text_send_messages_db(entity_exact) + template_message
+                line_bot_api.reply_message(event.reply_token,replies)
+
                 return
 
         # イヌ判定（テシストを返信して退出）
