@@ -873,13 +873,14 @@ def restaurant_image_url(restaurant):
     return image_url
 
 
-def warning_message_text():
-    text = random.choice([
-        '[警告] コマンドを拒否', '[警告] 危険なコマンド', '[警告] 禁止されています', '[警告] アクセスできません',
-        'やめろ', 'こら', '危険', '😾', 'あぶない',
-        '[?ｭｦ???] ??ｳ?????ｳ???????????ｦ', '[隴ｦ蜻馨 繧ｳ繝槭Φ繝峨ｒ諡貞凄'
-    ])
-    return text
+def warning_messages():
+    warning_entity = Entity
+    warning_entity.match = True
+    warning_entity.name = '@warning'
+
+    messages = text_send_messages_db(warning_entity)
+
+    return messages
 
 
 def restaurant_message_text():
@@ -1286,8 +1287,8 @@ def handle_text_message(event):
     # 古いスペシャル判定
     elif message_pattern == 'ghost':
         if epsilon <= random.random():
-            send_text = warning_message_text()
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=send_text))
+            replies = warning_messages()
+            line_bot_api.reply_message(event.reply_token,replies)
 
         else:
             line_bot_api.reply_message(event.reply_token,
@@ -1304,10 +1305,8 @@ def handle_text_message(event):
 
     elif message_pattern == 'gatarou':
         if epsilon <= random.random():
-            send_text = warning_message_text()
-            line_bot_api.reply_message(event.reply_token,
-                TextSendMessage(text=send_text)
-            )
+            replies = warning_messages()
+            line_bot_api.reply_message(event.reply_token,replies)
 
         else:
             line_bot_api.reply_message(event.reply_token,
