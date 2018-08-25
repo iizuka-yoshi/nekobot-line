@@ -798,23 +798,7 @@ def update_s3_thumb_bach(prefix):
 
 
 def get_message_pattern(text):
-    if text in{'くーちゃん', 'クーちゃん', 'クーチャン', 'ｸｰﾁｬﾝ', 'くー', 'クー', 'ｸｰ'}:
-        return 'neko_quu'
-
-    elif text in{'ちょこ', 'チョコ', 'ﾁｮｺ'}:
-        return 'neko_choco'
-
-    elif text in{
-        '漫画太郎', '漫☆画太郎',
-        'みっちー', 'ミッチー',
-        'みっちーさん', 'ミッチーサン',
-    }:
-        return 'gatarou'
-
-    elif text in{'おわかりいただけただろうか'}:
-        return 'ghost'
-
-    elif text in{'てすと', 'テスト', 'test'}:
+    if text in{'てすと', 'テスト', 'test'}:
         return 'test'
 
 
@@ -833,9 +817,6 @@ def get_img_dir(message_pattern):
         'test'
     }:
         return 'static/nekoimg'
-
-    else:
-        return 'static/specialimg'
 
 
 def image_send_message_dir(img_dir):
@@ -969,7 +950,7 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
 
-    epsilon = 0.05
+    epsilon = 0.1
     text = event.message.text
     textn = my_normalize(text)
 
@@ -980,7 +961,6 @@ def handle_text_message(event):
     
     #古い判定
     message_pattern = get_message_pattern(textn)
-    img_dir = get_img_dir(message_pattern)
 
     user_name, user_id, group_id, room_id = get_line_id(event)
     print('[Event Log]'
@@ -1006,43 +986,18 @@ def handle_text_message(event):
             '@gatarou','@ghost',
         }:
 
-            if entity_exact.name == '@gatarou':
+            if epsilon <= random.random():
+                replies = warning_messages()
+                line_bot_api.reply_message(event.reply_token,replies)
 
-                if epsilon <= random.random():
-                    replies = warning_messages()
-                    line_bot_api.reply_message(event.reply_token, replies)
+            else:
+                replies = text_send_messages_db(entity_exact)
+                replies.insert(
+                    1,
+                    image_send_messages_s3(entity_exact.category)
+                )
 
-                else:
-                    replies = text_send_messages_db(entity_exact)
-                    replies.insert(
-                        1,
-                        image_send_message_list(
-                            img_dir,
-                            ['IMG_0761.jpg', 'IMG_0761_2.jpg', 'IMG_0761.jpg', 'IMG_0761_2.jpg']
-                        )
-                    )
-
-                    line_bot_api.reply_message(event.reply_token,replies)
-
-
-            elif entity_exact.name == '@ghost':
-
-                if epsilon <= random.random():
-                    replies = warning_messages()
-                    line_bot_api.reply_message(event.reply_token,replies)
-
-                else:
-
-                    replies = text_send_messages_db(entity_exact)
-                    replies.insert(
-                        1,
-                        image_send_message_list(
-                            img_dir,
-                            ['IMG_0775.jpg', 'IMG_0847.jpg', 'IMG_0775.jpg', 'IMG_0847.jpg']
-                        )
-                    )
-
-                    line_bot_api.reply_message(event.reply_token, replies)
+                line_bot_api.reply_message(event.reply_token, replies)
 
             return
 
