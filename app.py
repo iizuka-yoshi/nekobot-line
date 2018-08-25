@@ -1030,7 +1030,8 @@ def handle_text_message(event):
                     template=CarouselTemplate(columns=t_select.carousel_columns())
                 )
 
-                replies = text_send_messages_db(entity_exact).append(template_message)
+                replies = text_send_messages_db(entity_exact)
+                replies = replies.append(template_message)
                 line_bot_api.reply_message(event.reply_token,replies)
 
                 return
