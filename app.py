@@ -1003,16 +1003,46 @@ def handle_text_message(event):
         
         # スペシャル判定
         if entity_exact.name in {
-            '@foo',
+            '@gatarou','@ghost',
         }:
 
-            # line_bot_api.reply_message(
-            #     event.reply_token,
-            #     [
-            #         text_send_messages_db(entity_exact)[0],
-            #         image_send_messages_s3(entity_exact.category)
-            #     ]
-            # )
+            if entity_exact.name == '@gatarou':
+
+                if epsilon <= random.random():
+                    replies = warning_messages()
+                    line_bot_api.reply_message(event.reply_token, replies)
+
+                else:
+                    replies = text_send_messages_db(entity_exact)
+                    replies.insert(
+                        1,
+                        image_send_message_list(
+                            img_dir,
+                            ['IMG_0761.jpg', 'IMG_0761_2.jpg', 'IMG_0761.jpg', 'IMG_0761_2.jpg']
+                        )
+                    )
+
+                    line_bot_api.reply_message(event.reply_token,replies)
+
+
+            elif entity_exact.name == '@ghost':
+
+                if epsilon <= random.random():
+                    replies = warning_messages()
+                    line_bot_api.reply_message(event.reply_token,replies)
+
+                else:
+
+                    replies = text_send_messages_db(entity_exact)
+                    replies.insert(
+                        1,
+                        image_send_message_list(
+                            img_dir,
+                            ['IMG_0775.jpg', 'IMG_0847.jpg', 'IMG_0775.jpg', 'IMG_0847.jpg']
+                        )
+                    )
+
+                    line_bot_api.reply_message(event.reply_token, replies)
 
             return
 
@@ -1282,44 +1312,6 @@ def handle_text_message(event):
                 ]
             )
             return
-
-
-    # 古いスペシャル判定
-    elif message_pattern == 'ghost':
-        if epsilon <= random.random():
-            replies = warning_messages()
-            line_bot_api.reply_message(event.reply_token,replies)
-
-        else:
-            line_bot_api.reply_message(event.reply_token,
-                [
-                    TextSendMessage(text=random.choice(
-                        ['笞??冗┌蜉ｹ縺ｪ繧ｳ繝槭Φ繝', '縺翫ｏ縺九ｊ縺?◆縺?縺代◆縺?繧阪≧縺'])),
-                    image_send_message_list(
-                        img_dir, ['IMG_0775.jpg', 'IMG_0847.jpg', 'IMG_0775.jpg', 'IMG_0847.jpg']),
-                    TextSendMessage(text='...'),
-                    TextSendMessage(text='エラー')
-                ]
-            )
-        return
-
-    elif message_pattern == 'gatarou':
-        if epsilon <= random.random():
-            replies = warning_messages()
-            line_bot_api.reply_message(event.reply_token,replies)
-
-        else:
-            line_bot_api.reply_message(event.reply_token,
-                [
-                    TextSendMessage(text=random.choice(
-                        ['??ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ?????ｷ??｣??ｼ', '･ｷ･罍ｼ｡｡･ｷ･罍ｼ｡｡･ｷ･罍ｼ'])),
-                    image_send_message_list(
-                        img_dir, ['IMG_0761.jpg', 'IMG_0761_2.jpg', 'IMG_0761.jpg', 'IMG_0761_2.jpg']),
-                    TextSendMessage(text='...'),
-                    TextSendMessage(text='エラー')
-                ]
-            )
-        return
 
     #食べログのリンク判定
     if setting.check_access_allow(user_id):
