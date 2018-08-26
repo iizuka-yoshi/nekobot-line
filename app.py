@@ -571,7 +571,7 @@ class _Tabelog_Select:
                             IconComponent(size='sm', url=stars_url[4]),
                             TextComponent(
                                 text='{:.2f}'.format(value.score),
-                                size='lg', color='#999999', margin='md',flex=0)
+                                size='md', color='#999999', margin='md',flex=0)
                         ]
                     ),
                     # info
@@ -633,11 +633,6 @@ class _Tabelog_Select:
                         action=URIAction(label='地図を見る', uri=map_url),
                     ),
                     # SeparatorComponent(),
-                    ButtonComponent(
-                        style='link',
-                        height='sm',
-                        action=MessageAction(label='行く', text='行きます')
-                    ),
                     ButtonComponent(
                         style='link',
                         height='sm',
