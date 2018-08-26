@@ -344,7 +344,7 @@ class _Tabelog_Scraping:
         #image_key
         image_key = 'nekobot/tabelog/tabelog_default.jpg'
 
-        self.value = self.value.set_value_tp(name, image_key, url, score, station, genre, hours,)
+        self.value.set_value_tp((name, image_key, url, score, station, genre, hours,))
 
         return self
 
