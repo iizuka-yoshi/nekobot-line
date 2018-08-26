@@ -1242,14 +1242,16 @@ def handle_text_message(event):
                 return
 
         #tabelogリンク判定
-        elif entity_exact.name.startswith('tabelog_'):
+        elif entity_exact.name.startswith('@tabelog_'):
 
             t_select = Tabelog().select
             flex = t_select.flex_send_message_entity(entity_exact.name)
 
             if flex != False:
                 replies = [TextSendMessage(text=random.choice(['おーけー', 'りょうかい'])),flex]
-                line_bot_api.reply_message(event.reply_token,replies)
+                line_bot_api.reply_message(event.reply_token, replies)
+                
+                return
 
         # イヌ判定（テシストを返信して退出）
         elif entity_exact.name in {
@@ -1485,15 +1487,16 @@ def handle_text_message(event):
             return
 
         #tabelogリンク判定
-        elif entity_partial.name.startswith('tabelog_'):
+        elif entity_partial.name.startswith('@tabelog_'):
 
             t_select = Tabelog().select
             flex = t_select.flex_send_message_entity(entity_partial.name)
 
             if flex != False:
                 replies = [TextSendMessage(text=random.choice(['おーけー', 'りょうかい'])),flex]
-                line_bot_api.reply_message(event.reply_token,replies)
-            
+                line_bot_api.reply_message(event.reply_token, replies)
+                
+                return
 
     # test判定
     send_text = ''
