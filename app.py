@@ -636,7 +636,7 @@ class _Tabelog_Select:
                     ButtonComponent(
                         style='link',
                         height='sm',
-                        action=MessageAction(label='ねこ', text=self._tabelog_action_text())
+                        action=MessageAction(label='ねこ', text='ねこ')
                     )
                 ]
             ),
