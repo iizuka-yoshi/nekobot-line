@@ -24,18 +24,23 @@ from linebot import (
     LineBotApi, WebhookHandler
 )
 from linebot.exceptions import (
-    InvalidSignatureError
+    LineBotApiError, InvalidSignatureError
 )
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,
     SourceUser, SourceGroup, SourceRoom,
-    TemplateSendMessage, ConfirmTemplate, MessageTemplateAction,
-    ButtonsTemplate, ImageCarouselTemplate, ImageCarouselColumn, URITemplateAction,
-    PostbackTemplateAction, DatetimePickerTemplateAction,
+    TemplateSendMessage, ConfirmTemplate, MessageAction,
+    ButtonsTemplate, ImageCarouselTemplate, ImageCarouselColumn, URIAction,
+    PostbackAction, DatetimePickerAction,
+    CameraAction, CameraRollAction, LocationAction,
     CarouselTemplate, CarouselColumn, PostbackEvent,
     StickerMessage, StickerSendMessage, LocationMessage, LocationSendMessage,
     ImageMessage, VideoMessage, AudioMessage, FileMessage,
-    UnfollowEvent, FollowEvent, JoinEvent, LeaveEvent, BeaconEvent, ImageSendMessage
+    UnfollowEvent, FollowEvent, JoinEvent, LeaveEvent, BeaconEvent,
+    FlexSendMessage, BubbleContainer, ImageComponent, BoxComponent,
+    TextComponent, SpacerComponent, IconComponent, ButtonComponent,
+    SeparatorComponent, QuickReply, QuickReplyButton,
+    ImageSendMessage
 )
 
 app = Flask(__name__)
@@ -461,6 +466,22 @@ class _Tabelog_Select:
 
         return self
 
+    def select_tabelog_entity(self, entity_name):
+        sql = 'SELECT name, image_key, url, score, station, genre, hours \
+                    FROM public.tabelog \
+                    WHERER entity = %s;'
+
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(sql, (entity_name,))
+                if 0 < curs.rowcount:
+                    value = curs.fetchone()
+                else:
+                    value = ()
+
+        return value
+
     def _tabelog_action_text(self):
         text = random.choice(
             ['猫', 'ねこ', 'ネコ', 'cat', 'neko', 'ひめ', 'ちゅーる']
@@ -476,11 +497,11 @@ class _Tabelog_Select:
                     title=(value.name + ' (' + '{:.2f}'.format(value.score) + ')')[:40],
                     text=(value.station + '\n' + value.genre)[:60],
                     actions=[
-                        URITemplateAction(
+                        URIAction(
                             label='食べログを見る', uri=value.url),
-                        MessageTemplateAction(
+                        MessageAction(
                             label='ここにする！', text='ここで！\n' + value.url),
-                        MessageTemplateAction(
+                        MessageAction(
                             label='ねこ', text=self._tabelog_action_text()),
                     ]
                 )
@@ -488,6 +509,141 @@ class _Tabelog_Select:
 
         return columns
 
+    def _review_stars_url(self, score):
+        gold_star_image_url = my_s3_link_url('nekobot/tabelog/star_image/gold_star_28.png')
+        harf_star_image_url = my_s3_link_url('nekobot/tabelog/star_image/half_star_28.png')
+        gray_star_image_url = my_s3_link_url('nekobot/tabelog/star_image/gray_star_28.png')
+
+        stars = []
+        for i in range(5):
+            if (score - i) >= 1:
+                stars.append(gold_star_image_url)
+            elif (score - i) >= 0.5:
+                stars.append(harf_star_image_url)
+            else:
+                stars.append(gray_star_image_url)
+
+        return stars
+
+    def flex_send_message_entity(self, entity):
+        if entity.match == False:
+            return False
+
+        value = _Tabelog_Value()
+        value.set_value_tp(self.select_tabelog_entity(entity.name))
+        
+        if value.name == '':
+            return False
+
+        stars_url = self._review_stars_url(value.score)
+
+        bubble = BubbleContainer(
+            hero=ImageComponent(
+                url=value.image_key,
+                size='full',
+                aspect_ratio='20:13',
+                aspect_mode='cover',
+                action=URIAction(
+                    uri=value.url
+                )
+            ),
+            body=BoxComponent(
+                layout='vertical',
+                contents=[
+                    # title
+                    TextComponent(text=value.name,
+                        weight='bold',
+                        size='xl'
+                    ),
+                    # review
+                    BoxComponent(
+                        layout='baseline',
+                        margin='md',
+                        contents=[
+                            IconComponent(size='sm', url=stars_url[0]),
+                            IconComponent(size='sm', url=stars_url[1]),
+                            IconComponent(size='sm', url=stars_url[2]),
+                            IconComponent(size='sm', url=stars_url[3]),
+                            IconComponent(size='sm', url=stars_url[4]),
+                            TextComponent(
+                                text='{:.2f}'.format(value.score),
+                                size='sm', color='#999999', margin='md',flex=0)
+                        ]
+                    ),
+                    # info
+                    BoxComponent(
+                        layout='vertical',
+                        margin='lg',
+                        spacing='sm',
+                        contents=[
+                            BoxComponent(
+                                layout='baseline',
+                                spacing='sm',
+                                contents=[
+                                    TextComponent(
+                                        text='Station',
+                                        color='#aaaaaa',
+                                        size='sm',
+                                        flex=1
+                                    ),
+                                    TextComponent(
+                                        text=value.station,
+                                        wrap=True,
+                                        color='#666666',
+                                        size='sm',
+                                        flex=5
+                                    )
+                                ],
+                            ),
+                            BoxComponent(
+                                layout='baseline',
+                                spacing='sm',
+                                contents=[
+                                    TextComponent(
+                                        text='Genre',
+                                        color='#aaaaaa',
+                                        size='sm',
+                                        flex=1
+                                    ),
+                                    TextComponent(
+                                        text=value.genre,
+                                        wrap=True,
+                                        color='#666666',
+                                        size='sm',
+                                        flex=5,
+                                    ),
+                                ],
+                            ),
+                        ],
+                    )
+                ],
+            ),
+            footer=BoxComponent(
+                layout='vertical',
+                spacing='sm',
+                contents=[
+                    # callAction, separator, websiteAction
+                    SpacerComponent(size='sm'),
+                    # callAction
+                    ButtonComponent(
+                        style='link',
+                        height='sm',
+                        action=URIAction(label='食べログを見る', uri=value.url),
+                    ),
+                    # separator
+                    SeparatorComponent(),
+                    # websiteAction
+                    ButtonComponent(
+                        style='link',
+                        height='sm',
+                        action=URIAction(label='WEBSITE', uri="https://example.com")
+                    )
+                ]
+            ),
+        )
+
+        message = FlexSendMessage(alt_text="tabelog flex", contents=bubble)
+        return message
 
 class _Tabelog_Update:
     _SLEEP_SECOND = 3
@@ -1085,6 +1241,16 @@ def handle_text_message(event):
 
                 return
 
+        #tabelogリンク判定
+        elif entity_exact.name.startswith('tabelog_'):
+
+            t_select = Tabelog().select
+            flex = t_select.flex_send_message_entity(entity_exact.name)
+
+            if flex != False:
+                replies = [TextSendMessage(text=random.choice(['おーけー', 'りょうかい'])),flex]
+                line_bot_api.reply_message(event.reply_token,replies)
+
         # イヌ判定（テシストを返信して退出）
         elif entity_exact.name in {
             '@dog'
@@ -1318,6 +1484,16 @@ def handle_text_message(event):
 
             return
 
+        #tabelogリンク判定
+        elif entity_partial.name.startswith('tabelog_'):
+
+            t_select = Tabelog().select
+            flex = t_select.flex_send_message_entity(entity_partial.name)
+
+            if flex != False:
+                replies = [TextSendMessage(text=random.choice(['おーけー', 'りょうかい'])),flex]
+                line_bot_api.reply_message(event.reply_token,replies)
+            
 
     # test判定
     send_text = ''
