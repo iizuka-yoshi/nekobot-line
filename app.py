@@ -585,9 +585,9 @@ class _Tabelog_Select:
                                 spacing='sm',
                                 contents=[
                                     TextComponent(
-                                        text='Station',
+                                        text='最寄り駅',
                                         color='#aaaaaa',
-                                        size='sm',
+                                        size='xs',
                                         flex=1
                                     ),
                                     TextComponent(
@@ -595,7 +595,7 @@ class _Tabelog_Select:
                                         wrap=True,
                                         color='#666666',
                                         size='sm',
-                                        flex=4
+                                        flex=3
                                     )
                                 ],
                             ),
@@ -604,9 +604,9 @@ class _Tabelog_Select:
                                 spacing='sm',
                                 contents=[
                                     TextComponent(
-                                        text='Genre',
+                                        text='ジャンル',
                                         color='#aaaaaa',
-                                        size='sm',
+                                        size='xs',
                                         flex=1
                                     ),
                                     TextComponent(
@@ -614,7 +614,7 @@ class _Tabelog_Select:
                                         wrap=True,
                                         color='#666666',
                                         size='sm',
-                                        flex=4,
+                                        flex=3
                                     ),
                                 ],
                             ),
@@ -634,8 +634,8 @@ class _Tabelog_Select:
                         height='sm',
                         action=URIAction(label='地図を見る', uri=map_url),
                     ),
-                    # separator
-                    SeparatorComponent(),
+                    # # separator
+                    # SeparatorComponent(),
                     # websiteAction
                     ButtonComponent(
                         style='link',
