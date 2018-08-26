@@ -526,7 +526,7 @@ class _Tabelog_Select:
         return stars
 
     def flex_send_message_entity(self, entity):
-        if entity.match == False:
+        if not entity.match:
             return False
 
         value = _Tabelog_Value()
@@ -1247,7 +1247,7 @@ def handle_text_message(event):
             t_select = Tabelog().select
             flex = t_select.flex_send_message_entity(entity_exact.name)
 
-            if flex != False:
+            if flex:
                 replies = [TextSendMessage(text=random.choice(['おーけー', 'りょうかい'])),flex]
                 line_bot_api.reply_message(event.reply_token, replies)
                 
