@@ -537,6 +537,7 @@ class _Tabelog_Select:
             return False
 
         image_url = my_s3_link_url(value.image_key)
+        map_url = value.url + 'dtlmap/'
         stars_url = self._review_stars_url(value.score)
 
         bubble = BubbleContainer(
@@ -594,7 +595,7 @@ class _Tabelog_Select:
                                         wrap=True,
                                         color='#666666',
                                         size='sm',
-                                        flex=5
+                                        flex=4
                                     )
                                 ],
                             ),
@@ -613,7 +614,7 @@ class _Tabelog_Select:
                                         wrap=True,
                                         color='#666666',
                                         size='sm',
-                                        flex=5,
+                                        flex=4,
                                     ),
                                 ],
                             ),
@@ -629,9 +630,9 @@ class _Tabelog_Select:
                     SpacerComponent(size='sm'),
                     # callAction
                     ButtonComponent(
-                        style='link',
+                        style='primary',
                         height='sm',
-                        action=URIAction(label='食べログを見る', uri=value.url),
+                        action=URIAction(label='地図を見る', uri=map_url),
                     ),
                     # separator
                     SeparatorComponent(),
@@ -639,7 +640,7 @@ class _Tabelog_Select:
                     ButtonComponent(
                         style='link',
                         height='sm',
-                        action=URIAction(label='WEBSITE', uri="https://example.com")
+                        action=MessageAction(label='ねこ', text=self._tabelog_action_text())
                     )
                 ]
             ),
