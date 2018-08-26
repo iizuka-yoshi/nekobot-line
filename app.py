@@ -1396,25 +1396,25 @@ def handle_text_message(event):
                     if entity_partial.position < intent.position:
 
                         if entity_partial.name == '@neko_image':
-                            setting.update_current_upload_category('image/neko')
+                            setting.update_current_upload_category('image/neko/')
                             send_text = 'ねこ画像を送って'
 
                         elif entity_partial.name == '@neko_cyu-ru_image':
-                            setting.update_current_upload_category('image/neko_cyu-ru')
+                            setting.update_current_upload_category('image/neko_cyu-ru/')
                             send_text = 'ちゅーる画像を送って'
 
                         elif entity_partial.name == '@kitada_image':
-                            setting.update_current_upload_category('image/kitada')
+                            setting.update_current_upload_category('image/kitada/')
                             send_text = '北田さん画像を送って'
 
                         elif entity_partial.name == '@wakamatsu_image':
-                            setting.update_current_upload_category('image/gakky')
+                            setting.update_current_upload_category('image/gakky/')
                             send_text = '若松さん（ガッキー）画像を送って'
 
                         elif entity_partial.name in {
                             '@tebelog_link', '@tabelog_izakaya',
                         }:
-                            setting.update_current_upload_category('tabelog/godrinking')
+                            setting.update_current_upload_category('tabelog/godrinking/')
                             send_text = '食べログのリンク送って'
 
                         if send_text != '':
@@ -1522,7 +1522,7 @@ def handle_text_message(event):
 
     #食べログのリンク判定
     if setting.check_access_allow(user_id):
-        if setting.current_upload_category == 'tabelog/godrinking':
+        if setting.current_upload_category == 'tabelog/godrinking/':
             
             t_insert = Tabelog().insert
             t_insert.set_target_url(text)
