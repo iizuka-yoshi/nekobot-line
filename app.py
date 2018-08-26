@@ -814,6 +814,9 @@ def genelate_image_url_s3(category):
     obj_collections = bucket.objects.filter(Prefix=category)
     keys = [obj_summary.key for obj_summary in obj_collections if obj_summary.key.endswith('.jpg')]
 
+    if not keys:
+        return '',''
+
     same_key = True
     counter = 0
     limit = math.floor(len(keys)/2)
@@ -934,10 +937,13 @@ def image_send_messages_s3(category):
 
     image_url, thumb_url = genelate_image_url_s3(category)
 
-    message = [ImageSendMessage(
-        original_content_url=image_url,
-        preview_image_url=thumb_url
-    )]
+    if not image_url:
+        message = []
+    else:
+        message = [ImageSendMessage(
+            original_content_url=image_url,
+            preview_image_url=thumb_url
+        )]
 
     return message
 
@@ -1245,7 +1251,7 @@ def handle_text_message(event):
         elif entity_exact.name.startswith('@tabelog_'):
 
             t_select = Tabelog().select
-            flex = t_select.flex_send_message_entity(entity_exact.name)
+            flex = t_select.flex_send_message_entity(entity_exact)
 
             if flex:
                 replies = [TextSendMessage(text=random.choice(['おーけー', 'りょうかい'])),flex]
@@ -1280,12 +1286,10 @@ def handle_text_message(event):
 
         #テキスト＋画像返信判定
         else:
-
             replies = text_send_messages_db(entity_exact) + image_send_messages_s3(entity_exact.category)
-            line_bot_api.reply_message(event.reply_token,replies)
-
-            return
-
+            if replies:
+                line_bot_api.reply_message(event.reply_token,replies)
+                return
 
     #Intent一致の判定
     if intent.match:
@@ -1490,7 +1494,7 @@ def handle_text_message(event):
         elif entity_partial.name.startswith('@tabelog_'):
 
             t_select = Tabelog().select
-            flex = t_select.flex_send_message_entity(entity_partial.name)
+            flex = t_select.flex_send_message_entity(entity_partial)
 
             if flex != False:
                 replies = [TextSendMessage(text=random.choice(['おーけー', 'りょうかい'])),flex]
