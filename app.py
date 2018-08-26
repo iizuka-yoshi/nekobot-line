@@ -493,7 +493,6 @@ class _Tabelog_Update:
     _SLEEP_SECOND = 3
 
     def __init__(self):
-        self.value = _Tabelog_Value()
         self.scraping = _Tabelog_Scraping()
 
     def _select_all_keys(self):
@@ -522,19 +521,19 @@ class _Tabelog_Update:
 
                 curs.execute(
                     sql,
-                    (self.value.name, self.value.score, self.value.station, self.value.genre, self.value.hours, id)
+                    (value.name, value.score, value.station, value.genre, value.hours, id)
                 )
                 conn.commit()
 
         print('[Event Log]'
             + ' update_tabelog_link'
-            + ' id=' + id
+            + ' id=' + str(id)
             + ' values=('
-            + str(self.value.name) + ', '
-            + str(self.value.score) + ', '
-            + str(self.value.station) + ', '
-            + str(self.value.genre) + ', '
-            + str(self.value.hours) + ')'
+            + str(value.name) + ', '
+            + str(value.score) + ', '
+            + str(value.station) + ', '
+            + str(value.genre) + ', '
+            + str(value.hours) + ')'
         )
 
     def update_link_batch(self):
@@ -549,6 +548,7 @@ class _Tabelog_Update:
 
         print('[Debug] _Tabelog_Update.update_link_batch end')
         return
+        
 
 class Tabelog:
 
