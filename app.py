@@ -405,7 +405,7 @@ class _Tabelog_Insert:
 
     def insert_tabelog_link(self):
         
-        self.value = (self.scraping.tabelog_scraping(self.url))
+        self.value = self.scraping.tabelog_scraping(self.url).value
 
         sql = 'INSERT INTO public.tabelog(\
                 name, image_key, url, score, station, genre, hours) \
@@ -548,7 +548,7 @@ class _Tabelog_Update:
 
         print('[Debug] _Tabelog_Update.update_link_batch end')
         return
-        
+
 
 class Tabelog:
 
