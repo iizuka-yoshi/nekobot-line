@@ -988,17 +988,12 @@ def handle_text_message(event):
 
             if epsilon <= random.random():
                 replies = warning_messages()
-                line_bot_api.reply_message(event.reply_token,replies)
-
+                
             else:
                 replies = text_send_messages_db(entity_exact)
-                replies.insert(
-                    1,
-                    image_send_messages_s3(entity_exact.category)
-                )
+                replies[1:0] = image_send_messages_s3(entity_exact.category)
 
-                line_bot_api.reply_message(event.reply_token, replies)
-
+            line_bot_api.reply_message(event.reply_token, replies)
             return
 
         #飲みいく判定（食べログカルーセルを表示）
