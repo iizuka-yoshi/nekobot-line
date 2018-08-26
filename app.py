@@ -536,11 +536,13 @@ class _Tabelog_Select:
         if value.name == '':
             return False
 
+        image_url = my_s3_link_url(value.image_key)
         stars_url = self._review_stars_url(value.score)
 
         bubble = BubbleContainer(
+            direction='ltr',
             hero=ImageComponent(
-                url=value.image_key,
+                url=image_url,
                 size='full',
                 aspect_ratio='20:13',
                 aspect_mode='cover',
