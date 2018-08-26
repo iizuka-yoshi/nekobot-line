@@ -288,13 +288,14 @@ class _Tabelog_Value:
         self.hours = ''
 
     def set_value_tp(self, value_tp):
-        self.name = value_tp[0]
-        self.image_key = value_tp[1]
-        self.url = value_tp[2]
-        self.score = value_tp[3]
-        self.station = value_tp[4]
-        self.genre = value_tp[5]
-        self.hours = value_tp[6]
+        if len(value_tp) >= 7:
+            self.name = value_tp[0]
+            self.image_key = value_tp[1]
+            self.url = value_tp[2]
+            self.score = value_tp[3]
+            self.station = value_tp[4]
+            self.genre = value_tp[5]
+            self.hours = value_tp[6]
         return self
 
     def get_value_tp(self):
@@ -469,7 +470,7 @@ class _Tabelog_Select:
     def select_tabelog_entity(self, entity_name):
         sql = 'SELECT name, image_key, url, score, station, genre, hours \
                     FROM public.tabelog \
-                    WHERER entity = %s;'
+                    WHERE entity = %s;'
 
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as curs:
