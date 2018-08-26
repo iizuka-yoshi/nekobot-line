@@ -282,7 +282,7 @@ class _Tabelog_Value:
         self.genre = ''
         self.hours = ''
 
-    def _set_value_tp(self, value_tp):
+    def set_value_tp(self, value_tp):
         self.name = value_tp[0]
         self.image_key = value_tp[1]
         self.url = value_tp[2]
@@ -292,8 +292,61 @@ class _Tabelog_Value:
         self.hours = value_tp[6]
         return self
 
-    def _get_value_tp(self):
-        return (self.name,self.image_key,self.url,self.score,self.station,self.genre,self.hours)
+    def get_value_tp(self):
+        return (self.name, self.image_key, self.url, self.score, self.station, self.genre, self.hours)
+        
+class _Tabelog_Scraping:
+
+    def __init__(self):
+        self.value = _Tabelog_Value()
+        self.url = ''
+
+    def _normalize_hours(self, hours):
+        hoursn = hours
+        hoursn = hoursn.replace('～', '-')
+        hoursn = hoursn.replace('・','･')
+        hoursn = neologdn.normalize(hoursn)
+        hoursn = hoursn[:100]
+        return hoursn
+    
+    def tabelog_scraping(self,url):
+        html = urllib.request.urlopen(url).read()
+        soup = BeautifulSoup(html, 'html.parser')
+
+        #name
+        name = soup.find(class_='display-name').span.string.strip()
+        name = name.strip()
+
+        #score
+        score = float(soup.find(class_='rdheader-rating__score-val-dtl').string)
+
+        #station
+        station = soup.find(class_='rdheader-subinfo__item rdheader-subinfo__item--station').find(class_='linktree__parent-target-text').string
+        station = station.strip()
+
+        #genre,hour
+        genre = ''
+        hours = ''
+        rstinfo_tables = soup.find_all('table', class_='c-table c-table--form rstinfo-table__table')
+        for rstinfo_table in rstinfo_tables:
+            rows = rstinfo_table.find_all('tr')
+            for row in rows:
+                if row.find('th').string == 'ジャンル':
+                    genre = row.find('span').string
+                elif row.find('th').string == '営業時間':
+                    lines = row.find_all('p')
+                    for line in lines:
+                        hours += line.text + ' '
+
+        genre = genre.strip()
+        hours = self._normalize_hours(hours)
+
+        #image_key
+        image_key = 'nekobot/tabelog/tabelog_default.jpg'
+
+        self.value = self.value.set_value_tp(name, image_key, url, score, station, genre, hours,)
+
+        return self
 
 
 class _Tabelog_Insert:
@@ -302,6 +355,7 @@ class _Tabelog_Insert:
 
     def __init__(self):
         self.value = _Tabelog_Value()
+        self.scraping = _Tabelog_Scraping()
         self.url = ''
 
     def set_target_url(self,target_url):
@@ -351,7 +405,7 @@ class _Tabelog_Insert:
 
     def insert_tabelog_link(self):
         
-        self.value._set_value_tp(self._tabelog_scraping())
+        self.value = (self.scraping.tabelog_scraping(self.url))
 
         sql = 'INSERT INTO public.tabelog(\
                 name, image_key, url, score, station, genre, hours) \
@@ -360,7 +414,7 @@ class _Tabelog_Insert:
         with psycopg2.connect(DB_URL) as conn:
             with conn.cursor() as curs:
 
-                curs.execute(sql, self.value._get_value_tp())
+                curs.execute(sql, self.value.get_value_tp())
                 conn.commit()
 
         print('[Event Log]'
@@ -377,52 +431,6 @@ class _Tabelog_Insert:
 
         return self
 
-    def _normalize_hours(self, hours):
-        hoursn = hours
-        hoursn = hoursn.replace('～', '-')
-        hoursn = hoursn.replace('・','･')
-        hoursn = neologdn.normalize(hoursn)
-        hoursn = hoursn[:100]
-        return hoursn
-    
-    def _tabelog_scraping(self):
-        url = self.url
-        html = urllib.request.urlopen(self.url).read()
-        soup = BeautifulSoup(html, 'html.parser')
-
-        #name
-        name = soup.find(class_='display-name').span.string.strip()
-        name = name.strip()
-
-        #score
-        score = float(soup.find(class_='rdheader-rating__score-val-dtl').string)
-
-        #station
-        station = soup.find(class_='rdheader-subinfo__item rdheader-subinfo__item--station').find(class_='linktree__parent-target-text').string
-        station = station.strip()
-
-        #genre,hour
-        genre = ''
-        hours = ''
-        rstinfo_tables = soup.find_all('table', class_='c-table c-table--form rstinfo-table__table')
-        for rstinfo_table in rstinfo_tables:
-            rows = rstinfo_table.find_all('tr')
-            for row in rows:
-                if row.find('th').string == 'ジャンル':
-                    genre = row.find('span').string
-                elif row.find('th').string == '営業時間':
-                    lines = row.find_all('p')
-                    for line in lines:
-                        hours += line.text + ' '
-
-        genre = genre.strip()
-        hours = self._normalize_hours(hours)
-
-        #image_key
-        image_key = 'nekobot/tabelog/tabelog_default.jpg'
-
-        return (name, image_key, url, score, station, genre, hours,)
-        
 
 class _Tabelog_Select:
     _LIMIT = 6
@@ -449,7 +457,7 @@ class _Tabelog_Select:
                     values = []
                     
         for value in values:
-            self.values.append(_Tabelog_Value()._set_value_tp(value))
+            self.values.append(_Tabelog_Value().set_value_tp(value))
 
         return self
 
@@ -481,12 +489,73 @@ class _Tabelog_Select:
         return columns
 
 
+class _Tabelog_Update:
+    _SLEEP_SECOND = 3
+
+    def __init__(self):
+        self.value = _Tabelog_Value()
+        self.scraping = _Tabelog_Scraping()
+
+    def _select_all_keys(self):
+        sql = 'SELECT id, url \
+	           FROM public.tabelog \
+               ORDER BY id ASC;'
+
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(sql)
+                if 0 < curs.rowcount:
+                    keys = curs.fetchall()
+                else:
+                    keys = []
+
+        return keys
+
+    def update_tabelog_link(self, id, value):
+        sql = 'UPDATE public.tabelog \
+	            SET name=%s, score=%s, station=%s, genre=%s, hours=%s \
+	            WHERE id = %s;'
+                
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(
+                    sql,
+                    (self.value.name, self.value.score, self.value.station, self.value.genre, self.value.hours, id)
+                )
+                conn.commit()
+
+        print('[Event Log]'
+            + ' update_tabelog_link'
+            + ' id=' + id
+            + ' values=('
+            + str(self.value.name) + ', '
+            + str(self.value.score) + ', '
+            + str(self.value.station) + ', '
+            + str(self.value.genre) + ', '
+            + str(self.value.hours) + ')'
+        )
+
+    def update_link_batch(self):
+        print('[Debug] _Tabelog_Update.update_link_batch start')
+
+        update_keys = self._select_all_keys()
+
+        for update_key in update_keys:
+            scraping = self.scraping.tabelog_scraping(update_key[1])
+            self.update_tabelog_link(update_key[0],scraping.value)
+            time.sleep(self._SLEEP_SECOND)
+
+        print('[Debug] _Tabelog_Update.update_link_batch end')
+        return
+
 class Tabelog:
 
     def __init__(self):
         self.insert = _Tabelog_Insert()
         self.select = _Tabelog_Select()
-
+        self.update = _Tabelog_Update()
 
 def my_normalize(text):
     text = neologdn.normalize(text)
@@ -1218,11 +1287,20 @@ def handle_text_message(event):
                         if setting.enable_access_management == 'True':
 
                             send_text = 'サムネイル更新しとく'
-
                             line_bot_api.reply_message(
                                 event.reply_token, TextMessage(text=send_text))
 
                             update_s3_thumb_bach('image')
+
+                    elif entity_partial.name == '@tebelog_link':
+                        if setting.enable_access_management == 'True':
+
+                            send_text = '食べログ更新しとく'
+                            line_bot_api.reply_message(
+                                event.reply_token, TextMessage(text=send_text))
+
+                            t_update = Tabelog().update
+                            t_update.update_link_batch()
 
                     return
 
