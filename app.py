@@ -154,7 +154,7 @@ class Entity:
         return self
 
     def _get_category(self):
-        
+
         sql = 'SELECT name \
                 FROM public.categories \
                 WHERE entity = %s \
@@ -175,6 +175,11 @@ class Entity:
             category = 'Unknown'
 
         return category
+
+    def set_name(self,name):
+        self.match = True
+        self.name = name
+        return self
 
 
 class Setting():
@@ -1105,23 +1110,23 @@ def restaurant_message_text():
 def get_line_id(event):
     try:
         if isinstance(event.source, SourceUser):
-            profile = line_bot_api.get_profile(event.source.user_id)
+            #profile = line_bot_api.get_profile(event.source.user_id)
 
             user_id = event.source.user_id
             group_id = ''
             room_id = ''
 
         elif isinstance(event.source, SourceGroup):
-            profile = line_bot_api.get_group_member_profile(
-                event.source.group_id, event.source.user_id)
+            #profile = line_bot_api.get_group_member_profile(
+            #    event.source.group_id, event.source.user_id)
 
             user_id = event.source.user_id
             group_id = event.source.group_id
             room_id = ''
 
         elif isinstance(event.source, SourceRoom):
-            profile = line_bot_api.get_room_member_profile(
-                event.source.room_id, event.source.user_id)
+            #profile = line_bot_api.get_room_member_profile(
+            #    event.source.room_id, event.source.user_id)
 
             user_id = event.source.user_id
             group_id = ''
@@ -1232,7 +1237,9 @@ def handle_text_message(event):
             flex = t_select.flex_send_message_entity(entity_exact)
 
             if flex:
-                replies = [TextSendMessage(text=random.choice(['おーけー', 'りょうかい'])),flex]
+                entity_event = Entity('').set_name('@event.tabelog.flex')
+                replies = text_send_messages_db(entity_event)
+                replies.append(flex)
                 line_bot_api.reply_message(event.reply_token, replies)
                 
                 return
@@ -1281,18 +1288,18 @@ def handle_text_message(event):
                 if entity_partial.name in {
                     '@kitada','@wakamatsu','@yoneda','@ozeki',
                 }:
-                    send_text = random.choice(['たしかに', '同意', 'そうね'])
+                    entity_event = Entity('').set_name('@event.isbad.positive')
+                    replies = text_send_messages_db(entity_event)
+                    line_bot_api.reply_message(event.reply_token, replies)
+                    return
                     
                 elif entity_partial.name in {
                     '@yoshi'
                 }:
-                    send_text = random.choice(['それはない'])
-
-                if send_text != '':
-                    line_bot_api.reply_message(
-                        event.reply_token, TextMessage(text=send_text))
-
-                return
+                    entity_event = Entity('').set_name('@event.isbad.negative')
+                    replies = text_send_messages_db(entity_event)
+                    line_bot_api.reply_message(event.reply_token, replies)
+                    return
 
         elif intent.name == '#change_setting':
             
@@ -1473,9 +1480,11 @@ def handle_text_message(event):
 
             t_select = Tabelog().select
             flex = t_select.flex_send_message_entity(entity_partial)
-
-            if flex != False:
-                replies = [TextSendMessage(text=random.choice(['おーけー', 'りょうかい'])),flex]
+            
+            if flex:
+                entity_event = Entity('').set_name('@event.tabelog.flex')
+                replies = text_send_messages_db(entity_event)
+                replies.append(flex)
                 line_bot_api.reply_message(event.reply_token, replies)
                 
                 return
@@ -1510,20 +1519,16 @@ def handle_text_message(event):
             t_insert.set_target_url(text)
 
             if t_insert.url_exists():
-
-                send_text = 'もう知ってる'
-                line_bot_api.reply_message(
-                    event.reply_token,TextSendMessage(text=send_text)
-                )
+                entity_event = Entity('').set_name('@event.exist.tabeloglink')
+                replies = text_send_messages_db(entity_event)
+                line_bot_api.reply_message(event.reply_token,replies)
 
                 return
 
             if t_insert.is_tabelog_domain():
-
-                send_text = '食べログのリンクもらった'
-                line_bot_api.reply_message(
-                    event.reply_token,TextSendMessage(text=send_text)
-                )
+                entity_event = Entity('').set_name('@event.get.tabeloglink')
+                replies = text_send_messages_db(entity_event)
+                line_bot_api.reply_message(event.reply_token,replies)
 
                 t_insert.insert_tabelog_link()
 
@@ -1549,11 +1554,10 @@ def handle_image_message(event):
 
     if setting.check_access_allow(user_id):
         if setting.current_upload_category.split('/')[0] == 'image':
-
-            send_text = '画像もらった'
-            line_bot_api.reply_message(
-                event.reply_token,TextSendMessage(text=send_text)
-            )
+            
+            entity_event = Entity('').set_name('@event.get.image')
+            replies = text_send_messages_db(entity_event)
+            line_bot_api.reply_message(event.reply_token,replies)
 
             message_content = line_bot_api.get_message_content(event.message.id)
 
@@ -1580,10 +1584,9 @@ def handle_image_message(event):
 
 @handler.add(JoinEvent)
 def handle_join(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text='ねこって言ってみ')
-    )
+    entity_event = Entity('').set_name('@event.join')
+    replies = text_send_messages_db(entity_event)
+    line_bot_api.reply_message(event.reply_token,replies)
 
 
 if __name__ == "__main__":
