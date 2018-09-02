@@ -61,7 +61,7 @@ handler = WebhookHandler(CHANNEL_SECRET)
 AP_URL = 'https://nekobot-line.herokuapp.com'
 DB_URL = os.getenv('DATABASE_URL', None)
 
-AWS_S3_BUCKET_NAME = 'nekobot'
+AWS_S3_BUCKET_NAME = os.getenv('AWS_S3_BUCKET_NAME', None)
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', None)
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', None)
 
