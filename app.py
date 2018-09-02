@@ -1103,28 +1103,10 @@ def restaurant_message_text():
 
 
 def get_line_id(event):
-    """
-    LINEに関するIDを取得する
-
-    Parameters
-    ----------
-    event : Event Object
-    LINEのイベントオブジェクト
-
-    Returns
-    -------
-    user_name : str
-    user_id : str
-    group_id : str
-    room_id : str
-
-    """
-
     try:
         if isinstance(event.source, SourceUser):
             profile = line_bot_api.get_profile(event.source.user_id)
 
-            user_name = profile.display_name
             user_id = event.source.user_id
             group_id = ''
             room_id = ''
@@ -1133,7 +1115,6 @@ def get_line_id(event):
             profile = line_bot_api.get_group_member_profile(
                 event.source.group_id, event.source.user_id)
 
-            user_name = profile.display_name
             user_id = event.source.user_id
             group_id = event.source.group_id
             room_id = ''
@@ -1142,18 +1123,16 @@ def get_line_id(event):
             profile = line_bot_api.get_room_member_profile(
                 event.source.room_id, event.source.user_id)
 
-            user_name = profile.display_name
             user_id = event.source.user_id
             group_id = ''
             room_id = event.source.room_id
 
     except:
-        user_name = 'Unknown'
         user_id = ''
         group_id = ''
         room_id = ''
 
-    return user_name, user_id, group_id, room_id
+    return user_id, group_id, room_id
 
 @app.route('/')
 def hello_world():
@@ -1193,10 +1172,9 @@ def handle_text_message(event):
     #古い判定
     message_pattern = get_message_pattern(textn)
 
-    user_name, user_id, group_id, room_id = get_line_id(event)
+    user_id, group_id, room_id = get_line_id(event)
     print('[Event Log]'
         + ' text_message'
-        + ' user_name=' + str(user_name)
         + ' user_id=' + str(user_id)
         + ' group_id=' + str(group_id)
         + ' room_id=' + str(room_id)
@@ -1560,10 +1538,9 @@ def handle_image_message(event):
 
     setting = Setting()
 
-    user_name, user_id, group_id, room_id = get_line_id(event)
+    user_id, group_id, room_id = get_line_id(event)
     print('[Event Log]'
         + ' image_message'
-        + ' user_name=' + str(user_name)
         + ' user_id=' + str(user_id)
         + ' group_id=' + str(group_id)
         + ' room_id=' + str(room_id)
