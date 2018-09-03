@@ -489,9 +489,26 @@ class _Tabelog_Select:
         return value
 
     def _tabelog_action_text(self):
-        text = random.choice(
-            ['猫', 'ねこ', 'ネコ', 'cat', 'neko', 'ひめ', 'ちゅーる']
-        )
+        sql = 'SELECT DISTINCT ON (reply_order) text, reply_order \
+                FROM public.replies \
+                WHERE entity = %s \
+                ORDER BY reply_order ASC, RANDOM();'
+        
+        with psycopg2.connect(DB_URL) as conn:
+            with conn.cursor() as curs:
+
+                curs.execute(sql, ('@event.tabelog.neko', ))
+                if 0 < curs.rowcount:
+                    reply_texts_tp = curs.fetchone()
+
+                    reply_texts = []
+                    for reply_text in reply_texts_tp:
+                        reply_texts.append(reply_text[0])
+
+                else:
+                    reply_texts = []
+        
+        text = reply_texts[0]
         return text
 
     def carousel_columns(self):
