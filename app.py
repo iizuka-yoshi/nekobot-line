@@ -499,17 +499,12 @@ class _Tabelog_Select:
 
                 curs.execute(sql, ('@event.tabelog.neko', ))
                 if 0 < curs.rowcount:
-                    reply_texts_tp = curs.fetchone()
-
-                    reply_texts = []
-                    for reply_text in reply_texts_tp:
-                        reply_texts.append(reply_text[0])
+                    reply_texts = curs.fetchone()
 
                 else:
-                    reply_texts = []
+                    reply_texts = ()
         
-        text = reply_texts[0]
-        return text
+        return reply_texts[0]
 
     def carousel_columns(self):
         columns = []
